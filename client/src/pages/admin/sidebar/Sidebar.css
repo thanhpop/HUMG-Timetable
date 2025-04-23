@@ -1,0 +1,48 @@
+.sidebar {
+    width: 200px;
+    height: 100vh;
+    background-color: rgb(12, 76, 163);
+    display: block;
+    color: #fff;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.sidebar h2 {
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    margin-top: 0rem;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li+li {
+    margin-top: 1rem;
+}
+
+.sidebar a {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.sidebar a:hover {
+    background-color: #4a5568;
+}
+
+
+.sidebar a.active {
+    background-color: #003d88;
+
+}

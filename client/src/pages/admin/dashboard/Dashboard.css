@@ -1,0 +1,13 @@
+.container {
+    display: flex;
+
+}
+
+
+/* Phần nội dung chính */
+.main-content {
+    margin-left: 200px;
+    padding: 20px;
+    width: 100%;
+    min-height: 100vh;
+}
