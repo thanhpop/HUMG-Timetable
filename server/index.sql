@@ -10,5 +10,7 @@ CREATE TABLE IF NOT EXISTS students (
   lop       VARCHAR(50)  NOT NULL,
   gender    ENUM('Nam','Nữ') NOT NULL,
   dob       DATE        NOT NULL,
-
+  sdt VARCHAR(20)  NULL,
+  COLUMN email VARCHAR(255) NULL, 
+  COLUMN cccd VARCHAR(20) NULL,
 );

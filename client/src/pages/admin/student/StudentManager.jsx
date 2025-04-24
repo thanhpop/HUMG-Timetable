@@ -59,7 +59,13 @@ export default function StudentManager() {
         {
             name: 'Hành động',
             cell: row => (
-                <div style={{ display: 'flex', }}>
+                <div style={{ display: 'flex', gap: 1 }}>
+                    <button
+                        onClick={() => navigate(`/admin/students/view/${row.id}`)}
+                        style={{ width: 45, padding: '6px', backgroundColor: '#17a2b8', color: 'white', border: 'none', borderRadius: 4 }}
+                    >
+                        Xem
+                    </button>
                     <button
                         onClick={() => navigate(`/admin/students/edit/${row.id}`)}
                         style={{ width: 40, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}
@@ -72,7 +78,7 @@ export default function StudentManager() {
                     >
                         Xóa
                     </button>
-                </div>
+                </div >
             ),
             ignoreRowClick: true,
 
@@ -84,20 +90,38 @@ export default function StudentManager() {
         table: {
             style: {
                 backgroundColor: '#f9f9f9',
+                fontSize: '18px',
+                width: '1010px',
             },
         },
         headRow: {
             style: {
                 backgroundColor: '#e0e0e0',
                 fontWeight: 'bold',
+                minHeight: '56px',
+            },
+        },
+        headCells: {
+            style: {
+                fontSize: '18px',
+                paddingLeft: '16px',
+                paddingRight: '16px',
             },
         },
         rows: {
             style: {
                 backgroundColor: '#fff',
+                minHeight: '48px',
+                fontSize: '16px',
                 '&:hover': {
                     backgroundColor: '#f1f1f1',
                 },
+            },
+        },
+        cells: {
+            style: {
+                paddingLeft: '16px',
+                paddingRight: '16px',
             },
         },
     };
@@ -121,7 +145,7 @@ export default function StudentManager() {
                     onClick={() => navigate('/admin/students/add')}
                     style={{
                         padding: '10px 16px',
-                        backgroundColor: '#28a745',
+                        backgroundColor: '#0c4ca3',
                         color: 'white',
                         border: 'none',
                         borderRadius: 4,

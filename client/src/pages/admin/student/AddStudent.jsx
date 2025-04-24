@@ -1,11 +1,24 @@
+// src/pages/admin/student/AddStudent.jsx
 import React, { useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { createStudent } from '../../../api/studentApi';
+import './style.css';
 
 export default function AddStudent() {
     const navigate = useNavigate();
     const { students, setStudents } = useOutletContext();
-    const [form, setForm] = useState({ msv: '', name: '', khoa: '', lop: '', gender: '', dob: '' });
+
+    const [form, setForm] = useState({
+        msv: '',
+        name: '',
+        khoa: '',
+        lop: '',
+        gender: '',
+        dob: '',
+        sdt: '',
+        email: '',
+        cccd: ''
+    });
 
     const handleInput = e => {
         const { name, value } = e.target;
@@ -22,18 +35,25 @@ export default function AddStudent() {
     return (
         <div style={{ padding: 20 }}>
             <h2>Thêm sinh viên</h2>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 300 }}>
+            <form onSubmit={handleSubmit} className="two-column-form"
+                style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '10px 20px',
+                    width: 640
+                }}>
+
                 <label htmlFor="msv">Mã sinh viên</label>
-                <input id="msv" name="msv" placeholder="Mã sinh viên" value={form.msv} onChange={handleInput} />
+                <input id="msv" name="msv" value={form.msv} onChange={handleInput} />
 
                 <label htmlFor="name">Họ và tên</label>
-                <input id="name" name="name" placeholder="Tên" value={form.name} onChange={handleInput} />
+                <input id="name" name="name" value={form.name} onChange={handleInput} />
 
                 <label htmlFor="khoa">Khoa</label>
-                <input id="khoa" name="khoa" placeholder="Khoa" value={form.khoa} onChange={handleInput} />
+                <input id="khoa" name="khoa" value={form.khoa} onChange={handleInput} />
 
                 <label htmlFor="lop">Lớp</label>
-                <input id="lop" name="lop" placeholder="Lớp" value={form.lop} onChange={handleInput} />
+                <input id="lop" name="lop" value={form.lop} onChange={handleInput} />
 
                 <label htmlFor="gender">Giới tính</label>
                 <select id="gender" name="gender" value={form.gender} onChange={handleInput}>
@@ -45,13 +65,22 @@ export default function AddStudent() {
                 <label htmlFor="dob">Ngày sinh</label>
                 <input id="dob" type="date" name="dob" value={form.dob} onChange={handleInput} />
 
-                <div>
+                <label htmlFor="sdt">Số điện thoại</label>
+                <input id="sdt" name="sdt" type="tel" value={form.sdt} onChange={handleInput} />
+
+                <label htmlFor="email">Email</label>
+                <input id="email" name="email" type="email" value={form.email} onChange={handleInput} />
+
+                <label htmlFor="cccd">CCCD</label>
+                <input id="cccd" name="cccd" type="text" value={form.cccd} onChange={handleInput} />
+
+                <div style={{ marginTop: 16 }}>
                     <button type="submit">Thêm</button>
                     <button type="button" onClick={() => navigate(-1)} style={{ marginLeft: 8 }}>
                         Hủy
                     </button>
                 </div>
             </form>
-        </div>
+        </div >
     );
 }

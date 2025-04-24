@@ -5,15 +5,25 @@ import { getStudent, updateStudent } from '../../../api/studentApi';
 
 export default function EditStudent() {
     const navigate = useNavigate();
-    const { id } = useParams();               // lấy id từ URL
+    const { id } = useParams();
     const { students, setStudents } = useOutletContext();
-    const [form, setForm] = useState(null);   // form khởi tạo sau khi tìm student
 
-    // khi mount, tìm student theo id và set lên form
+    const [form, setForm] = useState(null);
+
+    const formatDateForInput = isoString => {
+        const date = new Date(isoString);
+        const offset = date.getTimezoneOffset();
+        const localDate = new Date(date.getTime() - offset * 60000);
+        return localDate.toISOString().split('T')[0];
+    };
+
+    // load dữ liệu sinh viên
     useEffect(() => {
         (async () => {
             const res = await getStudent(id);
-            setForm(res.data);
+            const stu = res.data;
+            if (stu.dob) stu.dob = formatDateForInput(stu.dob);
+            setForm(stu);
         })();
     }, [id]);
 
@@ -28,20 +38,15 @@ export default function EditStudent() {
         setStudents(students.map(s => (s.id === res.data.id ? res.data : s)));
         navigate('/admin/students');
     };
-    const formatDateForInput = isoString => {
-        const date = new Date(isoString);
-        const offset = date.getTimezoneOffset();
-        const localDate = new Date(date.getTime() - offset * 60000);
-        return localDate.toISOString().split('T')[0];
-    };
 
-    if (!form) return <div>Loading…</div>; // hoặc một loading indicator
+    if (!form) return <div>Loading…</div>;
 
     return (
         <div style={{ padding: 20 }}>
             <h2>Chỉnh sửa sinh viên</h2>
             <form onSubmit={handleSubmit}
-                style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 300 }}>
+                style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 320 }}>
+
                 <label htmlFor="msv">Mã sinh viên</label>
                 <input id="msv" name="msv" value={form.msv} onChange={handleInput} />
 
@@ -62,9 +67,19 @@ export default function EditStudent() {
                 </select>
 
                 <label htmlFor="dob">Ngày sinh</label>
-                <input id="dob" type="date" name="dob" value={form.dob ? formatDateForInput(form.dob) : ''} onChange={handleInput} />
+                <input id="dob" type="date" name="dob"
+                    value={form.dob || ''} onChange={handleInput} />
 
-                <div>
+                <label htmlFor="sdt">Số điện thoại</label>
+                <input id="sdt" name="sdt" type="tel" value={form.sdt || ''} onChange={handleInput} />
+
+                <label htmlFor="email">Email</label>
+                <input id="email" name="email" type="email" value={form.email || ''} onChange={handleInput} />
+
+                <label htmlFor="cccd">CCCD</label>
+                <input id="cccd" name="cccd" type="text" value={form.cccd || ''} onChange={handleInput} />
+
+                <div style={{ marginTop: 16 }}>
                     <button type="submit">Lưu</button>
                     <button type="button" onClick={() => navigate(-1)} style={{ marginLeft: 8 }}>
                         Hủy

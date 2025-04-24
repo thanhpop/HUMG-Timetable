@@ -3,8 +3,10 @@
 
 }
 
+body {
+    background-color: #f2f0f0;
+}
 
-/* Phần nội dung chính */
 .main-content {
     margin-left: 200px;
     padding: 20px;
