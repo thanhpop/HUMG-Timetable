@@ -22,9 +22,9 @@ exports.getOne = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
     try {
-        const { msv, name, khoa, lop, gender, dob, sdt, email, cccd } = req.body;
+        const { msv, name, khoa, lop, gender, dob, sdt, email, cccd, diachi } = req.body;
         // bạn có thể thêm validate ở đây
-        const [result] = await Student.create({ msv, name, khoa, lop, gender, dob, sdt, email, cccd });
+        const [result] = await Student.create({ msv, name, khoa, lop, gender, dob, sdt, email, cccd, diachi });
         const [newRow] = await Student.findById(result.insertId);
         res.status(201).json(newRow[0]);
     } catch (err) {
@@ -34,8 +34,8 @@ exports.create = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
     try {
-        const { msv, name, khoa, lop, gender, dob, sdt, email, cccd } = req.body;
-        const [result] = await Student.update(req.params.id, { msv, name, khoa, lop, gender, dob, sdt, email, cccd });
+        const { msv, name, khoa, lop, gender, dob, sdt, email, cccd, diachi } = req.body;
+        const [result] = await Student.update(req.params.id, { msv, name, khoa, lop, gender, dob, sdt, email, cccd, diachi });
         if (result.affectedRows === 0) return res.status(404).json({ error: 'Not found' });
         const [rows] = await Student.findById(req.params.id);
         res.json(rows[0]);

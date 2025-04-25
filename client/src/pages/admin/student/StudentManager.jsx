@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { getStudents, deleteStudent as apiDelete } from '../../../api/studentApi';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import './style.css';
 export default function StudentManager() {
     const navigate = useNavigate();
     const { students, setStudents } = useOutletContext();
@@ -62,19 +64,19 @@ export default function StudentManager() {
                 <div style={{ display: 'flex', gap: 1 }}>
                     <button
                         onClick={() => navigate(`/admin/students/view/${row.id}`)}
-                        style={{ width: 45, padding: '6px', backgroundColor: '#17a2b8', color: 'white', border: 'none', borderRadius: 4 }}
+                        style={{ width: 50, padding: '6px', backgroundColor: '#17a2b8', color: 'white', border: 'none', borderRadius: 4 }}
                     >
                         Xem
                     </button>
                     <button
                         onClick={() => navigate(`/admin/students/edit/${row.id}`)}
-                        style={{ width: 40, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}
+                        style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}
                     >
                         Sửa
                     </button>
                     <button
                         onClick={() => handleDelete(row.id)}
-                        style={{ width: 40, padding: '6px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}
+                        style={{ width: 50, padding: '6px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}
                     >
                         Xóa
                     </button>
@@ -91,7 +93,8 @@ export default function StudentManager() {
             style: {
                 backgroundColor: '#f9f9f9',
                 fontSize: '18px',
-                width: '1010px',
+                width: '100%',
+                maxWidth: '100%',
             },
         },
         headRow: {
@@ -129,22 +132,23 @@ export default function StudentManager() {
     return (
         <div style={{ padding: 20 }}>
             <h1 style={{ textAlign: 'left', marginBottom: 16 }}>Quản lý sinh viên</h1>
+            <div className="search-container">
 
-            <div style={{ marginBottom: 16, textAlign: 'left' }}>
+                <FontAwesomeIcon icon={faSearch} className="search-icon" />
                 <input
                     type="text"
                     placeholder="Tìm kiếm MSV hoặc tên"
                     value={searchTerm}
                     onChange={handleSearch}
-                    style={{ padding: 6, width: 250 }}
+                    style={{ padding: 10, width: 280, fontSize: 16 }}
                 />
             </div>
 
-            <div style={{ marginBottom: 16, textAlign: 'right' }}>
+            <div style={{ marginBottom: 16, textAlign: 'right', }}>
                 <button
                     onClick={() => navigate('/admin/students/add')}
                     style={{
-                        padding: '10px 16px',
+                        padding: '15px 20px',
                         backgroundColor: '#0c4ca3',
                         color: 'white',
                         border: 'none',
@@ -157,16 +161,18 @@ export default function StudentManager() {
             </div>
 
             {/* DataTable */}
-            <DataTable
-                columns={columns}
-                data={filtered}
-                pagination
-                highlightOnHover
-                defaultSortField="msv"
-                customStyles={customStyles}
-                persistTableHead={true}
-                progressPending={loading}
-            />
+            <div className="table-responsive">
+                <DataTable
+                    columns={columns}
+                    data={filtered}
+                    pagination
+                    highlightOnHover
+                    defaultSortField="msv"
+                    customStyles={customStyles}
+                    persistTableHead={true}
+                    progressPending={loading}
+                />
+            </div>
         </div>
     );
 }

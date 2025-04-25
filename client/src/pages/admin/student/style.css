@@ -1,0 +1,181 @@
+/* style for student Manager */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+@media (max-width: 600px) {
+
+    .rdt_TableCell,
+    .rdt_TableHeadCell {
+        font-size: 14px !important;
+        padding: 8px !important;
+    }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+
+    .rdt_TableCell,
+    .rdt_TableHeadCell {
+        font-size: 16px !important;
+        padding: 12px !important;
+    }
+}
+
+@media (min-width: 1025px) {
+
+    .rdt_TableCell,
+    .rdt_TableHeadCell {
+        font-size: 18px !important;
+        padding: 16px !important;
+    }
+}
+
+/* style for searchbar */
+.search-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    /* khoảng cách giữa icon và input */
+    margin-bottom: 16px;
+}
+
+.search-icon-outside {
+    font-size: 20px;
+    color: #888;
+}
+
+.search-input-outside {
+    flex: 1;
+    /* input chiếm toàn bộ phần còn lại */
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.search-input-outside:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+/* style for addstudent */
+
+/* Khung chung quanh form */
+.form-card {
+    background-color: #fafafa;
+    border-radius: 8px;
+    padding: 24px;
+    max-width: 680px;
+    margin: 0 auto 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Tiêu đề form to hơn */
+.form-card h2 {
+    font-size: 24px;
+    margin-bottom: 16px;
+    color: #333;
+}
+
+/* Grid 2 cột giữ nguyên */
+.two-column-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 10px;
+}
+
+/* Label to hơn */
+.two-column-form label {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 4px;
+
+    color: #444;
+}
+
+/* Input/Select to hơn, có bo góc, nền trắng */
+.two-column-form input,
+.two-column-form select {
+    font-size: 16px;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Nút hành động */
+.form-actions {
+    grid-column: 1 / span 2;
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.form-actions button {
+    font-size: 16px;
+    padding: 10px 18px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+
+.form-actions button:first-of-type {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.form-actions button:last-of-type {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+/* view student */
+.view-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* card chính */
+.view-card {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 24px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* tiêu đề */
+.view-title {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 24px;
+    color: #333;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 8px;
+}
+
+/* nội dung */
+.view-content p {
+    margin: 8px 0;
+    font-size: 16px;
+    color: #444;
+}
+
+/* button quay lại */
+.btn-secondary {
+    margin-top: 20px;
+    padding: 10px 16px;
+    background-color: #6c757d;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}

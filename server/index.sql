@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS students (
   gender    ENUM('Nam','Nữ') NOT NULL,
   dob       DATE        NOT NULL,
   sdt VARCHAR(20)  NULL,
-  COLUMN email VARCHAR(255) NULL, 
-  COLUMN cccd VARCHAR(20) NULL,
+  email VARCHAR(255) NULL, 
+  cccd VARCHAR(20) NULL,
+  diachi VARCHAR(255) NULL,
 );

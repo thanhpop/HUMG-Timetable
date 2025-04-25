@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import { getStudent, updateStudent } from '../../../api/studentApi';
-
+import './style.css';
 export default function EditStudent() {
     const navigate = useNavigate();
     const { id } = useParams();
@@ -43,49 +43,55 @@ export default function EditStudent() {
 
     return (
         <div style={{ padding: 20 }}>
-            <h2>Chỉnh sửa sinh viên</h2>
-            <form onSubmit={handleSubmit}
-                style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 320 }}>
+            <div className="form-card">
+                <h2>Chỉnh sửa sinh viên</h2>
 
-                <label htmlFor="msv">Mã sinh viên</label>
-                <input id="msv" name="msv" value={form.msv} onChange={handleInput} />
+                <form onSubmit={handleSubmit}
+                    className="two-column-form">
 
-                <label htmlFor="name">Họ và tên</label>
-                <input id="name" name="name" value={form.name} onChange={handleInput} />
+                    <label htmlFor="msv">Mã sinh viên</label>
+                    <input id="msv" name="msv" type="number" pattern="\d*" value={form.msv} onChange={handleInput} />
 
-                <label htmlFor="khoa">Khoa</label>
-                <input id="khoa" name="khoa" value={form.khoa} onChange={handleInput} />
+                    <label htmlFor="name">Họ và tên</label>
+                    <input id="name" name="name" value={form.name} onChange={handleInput} />
 
-                <label htmlFor="lop">Lớp</label>
-                <input id="lop" name="lop" value={form.lop} onChange={handleInput} />
+                    <label htmlFor="khoa">Khoa</label>
+                    <input id="khoa" name="khoa" value={form.khoa} onChange={handleInput} />
 
-                <label htmlFor="gender">Giới tính</label>
-                <select id="gender" name="gender" value={form.gender} onChange={handleInput}>
-                    <option value="">Chọn giới tính</option>
-                    <option value="Nam">Nam</option>
-                    <option value="Nữ">Nữ</option>
-                </select>
+                    <label htmlFor="lop">Lớp</label>
+                    <input id="lop" name="lop" value={form.lop} onChange={handleInput} />
 
-                <label htmlFor="dob">Ngày sinh</label>
-                <input id="dob" type="date" name="dob"
-                    value={form.dob || ''} onChange={handleInput} />
+                    <label htmlFor="gender">Giới tính</label>
+                    <select id="gender" name="gender" value={form.gender} onChange={handleInput}>
+                        <option value="">Chọn giới tính</option>
+                        <option value="Nam">Nam</option>
+                        <option value="Nữ">Nữ</option>
+                    </select>
 
-                <label htmlFor="sdt">Số điện thoại</label>
-                <input id="sdt" name="sdt" type="tel" value={form.sdt || ''} onChange={handleInput} />
+                    <label htmlFor="dob">Ngày sinh</label>
+                    <input id="dob" type="date" name="dob"
+                        value={form.dob || ''} onChange={handleInput} />
 
-                <label htmlFor="email">Email</label>
-                <input id="email" name="email" type="email" value={form.email || ''} onChange={handleInput} />
+                    <label htmlFor="sdt">Số điện thoại</label>
+                    <input id="sdt" name="sdt" type="tel" pattern="\d*" inputMode="numeric" value={form.sdt || ''} onChange={handleInput} />
 
-                <label htmlFor="cccd">CCCD</label>
-                <input id="cccd" name="cccd" type="text" value={form.cccd || ''} onChange={handleInput} />
+                    <label htmlFor="email">Email</label>
+                    <input id="email" name="email" type="email" value={form.email || ''} onChange={handleInput} />
 
-                <div style={{ marginTop: 16 }}>
-                    <button type="submit">Lưu</button>
-                    <button type="button" onClick={() => navigate(-1)} style={{ marginLeft: 8 }}>
-                        Hủy
-                    </button>
-                </div>
-            </form>
+                    <label htmlFor="cccd">CCCD</label>
+                    <input id="cccd" name="cccd" type="number" pattern="\d*" value={form.cccd || ''} onChange={handleInput} />
+
+                    <label htmlFor="diachi">Địa chỉ</label>
+                    <input id="diachi" name="diachi" value={form.diachi || ''} onChange={handleInput} />
+
+                    <div className="form-actions">
+                        <button type="submit">Lưu</button>
+                        <button type="button" onClick={() => navigate(-1)} style={{ marginLeft: 8 }}>
+                            Hủy
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }
