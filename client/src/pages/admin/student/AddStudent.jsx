@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { createStudent } from '../../../api/studentApi';
-import './style.css';
+import '../style.css';
 
 export default function AddStudent() {
     const navigate = useNavigate();
@@ -58,6 +58,7 @@ export default function AddStudent() {
 
                     <label htmlFor="msv">Mã sinh viên*</label>
                     <input id="msv" name="msv" type="number" pattern="\d*" value={form.msv} onChange={handleInput} required />
+                    {error && <div className="error-message">{error}</div>}
 
 
                     <label htmlFor="ten">Họ và tên*</label>

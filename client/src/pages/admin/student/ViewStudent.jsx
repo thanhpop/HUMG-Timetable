@@ -2,18 +2,18 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getStudent } from '../../../api/studentApi';
-import './style.css';
+import '../style.css';
 export default function ViewStudent() {
-    const { id } = useParams();
+    const { msv } = useParams();
     const navigate = useNavigate();
     const [stu, setStu] = useState(null);
 
     useEffect(() => {
         (async () => {
-            const res = await getStudent(id);
+            const res = await getStudent(msv);
             setStu(res.data);
         })();
-    }, [id]);
+    }, [msv]);
 
     if (!stu) return <div>Loading…</div>;
 

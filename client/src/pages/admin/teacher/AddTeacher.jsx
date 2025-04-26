@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { createTeacher } from '../../../api/teacherApi';
-import '../student/style.css';
+import '../style.css';
 
 export default function AddTeacher() {
     const navigate = useNavigate();

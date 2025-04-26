@@ -2,10 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import { getStudent, updateStudent } from '../../../api/studentApi';
-import './style.css';
+import '../style.css';
 export default function EditStudent() {
     const navigate = useNavigate();
-    const { id } = useParams();
+    const { msv } = useParams();
     const { students, setStudents } = useOutletContext();
 
     const [form, setForm] = useState(null);
@@ -21,7 +21,7 @@ export default function EditStudent() {
     // load dữ liệu sinh viên
     useEffect(() => {
         (async () => {
-            const res = await getStudent(id);
+            const res = await getStudent(msv);
             const stu = res.data;
             if (stu.ngaysinh) {
                 // chuyển ISO → "YYYY-MM-DD"
@@ -29,7 +29,7 @@ export default function EditStudent() {
             }
             setForm(stu);
         })();
-    }, [id]);
+    }, [msv]);
 
     const handleInput = e => {
         const { name, value } = e.target;
@@ -40,7 +40,7 @@ export default function EditStudent() {
     const handleSubmit = async e => {
         e.preventDefault();
         const isDuplicate = students.some(
-            s => s.msv === form.msv && s.id.toString() !== id
+            s => s.msv === form.msv && s.msv.toString() !== msv
         );
 
         if (isDuplicate) {
@@ -48,8 +48,8 @@ export default function EditStudent() {
             return;
         }
 
-        const res = await updateStudent(id, form);
-        setStudents(students.map(s => (s.id === res.data.id ? res.data : s)));
+        const res = await updateStudent(msv, form);
+        setStudents(students.map(s => (s.msv === res.data.msv ? res.data : s)));
         navigate('/admin/students');
     };
 
@@ -64,7 +64,7 @@ export default function EditStudent() {
                     className="two-column-form">
 
                     <label htmlFor="msv">Mã sinh viên</label>
-                    <input id="msv" name="msv" type="number" pattern="\d*" value={form.msv} onChange={handleInput} />
+                    <input id="msv" name="msv" type="number" pattern="\d*" value={form.msv} onChange={handleInput} disabled />
                     {error && (
                         <div className="error-message">{error}</div>
                     )}

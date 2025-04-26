@@ -2,11 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import { getTeacher, updateTeacher } from '../../../api/teacherApi';
-import '../student/style.css';
+import '../style.css';
 
 export default function EditTeacher() {
     const navigate = useNavigate();
-    const { id } = useParams();
+    const { mgv } = useParams();              // ← dùng mgv
     const { teachers, setTeachers } = useOutletContext();
 
     const [form, setForm] = useState({
@@ -21,7 +21,7 @@ export default function EditTeacher() {
     // load dữ liệu lên form
     useEffect(() => {
         (async () => {
-            const res = await getTeacher(id);
+            const res = await getTeacher(mgv);    // ← lấy theo mgv
             const t = res.data;
             setForm({
                 mgv: t.mgv,
@@ -32,7 +32,7 @@ export default function EditTeacher() {
                 sdt: t.sdt || ''
             });
         })();
-    }, [id]);
+    }, [mgv]);
 
     const handleInput = e => {
         const { name, value } = e.target;
@@ -41,8 +41,8 @@ export default function EditTeacher() {
 
     const handleSubmit = async e => {
         e.preventDefault();
-        const res = await updateTeacher(id, form);
-        setTeachers(teachers.map(t => (t.id === res.data.id ? res.data : t)));
+        const res = await updateTeacher(mgv, form);   // ← cập nhật theo mgv
+        setTeachers(teachers.map(t => (t.mgv === res.data.mgv ? res.data : t)));  // ← so sánh mgv
         navigate('/admin/teachers');
     };
 
@@ -56,6 +56,7 @@ export default function EditTeacher() {
                         id="mgv" name="mgv" type="text"
                         value={form.mgv} onChange={handleInput}
                         required
+                        disabled
                     />
 
                     <label htmlFor="ten">Họ và tên*</label>
@@ -97,7 +98,7 @@ export default function EditTeacher() {
 
                     <div className="form-actions">
                         <button type="submit" className="btn btn-primary">Lưu</button>
-                        <button type="button" onClick={() => navigate(-1)} >
+                        <button type="button" onClick={() => navigate(-1)}>
                             Hủy
                         </button>
                     </div>

@@ -2,8 +2,7 @@
 CREATE DATABASE IF NOT EXISTS timetable;
 USE timetable;
 
-CREATE TABLE IF NOT EXISTS students (
-  id        INT         AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS sinhvien (
   msv       VARCHAR(50) NOT NULL,
   ten      VARCHAR(100) NOT NULL,
   khoa      VARCHAR(100) NOT NULL,
@@ -14,16 +13,25 @@ CREATE TABLE IF NOT EXISTS students (
   email VARCHAR(255) NULL, 
   cccd VARCHAR(20) NULL,
   diachi VARCHAR(255) NULL,
+  PRIMARY KEY (msv),
   UNIQUE KEY idx_msv (msv) 
 );
 
-CREATE TABLE IF NOT EXISTS teachers (
-  id           INT         NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  mgv    VARCHAR(50) NOT NULL,
-  ten         VARCHAR(100) NOT NULL,
-  khoa   VARCHAR(100) NOT NULL,
-  email        VARCHAR(150),
-  sdt        VARCHAR(20),
-  gioitinh ENUM('Nam','Nữ') NULL,
-  UNIQUE KEY idx_mgv (mgv)
-);
+CREATE TABLE IF NOT EXISTS giangvien (
+  mgv      VARCHAR(50)    NOT NULL,
+  ten      VARCHAR(100)   NOT NULL,
+  khoa     VARCHAR(100)   NOT NULL,
+  email    VARCHAR(150) NULL,
+  sdt      VARCHAR(20) NULL,
+  gioitinh ENUM('Nam','Nữ') NOT NULL, 
+  PRIMARY KEY (mgv),
+  UNIQUE KEY idx_mgv (mgv)     
+)
+CREATE TABLE IF NOT EXISTS monhoc (
+  mamh      VARCHAR(50)   NOT NULL,
+  tenmh     VARCHAR(150)  NOT NULL,
+  sotinchi  INT           NOT NULL,
+  khoa      VARCHAR(100)  NOT NULL,
+  PRIMARY KEY (mamh),
+  UNIQUE KEY idx_mamh (mamh)     
+)

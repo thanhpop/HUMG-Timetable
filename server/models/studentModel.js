@@ -2,22 +2,22 @@
 const db = require('../config/db');
 
 exports.findAll = () =>
-    db.query('SELECT * FROM students ORDER BY id DESC');
+    db.query('SELECT * FROM sinhvien ORDER BY msv DESC');
 
-exports.findById = id =>
-    db.query('SELECT * FROM students WHERE id = ?', [id]);
+exports.findById = msv =>
+    db.query('SELECT * FROM sinhvien WHERE msv = ?', [msv]);
 
 exports.create = ({ msv, ten, khoa, lop, gioitinh, ngaysinh, sdt, email, cccd, diachi }) =>
     db.query(
-        'INSERT INTO students (msv,ten,khoa,lop,gioitinh,ngaysinh,sdt,email,cccd,diachi) VALUES (?,?,?,?,?,?,?,?,?,?)',
+        'INSERT INTO sinhvien (msv,ten,khoa,lop,gioitinh,ngaysinh,sdt,email,cccd,diachi) VALUES (?,?,?,?,?,?,?,?,?,?)',
         [msv, ten, khoa, lop, gioitinh, ngaysinh, sdt, email, cccd, diachi]
     );
 
-exports.update = (id, { msv, ten, khoa, lop, gioitinh, ngaysinh, sdt, email, cccd, diachi }) =>
+exports.update = (msv, { ten, khoa, lop, gioitinh, ngaysinh, sdt, email, cccd, diachi }) =>
     db.query(
-        'UPDATE students SET msv=?,ten=?,khoa=?,lop=?,gioitinh=?,ngaysinh=?,sdt=?,email=?,cccd=?,diachi=? WHERE id=?',
-        [msv, ten, khoa, lop, gioitinh, ngaysinh, sdt, email, cccd, diachi, id]
+        'UPDATE sinhvien SET ten=?,khoa=?,lop=?,gioitinh=?,ngaysinh=?,sdt=?,email=?,cccd=?,diachi=? WHERE msv=?',
+        [ten, khoa, lop, gioitinh, ngaysinh, sdt, email, cccd, diachi, msv]
     );
 
-exports.remove = id =>
-    db.query('DELETE FROM students WHERE id = ?', [id]);
+exports.remove = msv =>
+    db.query('DELETE FROM sinhvien WHERE msv = ?', [msv]);

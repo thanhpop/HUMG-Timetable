@@ -12,7 +12,7 @@ exports.getAll = async (req, res, next) => {
 
 exports.getOne = async (req, res, next) => {
     try {
-        const [rows] = await Student.findById(req.params.id);
+        const [rows] = await Student.findById(req.params.msv);
         if (!rows.length) return res.status(404).json({ error: 'Not found' });
         res.json(rows[0]);
     } catch (err) {
@@ -35,9 +35,9 @@ exports.create = async (req, res, next) => {
 exports.update = async (req, res, next) => {
     try {
         const { msv, ten, khoa, lop, gioitinh, ngaysinh, sdt, email, cccd, diachi } = req.body;
-        const [result] = await Student.update(req.params.id, { msv, ten, khoa, lop, gioitinh, ngaysinh, sdt, email, cccd, diachi });
+        const [result] = await Student.update(req.params.msv, { msv, ten, khoa, lop, gioitinh, ngaysinh, sdt, email, cccd, diachi });
         if (result.affectedRows === 0) return res.status(404).json({ error: 'Not found' });
-        const [rows] = await Student.findById(req.params.id);
+        const [rows] = await Student.findById(req.params.msv);
         res.json(rows[0]);
     } catch (err) {
         next(err);
@@ -46,7 +46,7 @@ exports.update = async (req, res, next) => {
 
 exports.remove = async (req, res, next) => {
     try {
-        const [result] = await Student.remove(req.params.id);
+        const [result] = await Student.remove(req.params.msv);
         if (result.affectedRows === 0) return res.status(404).json({ error: 'Not found' });
         res.json({ message: 'Deleted' });
     } catch (err) {

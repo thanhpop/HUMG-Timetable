@@ -5,7 +5,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { getTeachers, deleteTeacher as apiDelete } from '../../../api/teacherApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import '../student/style.css';
+import '../style.css';
 
 export default function TeacherManager() {
     const navigate = useNavigate();
@@ -18,8 +18,6 @@ export default function TeacherManager() {
         try {
             const res = await getTeachers();
             setTeachers(res.data);
-        } catch (err) {
-            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -29,14 +27,14 @@ export default function TeacherManager() {
         fetchTeachers();
     }, []);
 
-    const handleDelete = async id => {
+    const handleDelete = async mgv => {
         if (window.confirm('Bạn có chắc muốn xóa giáo viên này?')) {
-            await apiDelete(id);
+            await apiDelete(mgv);
             fetchTeachers();
         }
     };
 
-    const filtered = teachers.filter(
+    const filtered = (teachers || []).filter(
         t =>
             t.mgv.toString().includes(searchTerm) ||
             t.ten.toLowerCase().includes(searchTerm.toLowerCase())
@@ -54,19 +52,19 @@ export default function TeacherManager() {
             cell: row => (
                 <div style={{ display: 'flex', gap: 4 }}>
                     <button
-                        onClick={() => navigate(`/admin/teachers/view/${row.id}`)}
+                        onClick={() => navigate(`/admin/teachers/view/${row.mgv}`)}
                         style={{ width: 50, padding: '6px', backgroundColor: '#17a2b8', color: 'white', border: 'none', borderRadius: 4 }}
                     >
                         Xem
                     </button>
                     <button
-                        onClick={() => navigate(`/admin/teachers/edit/${row.id}`)}
+                        onClick={() => navigate(`/admin/teachers/edit/${row.mgv}`)}
                         style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}
                     >
                         Sửa
                     </button>
                     <button
-                        onClick={() => handleDelete(row.id)}
+                        onClick={() => handleDelete(row.mgv)}
                         style={{ width: 50, padding: '6px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}
                     >
                         Xóa
@@ -78,51 +76,18 @@ export default function TeacherManager() {
     ];
 
     const customStyles = {
-        table: {
-            style: {
-                backgroundColor: '#f9f9f9',
-                fontSize: '18px',
-                width: '100%',
-                maxWidth: '100%',
-            },
-        },
-        headRow: {
-            style: {
-                backgroundColor: '#e0e0e0',
-                fontWeight: 'bold',
-                minHeight: '56px',
-            },
-        },
-        headCells: {
-            style: {
-                fontSize: '18px',
-                paddingLeft: '16px',
-                paddingRight: '16px',
-            },
-        },
-        rows: {
-            style: {
-                backgroundColor: '#fff',
-                minHeight: '48px',
-                fontSize: '16px',
-                '&:hover': {
-                    backgroundColor: '#f1f1f1',
-                },
-            },
-        },
-        cells: {
-            style: {
-                paddingLeft: '16px',
-                paddingRight: '16px',
-            },
-        },
+        table: { style: { backgroundColor: '#f9f9f9' } },
+        headRow: { style: { backgroundColor: '#e0e0e0', fontWeight: 'bold' } },
+        headCells: { style: { fontSize: '16px', paddingLeft: '16px', paddingRight: '16px' } },
+        rows: { style: { backgroundColor: '#fff', '&:hover': { backgroundColor: '#f1f1f1' } } },
+        cells: { style: { paddingLeft: '16px', paddingRight: '16px' } },
     };
 
     return (
         <div style={{ padding: 20 }}>
             <h1 style={{ textAlign: 'left', marginBottom: 16 }}>Quản lý giáo viên</h1>
 
-            <div className="search-container">
+            <div className="search-container" style={{ marginBottom: 16 }}>
                 <FontAwesomeIcon icon={faSearch} className="search-icon" />
                 <input
                     type="text"
@@ -158,8 +123,9 @@ export default function TeacherManager() {
                     highlightOnHover
                     defaultSortField="mgv"
                     customStyles={customStyles}
-                    persistTableHead
+                    persistTableHead={true}
                     progressPending={loading}
+
                 />
             </div>
         </div>

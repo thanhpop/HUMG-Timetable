@@ -1,22 +1,27 @@
+// src/models/giangvienModel.js
 const db = require('../config/db');
 
 exports.findAll = () =>
-    db.query('SELECT * FROM teachers ORDER BY id DESC');
+    // sắp xếp theo mgv thay vì id
+    db.query('SELECT * FROM giangvien ORDER BY mgv DESC');
 
-exports.findById = id =>
-    db.query('SELECT * FROM teachers WHERE id = ?', [id]);
+exports.findById = mgv =>
+    // tìm theo mgv (khóa chính)
+    db.query('SELECT * FROM giangvien WHERE mgv = ?', [mgv]);
 
 exports.create = ({ mgv, ten, khoa, email, sdt, gioitinh }) =>
     db.query(
-        'INSERT INTO teachers (mgv, ten, khoa, email, sdt, gioitinh) VALUES (?,?,?,?,?,?)',
+        'INSERT INTO giangvien (mgv, ten, khoa, email, sdt, gioitinh) VALUES (?,?,?,?,?,?)',
         [mgv, ten, khoa, email, sdt, gioitinh]
     );
 
-exports.update = (id, { mgv, ten, khoa, email, sdt, gioitinh }) =>
+exports.update = (mgv, { ten, khoa, email, sdt, gioitinh }) =>
     db.query(
-        'UPDATE teachers SET mgv=?, ten=?, khoa=?, email=?, sdt=?, gioitinh=? WHERE id=?',
-        [mgv, ten, khoa, email, sdt, gioitinh, id]
+        // cập nhật theo mgv
+        'UPDATE giangvien SET ten = ?, khoa = ?, email = ?, sdt = ?, gioitinh = ? WHERE mgv = ?',
+        [ten, khoa, email, sdt, gioitinh, mgv]
     );
 
-exports.remove = id =>
-    db.query('DELETE FROM teachers WHERE id = ?', [id]);
+exports.remove = mgv =>
+    // xóa theo mgv
+    db.query('DELETE FROM giangvien WHERE mgv = ?', [mgv]);

@@ -4,7 +4,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { getStudents, deleteStudent as apiDelete } from '../../../api/studentApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import './style.css';
+import '../style.css';
 export default function StudentManager() {
     const navigate = useNavigate();
     const { students, setStudents } = useOutletContext();
@@ -30,26 +30,22 @@ export default function StudentManager() {
 
 
     // Xóa sinh viên
-    const handleDelete = async id => {
+    const handleDelete = async msv => {
         if (window.confirm('Bạn có chắc muốn xóa sinh viên này?')) {
-            await apiDelete(id);
+            await apiDelete(msv);
             fetchStudents();
         }
     };
-    const filtered = students.filter(
-        s =>
-            s.msv.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            s.ten.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filtered = (students || []).filter(s => {
+        const msv = s.msv ?? '';
+        const ten = s.ten ?? '';
+        const term = searchTerm.toLowerCase();
+        return msv.includes(term) || ten.toLowerCase().includes(term);
+    });
 
     // Tìm kiếm sinh viên theo tên hoặc MSV
     const handleSearch = e => setSearchTerm(e.target.value);
 
-    const filteredStudents = students.filter(
-        s =>
-            s.msv.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            s.ten.toLowerCase().includes(searchTerm.toLowerCase())
-    );
 
     const columns = [
         { name: 'MSV', selector: row => row.msv, sortable: true },
@@ -63,19 +59,19 @@ export default function StudentManager() {
             cell: row => (
                 <div style={{ display: 'flex', gap: 4 }}>
                     <button
-                        onClick={() => navigate(`/admin/students/view/${row.id}`)}
+                        onClick={() => navigate(`/admin/students/view/${row.msv}`)}
                         style={{ width: 50, padding: '6px', backgroundColor: '#17a2b8', color: 'white', border: 'none', borderRadius: 4 }}
                     >
                         Xem
                     </button>
                     <button
-                        onClick={() => navigate(`/admin/students/edit/${row.id}`)}
+                        onClick={() => navigate(`/admin/students/edit/${row.msv}`)}
                         style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}
                     >
                         Sửa
                     </button>
                     <button
-                        onClick={() => handleDelete(row.id)}
+                        onClick={() => handleDelete(row.msv)}
                         style={{ width: 50, padding: '6px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}
                     >
                         Xóa

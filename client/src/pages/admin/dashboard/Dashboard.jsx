@@ -7,6 +7,7 @@ import './Dashboard.css';
 export default function Dashboard() {
     const [students, setStudents] = useState([]);
     const [teachers, setTeachers] = useState([]);
+    const [courses, setCourses] = useState([]);
     return (
         <div className="container">
 
@@ -14,7 +15,7 @@ export default function Dashboard() {
 
             <div className="main-content">
 
-                <Outlet context={{ students, setStudents, teachers, setTeachers }} />
+                <Outlet context={{ students, setStudents, teachers, setTeachers, courses, setCourses }} />
             </div>
 
         </div>
