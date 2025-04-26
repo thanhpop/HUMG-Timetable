@@ -14,7 +14,7 @@ export default function Sidebar() {
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to="/admin/lecturers" className={({ isActive }) => isActive ? 'active' : ''}>
+                    <NavLink to="/admin/teachers" className={({ isActive }) => isActive ? 'active' : ''}>
                         Quản lý giảng viên
                     </NavLink>
                 </li>

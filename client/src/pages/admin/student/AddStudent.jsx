@@ -10,28 +10,44 @@ export default function AddStudent() {
 
     const [form, setForm] = useState({
         msv: '',
-        name: '',
+        ten: '',
         khoa: '',
         lop: '',
-        gender: '',
-        dob: '',
+        gioitinh: '',
+        ngaysinh: '',
         sdt: '',
         email: '',
         cccd: '',
         diachi: '',
     });
+    const [error, setError] = useState('');
 
     const handleInput = e => {
         const { name, value } = e.target;
         setForm(prev => ({ ...prev, [name]: value }));
+        if (name === 'msv') setError('');
     };
 
     const handleSubmit = async e => {
         e.preventDefault();
-        const res = await createStudent(form);
-        setStudents([res.data, ...students]);
-        navigate('/admin/students');
+        if (students.some(s => s.msv === form.msv)) {
+            setError(`Mã sinh viên "${form.msv}" đã tồn tại!`);
+            return;
+        }
+
+        // nếu không trùng, gọi API thêm
+        try {
+            const res = await createStudent(form);
+            setStudents([res.data, ...students]);
+            navigate('/admin/students');
+        } catch (err) {
+            console.error(err);
+            setError('Có lỗi khi thêm sinh viên. Vui lòng thử lại.');
+        }
     };
+
+
+
 
     return (
         <div style={{ padding: 20 }}>
@@ -40,27 +56,28 @@ export default function AddStudent() {
                 <form onSubmit={handleSubmit} className="two-column-form"
                 >
 
-                    <label htmlFor="msv">Mã sinh viên</label>
+                    <label htmlFor="msv">Mã sinh viên*</label>
                     <input id="msv" name="msv" type="number" pattern="\d*" value={form.msv} onChange={handleInput} required />
 
-                    <label htmlFor="name">Họ và tên</label>
-                    <input id="name" name="name" value={form.name} onChange={handleInput} required />
 
-                    <label htmlFor="khoa">Khoa</label>
+                    <label htmlFor="ten">Họ và tên*</label>
+                    <input id="ten" name="ten" value={form.ten} onChange={handleInput} required />
+
+                    <label htmlFor="khoa">Khoa*</label>
                     <input id="khoa" name="khoa" value={form.khoa} onChange={handleInput} required />
 
-                    <label htmlFor="lop">Lớp</label>
+                    <label htmlFor="lop">Lớp*</label>
                     <input id="lop" name="lop" value={form.lop} onChange={handleInput} required />
 
-                    <label htmlFor="gender">Giới tính</label>
-                    <select id="gender" name="gender" value={form.gender} onChange={handleInput} required>
+                    <label htmlFor="gioitinh">Giới tính*</label>
+                    <select id="gioitinh" name="gioitinh" value={form.gioitinh} onChange={handleInput} required>
                         <option value="">Chọn giới tính</option>
                         <option value="Nam">Nam</option>
                         <option value="Nữ">Nữ</option>
                     </select>
 
-                    <label htmlFor="dob">Ngày sinh</label>
-                    <input id="dob" type="date" name="dob" value={form.dob} onChange={handleInput} required />
+                    <label htmlFor="ngaysinh">Ngày sinh*</label>
+                    <input id="ngaysinh" type="date" name="ngaysinh" value={form.ngaysinh} onChange={handleInput} required />
 
                     <label htmlFor="sdt">Số điện thoại</label>
                     <input id="sdt" name="sdt" type="tel" inputMode="numeric" pattern="\d*" value={form.sdt} onChange={handleInput} />

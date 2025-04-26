@@ -179,3 +179,15 @@
 .btn-secondary:hover {
     background-color: #5a6268;
 }
+
+/* style thông báo lỗi */
+.error-message {
+    grid-column: 2;
+    justify-self: end;
+    /* xuống cả 2 cột */
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: -8px;
+    margin-bottom: 8px;
+    text-align: right;
+}

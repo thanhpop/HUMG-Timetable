@@ -1,21 +1,23 @@
+// src/pages/admin/teacher/TeacherManager.jsx
 import React, { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import { getStudents, deleteStudent as apiDelete } from '../../../api/studentApi';
+import { getTeachers, deleteTeacher as apiDelete } from '../../../api/teacherApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import './style.css';
-export default function StudentManager() {
+import '../student/style.css';
+
+export default function TeacherManager() {
     const navigate = useNavigate();
-    const { students, setStudents } = useOutletContext();
+    const { teachers, setTeachers } = useOutletContext();
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
-    const fetchStudents = async () => {
+    const fetchTeachers = async () => {
         setLoading(true);
         try {
-            const res = await getStudents();
-            setStudents(res.data);
+            const res = await getTeachers();
+            setTeachers(res.data);
         } catch (err) {
             console.error(err);
         } finally {
@@ -24,52 +26,41 @@ export default function StudentManager() {
     };
 
     useEffect(() => {
-        fetchStudents();
+        fetchTeachers();
     }, []);
 
-
-
-    // Xóa sinh viên
     const handleDelete = async id => {
-        if (window.confirm('Bạn có chắc muốn xóa sinh viên này?')) {
+        if (window.confirm('Bạn có chắc muốn xóa giáo viên này?')) {
             await apiDelete(id);
-            fetchStudents();
+            fetchTeachers();
         }
     };
-    const filtered = students.filter(
-        s =>
-            s.msv.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            s.ten.toLowerCase().includes(searchTerm.toLowerCase())
-    );
 
-    // Tìm kiếm sinh viên theo tên hoặc MSV
-    const handleSearch = e => setSearchTerm(e.target.value);
-
-    const filteredStudents = students.filter(
-        s =>
-            s.msv.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            s.ten.toLowerCase().includes(searchTerm.toLowerCase())
+    const filtered = teachers.filter(
+        t =>
+            t.mgv.toString().includes(searchTerm) ||
+            t.ten.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const columns = [
-        { name: 'MSV', selector: row => row.msv, sortable: true },
-        { name: 'Tên', selector: row => row.ten, sortable: true },
-        { name: 'Khoa', selector: row => row.khoa, sortable: true },
-        { name: 'Lớp', selector: row => row.lop, sortable: true },
+        { name: 'Mã GV', selector: row => row.mgv, sortable: true },
+        { name: 'Họ và tên', selector: row => row.ten, sortable: true },
+        { name: 'Bộ môn', selector: row => row.khoa, sortable: true },
         { name: 'Giới tính', selector: row => row.gioitinh },
-        { name: 'Ngày sinh', selector: row => new Date(row.ngaysinh).toLocaleDateString('vi-VN'), },
+        { name: 'Email', selector: row => row.email },
+        { name: 'Số ĐT', selector: row => row.sdt },
         {
             name: 'Hành động',
             cell: row => (
                 <div style={{ display: 'flex', gap: 4 }}>
                     <button
-                        onClick={() => navigate(`/admin/students/view/${row.id}`)}
+                        onClick={() => navigate(`/admin/teachers/view/${row.id}`)}
                         style={{ width: 50, padding: '6px', backgroundColor: '#17a2b8', color: 'white', border: 'none', borderRadius: 4 }}
                     >
                         Xem
                     </button>
                     <button
-                        onClick={() => navigate(`/admin/students/edit/${row.id}`)}
+                        onClick={() => navigate(`/admin/teachers/edit/${row.id}`)}
                         style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}
                     >
                         Sửa
@@ -80,11 +71,9 @@ export default function StudentManager() {
                     >
                         Xóa
                     </button>
-                </div >
+                </div>
             ),
             ignoreRowClick: true,
-
-
         },
     ];
 
@@ -131,22 +120,23 @@ export default function StudentManager() {
 
     return (
         <div style={{ padding: 20 }}>
-            <h1 style={{ textAlign: 'left', marginBottom: 16 }}>Quản lý sinh viên</h1>
-            <div className="search-container">
+            <h1 style={{ textAlign: 'left', marginBottom: 16 }}>Quản lý giáo viên</h1>
 
+            <div className="search-container">
                 <FontAwesomeIcon icon={faSearch} className="search-icon" />
                 <input
                     type="text"
-                    placeholder="Tìm kiếm MSV hoặc tên"
+                    placeholder="Tìm kiếm Mã GV hoặc tên"
                     value={searchTerm}
-                    onChange={handleSearch}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    className="search-input"
                     style={{ padding: 10, width: 280, fontSize: 16 }}
                 />
             </div>
 
-            <div style={{ marginBottom: 16, textAlign: 'right', }}>
+            <div style={{ marginBottom: 16, textAlign: 'right' }}>
                 <button
-                    onClick={() => navigate('/admin/students/add')}
+                    onClick={() => navigate('/admin/teachers/add')}
                     style={{
                         padding: '15px 20px',
                         backgroundColor: '#0c4ca3',
@@ -156,20 +146,19 @@ export default function StudentManager() {
                         fontWeight: 'bold',
                     }}
                 >
-                    Thêm sinh viên
+                    Thêm giáo viên
                 </button>
             </div>
 
-            {/* DataTable */}
             <div className="table-responsive">
                 <DataTable
                     columns={columns}
                     data={filtered}
                     pagination
                     highlightOnHover
-                    defaultSortField="msv"
+                    defaultSortField="mgv"
                     customStyles={customStyles}
-                    persistTableHead={true}
+                    persistTableHead
                     progressPending={loading}
                 />
             </div>
