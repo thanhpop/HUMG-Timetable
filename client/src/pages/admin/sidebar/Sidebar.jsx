@@ -23,6 +23,16 @@ export default function Sidebar() {
                         Quản lý môn học
                     </NavLink>
                 </li>
+                <li>
+                    <NavLink to="/admin/rooms" className={({ isActive }) => isActive ? 'active' : ''}>
+                        Quản lý phòng học
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink to="/admin/semesters" className={({ isActive }) => isActive ? 'active' : ''}>
+                        Quản lý học kỳ
+                    </NavLink>
+                </li>
             </ul>
         </div>
     );

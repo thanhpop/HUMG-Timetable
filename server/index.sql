@@ -35,3 +35,21 @@ CREATE TABLE IF NOT EXISTS monhoc (
   PRIMARY KEY (mamh),
   UNIQUE KEY idx_mamh (mamh)     
 )
+
+
+CREATE TABLE IF NOT EXISTS phonghoc (
+  maphong   INT AUTO_INCREMENT PRIMARY KEY,
+  tenphong  VARCHAR(100) NOT NULL,
+  khu       VARCHAR(100) NOT NULL,
+  soluong   INT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS hocky (
+  mahk      VARCHAR(50)   NOT NULL,
+  tenhk     VARCHAR(100)  NOT NULL,
+  namhoc    VARCHAR(15)   NOT NULL,
+  ngaybd    DATE          NOT NULL,
+  ngaykt    DATE          NOT NULL,
+  PRIMARY KEY (mahk),
+  UNIQUE KEY uq_mahk (mahk)
+)

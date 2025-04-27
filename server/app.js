@@ -4,6 +4,9 @@ const cors = require('cors');
 const studentRoutes = require('./routes/students');
 const teacherRoutes = require('./routes/teachers');
 const courseRoutes = require('./routes/courses');
+const roomRoutes = require('./routes/rooms');
+const semesterRoutes = require('./routes/semesters');
+
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -14,6 +17,9 @@ app.use(express.json());
 app.use('/students', studentRoutes);
 app.use('/teachers', teacherRoutes);
 app.use('/courses', courseRoutes);
+app.use('/rooms', roomRoutes);
+app.use('/semesters', semesterRoutes);
+
 
 
 app.use((req, res) => {

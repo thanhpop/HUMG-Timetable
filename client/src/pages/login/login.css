@@ -1,0 +1,149 @@
+/* login.css */
+
+
+body.login-bg {
+  margin: 0;
+  padding: 0;
+
+  font-family: 'Poppins', Arial, sans-serif;
+  background: linear-gradient(135deg, #003973 0%, #E5E5BE 100%);
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+
+}
+
+body.login-bg::before {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: radial-gradient(circle at center, rgba(0, 0, 255, 0.2) 0%, transparent 70%);
+  animation: wave 8s infinite linear;
+  opacity: 0.4;
+}
+
+.login-container {
+  background: rgba(255, 255, 255, 0.9);
+  width: 280px;
+  padding: 2rem 1.5rem;
+  margin: 100px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes wave {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(180deg) scale(1.05);
+  }
+
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+/* Typography and layout for inner elements */
+.login-container,
+.login-container * {
+  font-family: 'Poppins', Arial, sans-serif;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  z-index: 1;
+}
+
+.logo {
+  width: 50px;
+  margin-right: 12px;
+  z-index: 1;
+}
+
+.header h2 {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #003f88;
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0;
+  z-index: 1;
+}
+
+.input-group {
+  margin-bottom: 16px;
+  position: relative;
+
+  z-index: 1;
+}
+
+.input-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #003f88;
+  font-size: 14px;
+}
+
+.input-group input {
+  color: #003f88;
+  width: 80%;
+  padding: 8px 12px;
+  padding-right: 40px;
+  border: 1px solid #003f88;
+  border-radius: 10px;
+  font-size: 13px;
+  background-color: #f0f8ff;
+  transition: 0.3s;
+  display: block;
+  margin: 0 auto;
+  z-index: 1;
+}
+
+.input-group input:focus {
+  border-color: #66a6ff;
+  background-color: #e6f0ff;
+  outline: none;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #003f88;
+  font-size: 18px;
+  z-index: 1;
+}
+
+.login-container button {
+  display: block;
+  margin: 15px auto 0;
+  padding: 8px 20px;
+  background-color: #66a6ff;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  min-width: 120px;
+  text-align: center;
+  z-index: 1;
+}
+
+button:hover {
+  background-color: #003f88;
+}
