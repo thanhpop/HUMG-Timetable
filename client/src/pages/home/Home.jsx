@@ -1,5 +1,5 @@
 import React from 'react';
-
+import Sidebar from '../student/sidebar/sidebar.jsx';
 export default function Home() {
-    return <h1 >trang chính</h1>;
+    return <Sidebar />;
 }

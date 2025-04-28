@@ -11,8 +11,7 @@ exports.getAll = async (req, res, next) => {
 
 exports.getOne = async (req, res, next) => {
     try {
-        const maphong = req.params.maphong;
-        const [rows] = await Room.findById(maphong);
+        const [rows] = await Room.findById(req.params.maphong);
         if (!rows.length) return res.status(404).json({ error: 'Not found' });
         res.json(rows[0]);
     } catch (err) {
@@ -22,25 +21,27 @@ exports.getOne = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
     try {
-        const { tenphong, khu, soluong } = req.body;
-        if (!tenphong || !khu || soluong == null) {
-            return res.status(400).json({ error: 'Missing required fields' });
+        const { maphong, tenphong, khu, soluong } = req.body;
+        if (!maphong || !tenphong || !khu || soluong == null) {
+            return res.status(400).json({ error: 'Missing fields' });
         }
-        const [result] = await Room.create({ tenphong, khu, soluong });
-        const [[newRoom]] = await Room.findById(result.insertId);
-        res.status(201).json(newRoom);
+        const [result] = await Room.create({ maphong, tenphong, khu, soluong });
+        const [[newRow]] = await Room.findById(maphong);
+        res.status(201).json(newRow);
     } catch (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(400).json({ error: 'Mã phòng đã tồn tại' });
+        }
         next(err);
     }
 };
 
 exports.update = async (req, res, next) => {
     try {
-        const maphong = req.params.maphong;
         const { tenphong, khu, soluong } = req.body;
-        const [result] = await Room.update(maphong, { tenphong, khu, soluong });
+        const [result] = await Room.update(req.params.maphong, { tenphong, khu, soluong });
         if (result.affectedRows === 0) return res.status(404).json({ error: 'Not found' });
-        const [[updated]] = await Room.findById(maphong);
+        const [[updated]] = await Room.findById(req.params.maphong);
         res.json(updated);
     } catch (err) {
         next(err);
@@ -49,8 +50,7 @@ exports.update = async (req, res, next) => {
 
 exports.remove = async (req, res, next) => {
     try {
-        const maphong = req.params.maphong;
-        const [result] = await Room.remove(maphong);
+        const [result] = await Room.remove(req.params.maphong);
         if (result.affectedRows === 0) return res.status(404).json({ error: 'Not found' });
         res.json({ message: 'Deleted' });
     } catch (err) {

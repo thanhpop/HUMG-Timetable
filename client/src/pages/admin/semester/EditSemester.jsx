@@ -16,7 +16,7 @@ export default function EditSemester() {
         ngaybd: '',
         ngaykt: ''
     });
-
+    const [error, setError] = useState('');
 
     // load lên form
     useEffect(() => {
@@ -46,7 +46,10 @@ export default function EditSemester() {
 
     const onSubmit = async e => {
         e.preventDefault();
-
+        if (form.ngaykt <= form.ngaybd) {
+            setError('Ngày kết thúc phải sau ngày bắt đầu');
+            return;
+        }
         const res = await updateSemester(mahk, form);
         setSemesters(semesters.map(s => s.mahk === mahk ? res.data : s));
         nav('/admin/semesters');
@@ -112,7 +115,9 @@ export default function EditSemester() {
                     value={form.ngaykt}
                     onChange={onInput}
                     required
+                    min={form.ngaybd}
                 />
+                {error && <div className="error-message">{error}</div>}
 
 
                 <div className="form-actions">

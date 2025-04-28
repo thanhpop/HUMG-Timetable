@@ -15,7 +15,8 @@ export default function AddSemester() {
         ngaybd: '',
         ngaykt: ''
     });
-    const [error, setError] = useState('');
+    const [errorMahk, setErrorMahk] = useState('');
+    const [errorNgay, setErrorNgay] = useState('');
 
     const onInput = e => {
         const { name, value } = e.target;
@@ -25,9 +26,14 @@ export default function AddSemester() {
 
     const onSubmit = async e => {
         e.preventDefault();
+
+        if (form.ngaykt <= form.ngaybd) {
+            setErrorNgay('Ngày kết thúc phải sau ngày bắt đầu');
+            return;
+        }
         // kiểm tra duplicate mã HK
         if (semesters.some(s => s.mahk === form.mahk)) {
-            setError('Mã học kỳ đã tồn tại');
+            setErrorMahk('Mã học kỳ đã tồn tại');
             return;
         }
         // gọi API tạo mới
@@ -48,8 +54,9 @@ export default function AddSemester() {
                     value={form.mahk}
                     onChange={onInput}
                     required
+
                 />
-                {error && <div className="error-message">{error}</div>}
+                {errorMahk && <div className="error-message">{errorMahk}</div>}
 
 
 
@@ -96,7 +103,9 @@ export default function AddSemester() {
                     value={form.ngaykt}
                     onChange={onInput}
                     required
+                    min={form.ngaybd}
                 />
+                {errorNgay && <div className="error-message">{errorNgay}</div>}
 
                 <div className="form-actions">
                     <button type="submit" className="btn btn-primary">Thêm</button>

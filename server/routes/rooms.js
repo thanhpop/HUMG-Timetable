@@ -1,22 +1,11 @@
-// routes/rooms.js
-
 const express = require('express');
 const router = express.Router();
-const roomCtrl = require('../controllers/roomController');
+const ctrl = require('../controllers/roomController');
 
-// GET   /phonghoc          → Lấy danh sách tất cả phòng học
-router.get('/', roomCtrl.getAll);
-
-// GET   /phonghoc/:maphong → Lấy chi tiết phòng học theo maphong
-router.get('/:maphong', roomCtrl.getOne);
-
-// POST  /phonghoc          → Tạo mới phòng học
-router.post('/', roomCtrl.create);
-
-// PUT   /phonghoc/:maphong → Cập nhật phòng học
-router.put('/:maphong', roomCtrl.update);
-
-// DELETE /phonghoc/:maphong → Xóa phòng học
-router.delete('/:maphong', roomCtrl.remove);
+router.get('/', ctrl.getAll);
+router.get('/:maphong', ctrl.getOne);
+router.post('/', ctrl.create);
+router.put('/:maphong', ctrl.update);
+router.delete('/:maphong', ctrl.remove);
 
 module.exports = router;

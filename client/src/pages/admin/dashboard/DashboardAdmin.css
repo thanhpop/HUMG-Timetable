@@ -1,0 +1,15 @@
+.container {
+    display: flex;
+
+}
+
+body {
+    background-color: #f2f0f0;
+}
+
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+    width: 100%;
+    min-height: 100vh;
+}

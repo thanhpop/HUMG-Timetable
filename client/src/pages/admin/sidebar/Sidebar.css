@@ -1,5 +1,5 @@
-.sidebar {
-    width: 210px;
+.sidebar-admin {
+    width: 250px;
     height: 100vh;
     background-color: rgb(12, 76, 163);
     display: block;
@@ -13,23 +13,24 @@
     box-sizing: border-box;
 }
 
-.sidebar h2 {
+.sidebar-admin h2 {
     margin-bottom: 2rem;
     font-size: 1.5rem;
     margin-top: 0rem;
 }
 
-.sidebar ul {
+.sidebar-admin ul {
     list-style: none;
     padding: 0;
 }
 
-.sidebar li+li {
+.sidebar-admin li+li {
     margin-top: 1rem;
 }
 
-.sidebar a {
+.sidebar-admin a {
     display: block;
+    text-align: center;
     padding: 0.5rem 1rem;
     color: #fff;
     text-decoration: none;
@@ -37,12 +38,35 @@
     transition: background-color 0.2s;
 }
 
-.sidebar a:hover {
+.sidebar-admin a:hover {
     background-color: #4a5568;
 }
 
 
-.sidebar a.active {
+.sidebar-admin a.active {
     background-color: #003d88;
 
+}
+
+/* .sidebar-content {
+    flex-grow: 1;
+
+} */
+
+/* .sidebar-footer {
+    margin-top: auto;
+} */
+
+.logout-button {
+    width: 100%;
+    padding: 10px 15px;
+    border: none;
+
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.logout-button:hover {
+    background-color: #c0392b;
 }

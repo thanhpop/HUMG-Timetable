@@ -8,11 +8,10 @@ import { getRooms, deleteRoom } from '../../../api/roomApi';
 import '../style.css';
 
 export default function RoomManager() {
-    const navigate = useNavigate();
+    const nav = useNavigate();
     const { rooms, setRooms } = useOutletContext();
     const [loading, setLoading] = useState(false);
-    const [search, setSearch] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
+    const [q, setQ] = useState('');
 
     const fetch = async () => {
         setLoading(true);
@@ -20,36 +19,27 @@ export default function RoomManager() {
         setRooms(res.data);
         setLoading(false);
     };
-    const handleSearch = e => setSearchTerm(e.target.value);
+    useEffect(() => { fetch() }, []);
 
-    useEffect(() => { fetch(); }, []);
-
-    const filtered = rooms.filter(r => {
-        const code = r.maphong.toString();
-        return (
-            code.includes(searchTerm) ||
-            r.tenphong.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    });
+    const filtered = rooms.filter(r =>
+        r.maphong.includes(q) ||
+        r.tenphong.toLowerCase().includes(q.toLowerCase())
+    );
     const customStyles = {
         table: {
             style: {
                 backgroundColor: '#f9f9f9',
-                fontSize: '18px',
-                width: '100%',
-                maxWidth: '100%',
             },
         },
         headRow: {
             style: {
                 backgroundColor: '#e0e0e0',
                 fontWeight: 'bold',
-                minHeight: '56px',
             },
         },
         headCells: {
             style: {
-                fontSize: '18px',
+                fontSize: '16px',
                 paddingLeft: '16px',
                 paddingRight: '16px',
             },
@@ -57,8 +47,6 @@ export default function RoomManager() {
         rows: {
             style: {
                 backgroundColor: '#fff',
-                minHeight: '48px',
-                fontSize: '16px',
                 '&:hover': {
                     backgroundColor: '#f1f1f1',
                 },
@@ -81,9 +69,13 @@ export default function RoomManager() {
             name: 'Hành động',
             cell: r => (
                 <div style={{ display: 'flex', gap: 4 }}>
-
-                    <button onClick={() => navigate(`/admin/rooms/edit/${r.maphong}`)} style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}>Sửa</button>
-                    <button onClick={async () => { await deleteRoom(r.maphong); fetch(); }} style={{ width: 50, padding: '6px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}>Xóa</button>
+                    <button onClick={() => nav(`/admin/rooms/edit/${r.maphong}`)}>Sửa</button>
+                    <button onClick={async () => {
+                        if (window.confirm('Xóa phòng?')) {
+                            await deleteRoom(r.maphong);
+                            fetch();
+                        }
+                    }}>Xóa</button>
                 </div>
             ), ignoreRowClick: true
         }
@@ -95,29 +87,19 @@ export default function RoomManager() {
             <div className="search-container">
                 <FontAwesomeIcon icon={faSearch} className="search-icon" />
                 <input
-                    type="text"
-                    placeholder="Tìm mã hoặc tên phòng"
-                    value={searchTerm}
-                    onChange={handleSearch}
+                    placeholder="Tìm mã hoặc tên"
+                    value={q}
+                    onChange={e => setQ(e.target.value)}
                     style={{ padding: 10, width: 280, fontSize: 16 }}
                 />
-            </div>
-            <div style={{ marginBottom: 16, textAlign: 'right', }}>
-                <button onClick={() => navigate('/admin/rooms/add')} style={{
-                    padding: '15px 20px',
-                    backgroundColor: '#0c4ca3',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 4,
-                    fontWeight: 'bold',
-                }}>Thêm Phòng học</button>
-            </div>
+            </div><div style={{ marginBottom: 16, textAlign: 'right', }}>
+                <button onClick={() => nav('/admin/rooms/add')}>Thêm Phòng</button> </div>
             <DataTable
                 columns={columns}
                 data={filtered}
                 pagination
-
                 progressPending={loading}
+                persistTableHead={true}
                 customStyles={customStyles}
             />
         </div>

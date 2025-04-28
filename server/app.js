@@ -6,7 +6,10 @@ const teacherRoutes = require('./routes/teachers');
 const courseRoutes = require('./routes/courses');
 const roomRoutes = require('./routes/rooms');
 const semesterRoutes = require('./routes/semesters');
+const userRoutes = require('./routes/users');
+const groupRoutes = require('./routes/groupRoutes');
 
+const authRoutes = require('./routes/auth');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -20,6 +23,11 @@ app.use('/courses', courseRoutes);
 app.use('/rooms', roomRoutes);
 app.use('/semesters', semesterRoutes);
 
+app.use('/nhommh', groupRoutes);
+app.use('/users', userRoutes);
+
+
+app.use('/auth', authRoutes);
 
 
 app.use((req, res) => {
