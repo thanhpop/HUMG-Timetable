@@ -25,7 +25,7 @@ export default function ViewTeacher() {
                 <div className="view-content">
                     <p><strong>Mã GV:</strong> {tec.mgv}</p>
                     <p><strong>Họ và tên:</strong> {tec.ten}</p>
-                    <p><strong>Bộ môn:</strong> {tec.khoa}</p>
+                    <p><strong>Khoa:</strong> {tec.khoa}</p>
                     <p><strong>Giới tính:</strong> {tec.gioitinh}</p>
                     <p><strong>Email:</strong> {tec.email}</p>
                     <p><strong>SĐT:</strong> {tec.sdt}</p>

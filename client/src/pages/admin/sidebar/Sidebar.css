@@ -11,6 +11,11 @@
 
     padding: 1rem;
     box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    box-sizing: border-box;
 }
 
 .sidebar-admin h2 {
@@ -22,6 +27,11 @@
 .sidebar-admin ul {
     list-style: none;
     padding: 0;
+    height: 80%;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+
 }
 
 .sidebar-admin li+li {
@@ -48,16 +58,21 @@
 
 }
 
-/* .sidebar-content {
+.sidebar-footer-admin {
     flex-grow: 1;
 
-} */
+}
 
-/* .sidebar-footer {
+.sidebar-footer-admin {
     margin-top: auto;
+    /* align-items: center; */
+}
+
+/* .sidebar-footer-admin button {
+    background-color: transparent;
 } */
 
-.logout-button {
+.logout-button-admin {
     width: 100%;
     padding: 10px 15px;
     border: none;
@@ -67,6 +82,6 @@
     font-size: 16px;
 }
 
-.logout-button:hover {
+.logout-button-admin:hover {
     background-color: #c0392b;
 }

@@ -76,14 +76,27 @@ export default function AddTeacher() {
                     </select>
 
                     <label htmlFor="khoa">Khoa*</label>
-                    <input
+                    <select
                         id="khoa"
                         name="khoa"
-                        type="text"
                         value={form.khoa}
                         onChange={onInput}
                         required
-                    />
+                    >
+                        <option value="">Chọn khoa</option>
+                        <option value="Công nghệ Thông tin">Công nghệ Thông tin</option>
+                        <option value="Cơ - Điện">Cơ - Điện</option>
+                        <option value="Dầu khí và Năng lượng">Dầu khí và Năng lượng</option>
+                        <option value="Khoa học và Kỹ thuật Địa chất">Khoa học và Kỹ thuật Địa chất</option>
+                        <option value="Kinh tế - Quản trị kinh doanh">Kinh tế - Quản trị kinh doanh</option>
+                        <option value="Mỏ">Mỏ</option>
+                        <option value="Môi trường">Môi trường</option>
+                        <option value="Trắc địa - Bản đồ và Quản lý đất đai">Trắc địa - Bản đồ và Quản lý đất đai</option>
+                        <option value="Xây dựng">Xây dựng</option>
+                        <option value="Lý luận Chính trị">Lý luận Chính trị</option>
+                        <option value="Khoa học cơ bản">Khoa học cơ bản</option>
+                        <option value="Giáo dục Quốc phòng">Giáo dục Quốc phòng</option>
+                    </select>
 
                     <label htmlFor="email">Email</label>
                     <input

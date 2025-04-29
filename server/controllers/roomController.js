@@ -21,11 +21,11 @@ exports.getOne = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
     try {
-        const { maphong, tenphong, khu, soluong } = req.body;
-        if (!maphong || !tenphong || !khu || soluong == null) {
+        const { maphong, tenphong, khu, succhua } = req.body;
+        if (!maphong || !tenphong || !khu || succhua == null) {
             return res.status(400).json({ error: 'Missing fields' });
         }
-        const [result] = await Room.create({ maphong, tenphong, khu, soluong });
+        const [result] = await Room.create({ maphong, tenphong, khu, succhua });
         const [[newRow]] = await Room.findById(maphong);
         res.status(201).json(newRow);
     } catch (err) {
@@ -38,8 +38,8 @@ exports.create = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
     try {
-        const { tenphong, khu, soluong } = req.body;
-        const [result] = await Room.update(req.params.maphong, { tenphong, khu, soluong });
+        const { tenphong, khu, succhua } = req.body;
+        const [result] = await Room.update(req.params.maphong, { tenphong, khu, succhua });
         if (result.affectedRows === 0) return res.status(404).json({ error: 'Not found' });
         const [[updated]] = await Room.findById(req.params.maphong);
         res.json(updated);

@@ -9,17 +9,17 @@ exports.findById = maphong =>
     db.query('SELECT * FROM phonghoc WHERE maphong = ?', [maphong]);
 
 // tạo mới phải truyền maphong
-exports.create = ({ maphong, tenphong, khu, soluong }) =>
+exports.create = ({ maphong, tenphong, khu, succhua }) =>
     db.query(
-        'INSERT INTO phonghoc (maphong, tenphong, khu, soluong) VALUES (?,?,?,?)',
-        [maphong, tenphong, khu, soluong]
+        'INSERT INTO phonghoc (maphong, tenphong, khu, succhua) VALUES (?,?,?,?)',
+        [maphong, tenphong, khu, succhua]
     );
 
 // cập nhật theo maphong
-exports.update = (maphong, { tenphong, khu, soluong }) =>
+exports.update = (maphong, { tenphong, khu, succhua }) =>
     db.query(
-        'UPDATE phonghoc SET tenphong=?, khu=?, soluong=? WHERE maphong=?',
-        [tenphong, khu, soluong, maphong]
+        'UPDATE phonghoc SET tenphong=?, khu=?, succhua=? WHERE maphong=?',
+        [tenphong, khu, succhua, maphong]
     );
 
 // xóa theo maphong

@@ -72,7 +72,24 @@ export default function EditStudent() {
                     <input id="ten" name="ten" value={form.ten} onChange={handleInput} />
 
                     <label htmlFor="khoa">Khoa</label>
-                    <input id="khoa" name="khoa" value={form.khoa} onChange={handleInput} />
+                    <select
+                        id="khoa"
+                        name="khoa"
+                        value={form.khoa}
+                        onChange={handleInput}
+                        required
+                    >
+                        <option value="">Chọn khoa</option>
+                        <option value="Công nghệ Thông tin">Công nghệ Thông tin</option>
+                        <option value="Cơ - Điện">Cơ - Điện</option>
+                        <option value="Dầu khí và Năng lượng">Dầu khí và Năng lượng</option>
+                        <option value="Khoa học và Kỹ thuật Địa chất">Khoa học và Kỹ thuật Địa chất</option>
+                        <option value="Kinh tế - Quản trị kinh doanh">Kinh tế - Quản trị kinh doanh</option>
+                        <option value="Mỏ">Mỏ</option>
+                        <option value="Môi trường">Môi trường</option>
+                        <option value="Trắc địa - Bản đồ và Quản lý đất đai">Trắc địa - Bản đồ và Quản lý đất đai</option>
+                        <option value="Xây dựng">Xây dựng</option>
+                    </select>
 
                     <label htmlFor="lop">Lớp</label>
                     <input id="lop" name="lop" value={form.lop} onChange={handleInput} />

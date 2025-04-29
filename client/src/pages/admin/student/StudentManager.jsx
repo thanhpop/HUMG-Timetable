@@ -10,6 +10,7 @@ export default function StudentManager() {
     const { students, setStudents } = useOutletContext();
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [filterKhoa, setFilterKhoa] = useState('');
 
     const fetchStudents = async () => {
         setLoading(true);
@@ -36,11 +37,16 @@ export default function StudentManager() {
             fetchStudents();
         }
     };
+    const khoaOptions = Array.from(new Set(students.map(s => s.khoa))).sort();
+
+    // 3) Lọc theo searchTerm và filterKhoa
     const filtered = (students || []).filter(s => {
-        const msv = s.msv ?? '';
-        const ten = s.ten ?? '';
         const term = searchTerm.toLowerCase();
-        return msv.includes(term) || ten.toLowerCase().includes(term);
+        const matchText =
+            s.msv.toLowerCase().includes(term) ||
+            s.ten.toLowerCase().includes(term);
+        const matchKhoa = !filterKhoa || s.khoa === filterKhoa;
+        return matchText && matchKhoa;
     });
 
     // Tìm kiếm sinh viên theo tên hoặc MSV
@@ -138,7 +144,18 @@ export default function StudentManager() {
                     onChange={handleSearch}
                     style={{ padding: 10, width: 280, fontSize: 16 }}
                 />
+                <select
+                    value={filterKhoa}
+                    onChange={e => setFilterKhoa(e.target.value)}
+                    style={{ padding: 8, fontSize: 14 }}
+                >
+                    <option value="">-- Tất cả khoa --</option>
+                    {khoaOptions.map(k => (
+                        <option key={k} value={k}>{k}</option>
+                    ))}
+                </select>
             </div>
+
 
             <div style={{ marginBottom: 16, textAlign: 'right', }}>
                 <button

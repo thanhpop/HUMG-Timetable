@@ -1,3 +1,4 @@
+// controllers/groupController.js
 const Group = require('../models/groupModel');
 
 exports.getAll = async (req, res, next) => {
@@ -21,11 +22,11 @@ exports.getOne = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
     try {
-        const { manhom, tennhom, mamh, mgv, maphong, soluongsv } = req.body;
-        if (!manhom || !tennhom || !mamh || !mgv || !maphong) {
+        const { manhom, tennhom, mamh, mgv, maphong, mahk } = req.body;
+        if (!manhom || !tennhom || !mamh || !mgv || !maphong || !mahk) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
-        const [result] = await Group.create({ manhom, tennhom, mamh, mgv, maphong, soluongsv });
+        const [result] = await Group.create({ manhom, tennhom, mamh, mgv, maphong, mahk });
         const [[newRow]] = await Group.findById(manhom);
         res.status(201).json(newRow);
     } catch (err) {
@@ -38,8 +39,11 @@ exports.create = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
     try {
-        const { tennhom, mamh, mgv, maphong, soluongsv } = req.body;
-        const [result] = await Group.update(req.params.manhom, { tennhom, mamh, mgv, maphong, soluongsv });
+        const { tennhom, mamh, mgv, maphong, mahk } = req.body;
+        const [result] = await Group.update(
+            req.params.manhom,
+            { tennhom, mamh, mgv, maphong, mahk }
+        );
         if (result.affectedRows === 0) return res.status(404).json({ error: 'Not found' });
         const [[updated]] = await Group.findById(req.params.manhom);
         res.json(updated);

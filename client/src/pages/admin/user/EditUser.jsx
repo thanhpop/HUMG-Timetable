@@ -50,14 +50,20 @@ export default function EditUser() {
                 />
 
                 <label>Vai trò</label>
-                <select
-                    value={form.vaitro}
-                    onChange={e => setForm(f => ({ ...f, vaitro: e.target.value }))}
-                >
-                    <option value="gv">Giáo viên</option>
-                    <option value="sv">Sinh viên</option>
-
-                </select>
+                {form.vaitro === 'admin' ? (
+                    /* if it's an admin account, just show it as text */
+                    <input type="text" value="Admin" disabled className="readonly-input" />
+                ) : (
+                    /* otherwise allow switching between gv and sv */
+                    <select
+                        value={form.vaitro}
+                        onChange={e => setForm(f => ({ ...f, vaitro: e.target.value }))}
+                        required
+                    >
+                        <option value="gv">Giáo viên</option>
+                        <option value="sv">Sinh viên</option>
+                    </select>
+                )}
 
                 <div className="form-actions">
                     <button type="submit">Lưu</button>

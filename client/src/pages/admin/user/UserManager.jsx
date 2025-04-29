@@ -68,14 +68,14 @@ export default function UserManager() {
             name: 'Hành động',
             cell: r => (
                 <div style={{ display: 'flex', gap: 4 }}>
-                    <button onClick={() => nav(`/admin/users/edit/${r.id}`)}>Sửa</button>
+                    <button onClick={() => nav(`/admin/users/edit/${r.id}`)} style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}>Sửa</button>
                     <button onClick={async () => {
                         if (window.confirm('Xóa user này?')) {
                             await deleteUser(r.id);
                             const res = await getUsers();
                             setUsers(res.data);
                         }
-                    }}>Xóa</button>
+                    }} style={{ width: 50, padding: '6px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}>Xóa</button>
                 </div>
             ),
             ignoreRowClick: true

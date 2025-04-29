@@ -1,21 +1,52 @@
+// src/pages/admin/group/ViewGroup.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getGroup } from '../../../api/groupApi';
+import {
+    getAllCourses,
+    getAllTeachers,
+    getAllRooms,
+    getAllSemesters
+} from '../../../api/utilsApi';
 import '../style.css';
 
 export default function ViewGroup() {
     const { manhom } = useParams();
     const nav = useNavigate();
+
     const [g, setG] = useState(null);
+    const [courses, setCourses] = useState([]);
+    const [teachers, setTeachers] = useState([]);
+    const [rooms, setRooms] = useState([]);
+    const [semesters, setSemesters] = useState([]);
 
     useEffect(() => {
         (async () => {
-            const res = await getGroup(manhom);
-            setG(res.data);
+            try {
+                const [groupRes, courseRes, teacherRes, roomRes, semRes] = await Promise.all([
+                    getGroup(manhom),
+                    getAllCourses(),
+                    getAllTeachers(),
+                    getAllRooms(),
+                    getAllSemesters()
+                ]);
+                setG(groupRes.data);
+                setCourses(courseRes.data);
+                setTeachers(teacherRes.data);
+                setRooms(roomRes.data);
+                setSemesters(semRes.data);
+            } catch (err) {
+                console.error('Lỗi khi tải dữ liệu:', err);
+            }
         })();
     }, [manhom]);
 
     if (!g) return <div>Loading…</div>;
+
+    const course = courses.find(c => c.mamh === g.mamh);
+    const teacher = teachers.find(t => t.mgv === g.mgv);
+    const room = rooms.find(r => r.maphong === g.maphong);
+    const semester = semesters.find(s => s.mahk === g.mahk);
 
     return (
         <div className="view-wrapper">
@@ -24,10 +55,18 @@ export default function ViewGroup() {
                 <div className="view-content">
                     <p><strong>Mã nhóm:</strong> {g.manhom}</p>
                     <p><strong>Tên nhóm:</strong> {g.tennhom}</p>
-                    <p><strong>Mã MH:</strong> {g.mamh}</p>
-                    <p><strong>Mã GV:</strong> {g.mgv}</p>
-                    <p><strong>Phòng:</strong> {g.maphong}</p>
-                    <p><strong>Số SV:</strong> {g.soluongsv}</p>
+                    <p>
+                        <strong>Môn học:</strong> {g.mamh} — {course?.tenmh || 'Không tìm thấy'}
+                    </p>
+                    <p>
+                        <strong>Giảng viên:</strong> {g.mgv} — {teacher?.ten || 'Không tìm thấy'}
+                    </p>
+                    <p>
+                        <strong>Phòng học:</strong> {g.maphong} — {room?.tenphong || 'Không tìm thấy'}
+                    </p>
+                    <p>
+                        <strong>Học kỳ:</strong> {g.mahk} — {semester?.tenhk || 'Không tìm thấy'}
+                    </p>
                 </div>
                 <button className="btn btn-secondary" onClick={() => nav(-1)}>Quay lại</button>
             </div>

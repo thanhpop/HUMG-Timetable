@@ -57,8 +57,8 @@ export default function Sidebar() {
 
             </ul>
 
-            <div className="sidebar-footer">
-                <button onClick={handleLogout} className="logout-button">
+            <div className="sidebar-footer-admin">
+                <button onClick={handleLogout} className="logout-button-admin">
                     Đăng xuất
                 </button>
             </div>

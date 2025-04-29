@@ -1,7 +1,13 @@
+// src/pages/admin/group/GroupManager.jsx
 import React, { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { getGroups, deleteGroup } from '../../../api/groupApi';
+import {
+    getAllCourses,
+    getAllTeachers,
+    getAllRooms
+} from '../../../api/utilsApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import '../style.css';
@@ -9,72 +15,89 @@ import '../style.css';
 export default function GroupManager() {
     const nav = useNavigate();
     const { groups, setGroups } = useOutletContext();
+
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
+    const [courses, setCourses] = useState([]);
+    const [teachers, setTeachers] = useState([]);
+    const [rooms, setRooms] = useState([]);
 
-    const fetch = async () => {
-        setLoading(true);
-        const res = await getGroups();
-        setGroups(res.data);
-        setLoading(false);
-    };
-    useEffect(() => { fetch(); }, []);
+    // load groups + reference lists
+    useEffect(() => {
+        (async () => {
+            setLoading(true);
+            try {
+                const [gRes, cRes, tRes, rRes] = await Promise.all([
+                    getGroups(),
+                    getAllCourses(),
+                    getAllTeachers(),
+                    getAllRooms()
+                ]);
+                setGroups(gRes.data);
+                setCourses(cRes.data);
+                setTeachers(tRes.data);
+                setRooms(rRes.data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, []);
 
     const filtered = groups.filter(g =>
         g.manhom.includes(search) ||
         g.tennhom.toLowerCase().includes(search.toLowerCase())
     );
+
     const customStyles = {
-        table: {
-            style: {
-                backgroundColor: '#f9f9f9',
-            },
-        },
-        headRow: {
-            style: {
-                backgroundColor: '#e0e0e0',
-                fontWeight: 'bold',
-            },
-        },
-        headCells: {
-            style: {
-                fontSize: '16px',
-                paddingLeft: '16px',
-                paddingRight: '16px',
-            },
-        },
-        rows: {
-            style: {
-                backgroundColor: '#fff',
-                '&:hover': {
-                    backgroundColor: '#f1f1f1',
-                },
-            },
-        },
-        cells: {
-            style: {
-                paddingLeft: '16px',
-                paddingRight: '16px',
-            },
-        },
+        table: { style: { backgroundColor: '#f9f9f9' } },
+        headRow: { style: { backgroundColor: '#e0e0e0', fontWeight: 'bold' } },
+        /* …etc… */
     };
 
     const columns = [
         { name: 'Mã nhóm', selector: r => r.manhom, sortable: true },
         { name: 'Tên nhóm', selector: r => r.tennhom, sortable: true },
-        { name: 'Mã MH', selector: r => r.mamh },
-        { name: 'Mã GV', selector: r => r.mgv },
-        { name: 'Phòng', selector: r => r.maphong },
-        { name: 'Số SV', selector: r => r.soluongsv },
+
+        // Course code + course name
+        {
+            name: 'Tên MH',
+            selector: r => {
+                const c = courses.find(c => c.mamh === r.mamh);
+                return c ? c.tenmh : '';
+            }
+        },
+
+        {
+            name: 'Giảng viên',
+            selector: r => {
+                const t = teachers.find(t => t.mgv === r.mgv);
+                return t ? t.ten : '';
+            }
+        },
+
+        {
+            name: 'Tên Phòng',
+            selector: r => {
+                const rm = rooms.find(rm => rm.maphong === r.maphong);
+                return rm ? rm.tenphong : '';
+            }
+        },
+
         {
             name: 'Hành động',
             cell: r => (
-                <div style={{ display: 'flex', gap: 2 }}>
-                    <button onClick={() => nav(`/admin/groups/view/${r.manhom}`)} style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}>Xem</button>
+                <div style={{ display: 'flex', gap: 4 }}>
+                    <button onClick={() => nav(`/admin/groups/view/${r.manhom}`)} style={{ width: 50, padding: '6px', backgroundColor: '#17a2b8', color: 'white', border: 'none', borderRadius: 4 }}>Xem</button>
                     <button onClick={() => nav(`/admin/groups/edit/${r.manhom}`)} style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}>Sửa</button>
-                    <button onClick={async () => { await deleteGroup(r.manhom); fetch(); }} style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}>
-                        Xóa
-                    </button>
+                    <button onClick={async () => {
+                        if (window.confirm('Xóa?')) {
+                            await deleteGroup(r.manhom);
+                            const res = await getGroups();
+                            setGroups(res.data);
+                        }
+                    }} style={{ width: 50, padding: '6px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}>Xóa</button>
                 </div>
             ),
             ignoreRowClick: true
@@ -90,26 +113,19 @@ export default function GroupManager() {
                     placeholder="Tìm mã hoặc tên nhóm"
                     value={search}
                     onChange={e => setSearch(e.target.value)}
-                    style={{ padding: 10, width: 280, fontSize: 16 }}
+                    style={{ padding: 8, width: 300, fontSize: 14 }}
                 />
             </div>
-            <div style={{ marginBottom: 16, textAlign: 'right' }}>
-                <button onClick={() => nav('/admin/groups/add')} style={{
-                    padding: '15px 20px',
-                    backgroundColor: '#0c4ca3',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 4,
-                    fontWeight: 'bold',
-                }} >Thêm Nhóm</button>
+            <div style={{ textAlign: 'right', margin: '16px 0' }}>
+                <button onClick={() => nav('/admin/groups/add')}>Thêm Nhóm</button>
             </div>
             <DataTable
                 columns={columns}
                 data={filtered}
                 pagination
                 progressPending={loading}
-                persistTableHead={true}
                 customStyles={customStyles}
+                persistTableHead
             />
         </div>
     );

@@ -64,18 +64,18 @@ export default function RoomManager() {
         { name: 'Mã phòng', selector: r => r.maphong, sortable: true },
         { name: 'Tên phòng', selector: r => r.tenphong, sortable: true },
         { name: 'Khu', selector: r => r.khu },
-        { name: 'Sức chứa', selector: r => r.soluong },
+        { name: 'Sức chứa', selector: r => r.succhua },
         {
             name: 'Hành động',
             cell: r => (
                 <div style={{ display: 'flex', gap: 4 }}>
-                    <button onClick={() => nav(`/admin/rooms/edit/${r.maphong}`)}>Sửa</button>
+                    <button onClick={() => nav(`/admin/rooms/edit/${r.maphong}`)} style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}>Sửa</button>
                     <button onClick={async () => {
                         if (window.confirm('Xóa phòng?')) {
                             await deleteRoom(r.maphong);
                             fetch();
                         }
-                    }}>Xóa</button>
+                    }} style={{ width: 50, padding: '6px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}>Xóa</button>
                 </div>
             ), ignoreRowClick: true
         }
@@ -93,7 +93,14 @@ export default function RoomManager() {
                     style={{ padding: 10, width: 280, fontSize: 16 }}
                 />
             </div><div style={{ marginBottom: 16, textAlign: 'right', }}>
-                <button onClick={() => nav('/admin/rooms/add')}>Thêm Phòng</button> </div>
+                <button onClick={() => nav('/admin/rooms/add')} style={{
+                    padding: '15px 20px',
+                    backgroundColor: '#0c4ca3',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 4,
+                    fontWeight: 'bold',
+                }}>Thêm Phòng</button> </div>
             <DataTable
                 columns={columns}
                 data={filtered}

@@ -46,6 +46,18 @@ export default function EditSemester() {
 
     const onSubmit = async e => {
         e.preventDefault();
+
+        // validate năm học: YYYY-YYYY and difference = 1
+        const pattern = /^\d{4}-\d{4}$/;
+        if (!pattern.test(form.namhoc)) {
+            setErrorNamhoc('Năm học phải đúng định dạng YYYY-YYYY');
+            return;
+        }
+        const [startYear, endYear] = form.namhoc.split('-').map(Number);
+        if (endYear !== startYear + 1) {
+            setErrorNamhoc('Năm kết thúc phải lớn hơn năm bắt đầu 1 năm');
+            return;
+        }
         if (form.ngaykt <= form.ngaybd) {
             setError('Ngày kết thúc phải sau ngày bắt đầu');
             return;
@@ -73,13 +85,18 @@ export default function EditSemester() {
 
 
                 <label htmlFor="tenhk">Tên HK*</label>
-                <input
+                <select
                     id="tenhk"
                     name="tenhk"
                     value={form.tenhk}
                     onChange={onInput}
                     required
-                />
+                >
+                    <option value="">-- Chọn học kỳ --</option>
+                    <option value="Học kỳ 1">Học kỳ 1</option>
+                    <option value="Học kỳ 2">Học kỳ 2</option>
+                    <option value="Học kỳ 3">Học kỳ 3</option>
+                </select>
 
 
 

@@ -12,6 +12,8 @@ export default function CourseManager() {
     const { courses, setCourses } = useOutletContext();
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
+    const [filterKhoa, setFilterKhoa] = useState('');
+
 
     const fetch = async () => {
         setLoading(true);
@@ -21,9 +23,17 @@ export default function CourseManager() {
     };
     useEffect(() => { fetch() }, []);
 
-    const filtered = courses.filter(c =>
-        c.mamh.includes(search) || c.tenmh.toLowerCase().includes(search.toLowerCase())
-    );
+    const khoaOptions = Array.from(new Set(courses.map(c => c.khoa))).sort();
+
+    // 3) Lọc theo search text và khoa
+    const filtered = courses.filter(c => {
+        const term = search.toLowerCase();
+        const matchText =
+            c.mamh.includes(term) ||
+            c.tenmh.toLowerCase().includes(term);
+        const matchKhoa = !filterKhoa || c.khoa === filterKhoa;
+        return matchText && matchKhoa;
+    });
     const customStyles = {
         table: {
             style: {
@@ -81,6 +91,16 @@ export default function CourseManager() {
             <div className="search-container">
                 <FontAwesomeIcon icon={faSearch} className="search-icon" />
                 <input placeholder="Tìm mã hoặc tên" value={search} onChange={e => setSearch(e.target.value)} style={{ padding: 10, width: 280, fontSize: 16 }} />
+                <select
+                    value={filterKhoa}
+                    onChange={e => setFilterKhoa(e.target.value)}
+                    style={{ padding: 10, fontSize: 16 }}
+                >
+                    <option value="">-- Tất cả khoa --</option>
+                    {khoaOptions.map(k => (
+                        <option key={k} value={k}>{k}</option>
+                    ))}
+                </select>
             </div>
             <div style={{ marginBottom: 16, textAlign: 'right' }}>
                 <button onClick={() => nav('/admin/courses/add')} style={{

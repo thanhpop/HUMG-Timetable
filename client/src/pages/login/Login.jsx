@@ -26,6 +26,7 @@ export default function Login() {
       });
       // grab the user out of the response
       const user = res.data.user;
+      const { vaitro } = user;
 
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('vaitro', vaitro);

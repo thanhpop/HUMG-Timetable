@@ -19,7 +19,7 @@ const Sidebar = () => {
       <div className="profile">
         <div className="user-info">
           <h3 className="name">{profile.ten || 'Tên người dùng'}</h3>
-          <p className="student-id">{profile.mgv || 'N/A'}</p>
+          <p className="student-id">Mã GV: {profile.mgv || 'N/A'}</p>
         </div>
       </div>
 
@@ -27,7 +27,7 @@ const Sidebar = () => {
 
       <nav className="menu">
         <NavLink to="/teacher/info" className={({ isActive }) => `menu-item ${isActive ? "active" : ""}`}>
-          <User size={20} />
+          <User size={19} />
           <span>Thông tin giảng viên</span>
         </NavLink>
         <NavLink to="/teacher/schedule" className={({ isActive }) => `menu-item ${isActive ? "active" : ""}`}>

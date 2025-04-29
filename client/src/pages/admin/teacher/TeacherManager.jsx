@@ -12,6 +12,7 @@ export default function TeacherManager() {
     const { teachers, setTeachers } = useOutletContext();
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [filterKhoa, setFilterKhoa] = useState('');
 
     const fetchTeachers = async () => {
         setLoading(true);
@@ -34,16 +35,23 @@ export default function TeacherManager() {
         }
     };
 
-    const filtered = (teachers || []).filter(
-        t =>
-            t.mgv.toString().includes(searchTerm) ||
-            t.ten.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // ② danh sách các khoa duy nhất
+    const khoaOptions = Array.from(new Set(teachers.map(t => t.khoa))).sort();
+
+    // ③ lọc theo searchTerm và filterKhoa
+    const filtered = (teachers || []).filter(t => {
+        const term = searchTerm.toLowerCase();
+        const matchText =
+            t.mgv.toString().includes(term) ||
+            t.ten.toLowerCase().includes(term);
+        const matchKhoa = !filterKhoa || t.khoa === filterKhoa;
+        return matchText && matchKhoa;
+    });
 
     const columns = [
         { name: 'Mã GV', selector: row => row.mgv, sortable: true },
         { name: 'Họ và tên', selector: row => row.ten, sortable: true },
-        { name: 'Bộ môn', selector: row => row.khoa, sortable: true },
+        { name: 'Khoa', selector: row => row.khoa, sortable: true },
         { name: 'Giới tính', selector: row => row.gioitinh },
         { name: 'Email', selector: row => row.email },
         { name: 'Số ĐT', selector: row => row.sdt },
@@ -97,6 +105,16 @@ export default function TeacherManager() {
                     className="search-input"
                     style={{ padding: 10, width: 280, fontSize: 16 }}
                 />
+                <select
+                    value={filterKhoa}
+                    onChange={e => setFilterKhoa(e.target.value)}
+                    style={{ padding: 8, fontSize: 14 }}
+                >
+                    <option value="">--Tất cả khoa--</option>
+                    {khoaOptions.map(k => (
+                        <option key={k} value={k}>{k}</option>
+                    ))}
+                </select>
             </div>
 
             <div style={{ marginBottom: 16, textAlign: 'right' }}>

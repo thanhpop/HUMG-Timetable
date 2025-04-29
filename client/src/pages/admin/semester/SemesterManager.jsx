@@ -116,8 +116,8 @@ export default function SemesterManager() {
                 <button
                     onClick={() => nav('/admin/semesters/add')}
                     style={{
-                        padding: '10px 16px',
-                        backgroundColor: '#28a745',
+                        padding: '15px 20px',
+                        backgroundColor: '#0c4ca3',
                         color: 'white',
                         border: 'none',
                         borderRadius: 4,

@@ -20,7 +20,7 @@ export default function EditRoom() {
 
     const onInput = e => {
         const { name, value } = e.target;
-        setForm(f => ({ ...f, [name]: name === 'soluong' ? Number(value) : value }));
+        setForm(f => ({ ...f, [name]: name === 'succhua' ? Number(value) : value }));
         if (name === 'maphong') setErr('');
     };
 
@@ -46,10 +46,15 @@ export default function EditRoom() {
                 <input name="tenphong" value={form.tenphong} onChange={onInput} required />
 
                 <label>Khu*</label>
-                <input name="khu" value={form.khu} onChange={onInput} required />
+                <select name="khu" value={form.khu} onChange={onInput} required>
+                    <option value="">Chọn khu</option>
+                    <option value="A">Khu A</option>
+                    <option value="B">Khu B</option>
+
+                </select>
 
                 <label>Số lượng*</label>
-                <input name="soluong" type="number" min="0" value={form.soluong} onChange={onInput} required />
+                <input name="succhua" type="number" min="0" value={form.succhua} onChange={onInput} required />
 
                 <div className="form-actions">
                     <button type="submit">Lưu</button>
