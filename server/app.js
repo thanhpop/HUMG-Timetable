@@ -9,6 +9,8 @@ const semesterRoutes = require('./routes/semesters');
 const userRoutes = require('./routes/users');
 const groupRoutes = require('./routes/groupRoutes');
 
+const lichhocRoutes = require('./routes/lichhoc');
+
 const authRoutes = require('./routes/auth');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -25,6 +27,8 @@ app.use('/semesters', semesterRoutes);
 
 app.use('/nhommh', groupRoutes);
 app.use('/users', userRoutes);
+
+app.use('/lichhoc', lichhocRoutes);
 
 
 app.use('/auth', authRoutes);

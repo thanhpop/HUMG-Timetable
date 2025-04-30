@@ -42,6 +42,11 @@ import StudentInfo from '../pages/student/info/studentInfo.jsx';
 import DashboardTeacher from '../pages/teacher/dashboard/DashboardTeacher.jsx';
 import TeacherInfo from '../pages/teacher/info/TeacherInfo.jsx';
 
+import ScheduleManager from '../pages/admin/schedule/ScheduleManager.jsx';
+import AddSchedule from '../pages/admin/schedule/AddSchedule.jsx';
+import EditSchedule from '../pages/admin/schedule/EditSchedule.jsx';
+import ViewSchedule from '../pages/admin/schedule/ViewSchedule.jsx';
+
 import Login from '../pages/login/Login.jsx';
 
 
@@ -77,6 +82,10 @@ export default function AppRoutes() {
                 <Route path="groups/add" element={<AddGroup />} />
                 <Route path="groups/edit/:manhom" element={<EditGroup />} />
                 <Route path="groups/view/:manhom" element={<ViewGroup />} />
+                <Route path="/admin/lichhoc" element={<ScheduleManager />} />
+                <Route path="/admin/lichhoc/add" element={<AddSchedule />} />
+                <Route path="/admin/lichhoc/edit/:id" element={<EditSchedule />} />
+                <Route path="/admin/lichhoc/view/:id" element={<ViewSchedule />} />
             </Route>
             <Route path="/student" element={<ProtectedRoute allowedRoles={['sv']}>
                 <DashboardStudent />

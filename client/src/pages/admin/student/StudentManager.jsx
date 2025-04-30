@@ -160,14 +160,7 @@ export default function StudentManager() {
             <div style={{ marginBottom: 16, textAlign: 'right', }}>
                 <button
                     onClick={() => navigate('/admin/students/add')}
-                    style={{
-                        padding: '15px 20px',
-                        backgroundColor: '#0c4ca3',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: 4,
-                        fontWeight: 'bold',
-                    }}
+                    className='add-button-admin'
                 >
                     Thêm sinh viên
                 </button>

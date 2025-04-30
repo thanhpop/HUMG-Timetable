@@ -12,6 +12,7 @@ export default function DashboardAdmin() {
     const [semesters, setSemesters] = useState([]);
     const [users, setUsers] = useState([]);
     const [groups, setGroups] = useState([]);
+    const [schedules, setSchedules] = useState([]);
 
     return (
         <div className="container">
@@ -20,7 +21,7 @@ export default function DashboardAdmin() {
 
             <div className="main-content">
 
-                <Outlet context={{ students, setStudents, teachers, setTeachers, courses, setCourses, rooms, setRooms, semesters, setSemesters, users, setUsers, groups, setGroups }} />
+                <Outlet context={{ students, setStudents, teachers, setTeachers, courses, setCourses, rooms, setRooms, semesters, setSemesters, users, setUsers, groups, setGroups, schedules, setSchedules }} />
             </div>
 
         </div>

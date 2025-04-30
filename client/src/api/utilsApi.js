@@ -2,6 +2,7 @@
 import axios from 'axios';
 const BASE = 'http://localhost:3001';
 
+
 export function getAllCourses() {
     return axios.get(`${BASE}/courses`);
 }

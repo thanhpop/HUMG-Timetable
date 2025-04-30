@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { getUsers, deleteUser } from '../../../api/userApi';
+import '../style.css';
 
 export default function UserManager() {
     const nav = useNavigate();
@@ -35,6 +36,7 @@ export default function UserManager() {
             style: {
                 backgroundColor: '#e0e0e0',
                 fontWeight: 'bold',
+
             },
         },
         headCells: {
@@ -42,6 +44,8 @@ export default function UserManager() {
                 fontSize: '16px',
                 paddingLeft: '16px',
                 paddingRight: '16px',
+
+
             },
         },
         rows: {
@@ -56,6 +60,7 @@ export default function UserManager() {
             style: {
                 paddingLeft: '16px',
                 paddingRight: '16px',
+                borderRight: '1px solid #e0e0e0',
             },
         },
     };
@@ -69,13 +74,36 @@ export default function UserManager() {
             cell: r => (
                 <div style={{ display: 'flex', gap: 4 }}>
                     <button onClick={() => nav(`/admin/users/edit/${r.id}`)} style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}>Sửa</button>
-                    <button onClick={async () => {
-                        if (window.confirm('Xóa user này?')) {
-                            await deleteUser(r.id);
-                            const res = await getUsers();
-                            setUsers(res.data);
-                        }
-                    }} style={{ width: 50, padding: '6px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}>Xóa</button>
+                    {r.vaitro !== 'admin' ? (
+                        <button
+                            onClick={async () => {
+                                if (window.confirm('Xóa user này?')) {
+                                    await deleteUser(r.id);
+                                    const res = await getUsers();
+                                    setUsers(res.data);
+                                }
+                            }}
+                            style={{ width: 50, padding: '6px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}
+                        >
+                            Xóa
+                        </button>
+                    ) : (
+                        <button
+                            disabled
+                            title="Không thể xóa tài khoản admin"
+                            style={{
+                                width: 50,
+                                padding: '6px',
+                                backgroundColor: '#ccc',
+                                color: '#666',
+                                border: 'none',
+                                borderRadius: 4,
+                                cursor: 'not-allowed'
+                            }}
+                        >
+                            Xóa
+                        </button>
+                    )}
                 </div>
             ),
             ignoreRowClick: true
@@ -84,7 +112,7 @@ export default function UserManager() {
 
     return (
         <div style={{ padding: 20 }}>
-            <h1>Quản lý User</h1>
+            <h1>Quản lý tài khoản</h1>
             <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
                 <input
                     placeholder="Tìm username hoặc vai trò…"
@@ -96,14 +124,7 @@ export default function UserManager() {
 
             </div>
             <div style={{ marginBottom: 16, textAlign: 'right' }}>
-                <button onClick={() => nav('/admin/users/add')} style={{
-                    padding: '15px 20px',
-                    backgroundColor: '#0c4ca3',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 4,
-                    fontWeight: 'bold',
-                }}>
+                <button onClick={() => nav('/admin/users/add')} className='add-button-admin'>
                     Thêm User
                 </button>
 

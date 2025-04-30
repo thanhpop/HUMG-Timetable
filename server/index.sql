@@ -71,15 +71,13 @@ CREATE TABLE IF NOT EXISTS nhommh (
   mamh        VARCHAR(50)   NOT NULL,
   mgv         VARCHAR(50)   NOT NULL,
   maphong     VARCHAR(50)   NOT NULL,
+  mahk VARCHAR(50) NOT NULL,
   FOREIGN KEY (mamh)    REFERENCES monhoc(mamh),
   FOREIGN KEY (mgv)     REFERENCES giangvien(mgv),
-  FOREIGN KEY (maphong) REFERENCES phonghoc(maphong)
+  FOREIGN KEY (maphong) REFERENCES phonghoc(maphong),
+  FOREIGN KEY (mahk) REFERENCES hocky(mahk);
 );
-mahk VARCHAR(50) NOT NULL
 
-ALTER TABLE nhommh
-  ADD COLUMN mahk VARCHAR(50) NOT NULL AFTER mamh,
-  ADD FOREIGN KEY (mahk) REFERENCES hocky(mahk);
 
 
 CREATE TABLE IF NOT EXISTS lichhoc (

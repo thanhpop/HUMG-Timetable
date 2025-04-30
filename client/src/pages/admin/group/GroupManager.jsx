@@ -57,12 +57,12 @@ export default function GroupManager() {
     };
 
     const columns = [
-        { name: 'Mã nhóm', selector: r => r.manhom, sortable: true },
-        { name: 'Tên nhóm', selector: r => r.tennhom, sortable: true },
+        { name: 'Mã nhóm môn học', selector: r => r.manhom, sortable: true },
+        { name: 'Tên nhóm môn học', selector: r => r.tennhom, sortable: true },
 
         // Course code + course name
         {
-            name: 'Tên MH',
+            name: 'Tên Môn học',
             selector: r => {
                 const c = courses.find(c => c.mamh === r.mamh);
                 return c ? c.tenmh : '';
@@ -117,7 +117,7 @@ export default function GroupManager() {
                 />
             </div>
             <div style={{ textAlign: 'right', margin: '16px 0' }}>
-                <button onClick={() => nav('/admin/groups/add')}>Thêm Nhóm</button>
+                <button onClick={() => nav('/admin/groups/add')}>Thêm Nhóm môn học</button>
             </div>
             <DataTable
                 columns={columns}
