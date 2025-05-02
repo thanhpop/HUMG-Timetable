@@ -78,8 +78,8 @@ export default function CourseManager() {
             name: 'Hành động',
             cell: r => (
                 <div style={{ display: 'flex', gap: 4 }}>
-                    <button onClick={() => nav(`/admin/courses/edit/${r.mamh}`)} style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}>Sửa</button>
-                    <button onClick={async () => { await deleteCourse(r.mamh); fetch() }} style={{ width: 50, padding: '6px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}>Xóa</button>
+                    <button onClick={() => nav(`/admin/courses/edit/${r.mamh}`)} className="btn-edit">Sửa</button>
+                    <button onClick={async () => { await deleteCourse(r.mamh); fetch() }} className="btn-delete">Xóa</button>
                 </div>
             ), ignoreRowClick: true
         }
@@ -103,14 +103,7 @@ export default function CourseManager() {
                 </select>
             </div>
             <div style={{ marginBottom: 16, textAlign: 'right' }}>
-                <button onClick={() => nav('/admin/courses/add')} style={{
-                    padding: '15px 20px',
-                    backgroundColor: '#0c4ca3',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 4,
-                    fontWeight: 'bold',
-                }}>Thêm Môn học</button>
+                <button onClick={() => nav('/admin/courses/add')} className="btn-add">Thêm Môn học</button>
             </div>
             <DataTable columns={columns} data={filtered} pagination progressPending={loading} persistTableHead={true} customStyles={customStyles}      // luôn giữ header
             />

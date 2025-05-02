@@ -61,19 +61,19 @@ export default function TeacherManager() {
                 <div style={{ display: 'flex', gap: 4 }}>
                     <button
                         onClick={() => navigate(`/admin/teachers/view/${row.mgv}`)}
-                        style={{ width: 50, padding: '6px', backgroundColor: '#17a2b8', color: 'white', border: 'none', borderRadius: 4 }}
+                        className="btn-view"
                     >
                         Xem
                     </button>
                     <button
                         onClick={() => navigate(`/admin/teachers/edit/${row.mgv}`)}
-                        style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}
+                        className="btn-edit"
                     >
                         Sửa
                     </button>
                     <button
                         onClick={() => handleDelete(row.mgv)}
-                        style={{ width: 50, padding: '6px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}
+                        className="btn-delete"
                     >
                         Xóa
                     </button>
@@ -120,14 +120,7 @@ export default function TeacherManager() {
             <div style={{ marginBottom: 16, textAlign: 'right' }}>
                 <button
                     onClick={() => navigate('/admin/teachers/add')}
-                    style={{
-                        padding: '15px 20px',
-                        backgroundColor: '#0c4ca3',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: 4,
-                        fontWeight: 'bold',
-                    }}
+                    className="btn-add"
                 >
                     Thêm giáo viên
                 </button>

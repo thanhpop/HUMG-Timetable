@@ -121,7 +121,7 @@ export default function EditGroup() {
                 <label>Tên nhóm*</label>
                 <input name="tennhom" value={form.tennhom} onChange={onTextChange} required />
 
-                <label>Môn học*</label>
+                <label>Mã môn học*</label>
                 <Select
                     styles={customSelectStyles}
                     options={courses.map(c => ({ value: c.mamh, label: `${c.mamh} – ${c.tenmh}` }))}
@@ -131,7 +131,7 @@ export default function EditGroup() {
                     isClearable
                 />
 
-                <label>Giảng viên*</label>
+                <label>Mã giảng viên*</label>
                 <Select
                     styles={customSelectStyles}
                     options={teachers.map(t => ({ value: t.mgv, label: `${t.mgv} – ${t.ten}` }))}
@@ -141,7 +141,7 @@ export default function EditGroup() {
                     isClearable
                 />
 
-                <label>Phòng học*</label>
+                <label>Mã phòng học*</label>
                 <Select
                     styles={customSelectStyles}
                     options={rooms.map(r => ({ value: r.maphong, label: `${r.maphong} – ${r.tenphong}` }))}
@@ -151,7 +151,7 @@ export default function EditGroup() {
                     isClearable
                 />
 
-                <label>Học kỳ*</label>
+                <label>Mã học kỳ*</label>
                 <Select
                     styles={customSelectStyles}
                     options={semesters.map(s => ({ value: s.mahk, label: `${s.mahk} – ${s.tenhk}` }))}

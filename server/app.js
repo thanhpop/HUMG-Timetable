@@ -10,6 +10,7 @@ const userRoutes = require('./routes/users');
 const groupRoutes = require('./routes/groupRoutes');
 
 const lichhocRoutes = require('./routes/lichhoc');
+const dotdangkyRoutes = require('./routes/dotdangky');
 
 const authRoutes = require('./routes/auth');
 const errorHandler = require('./middleware/errorHandler');
@@ -29,7 +30,7 @@ app.use('/nhommh', groupRoutes);
 app.use('/users', userRoutes);
 
 app.use('/lichhoc', lichhocRoutes);
-
+app.use('/dotdangky', dotdangkyRoutes);
 
 app.use('/auth', authRoutes);
 

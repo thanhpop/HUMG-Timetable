@@ -66,19 +66,19 @@ export default function StudentManager() {
                 <div style={{ display: 'flex', gap: 4 }}>
                     <button
                         onClick={() => navigate(`/admin/students/view/${row.msv}`)}
-                        style={{ width: 50, padding: '6px', backgroundColor: '#17a2b8', color: 'white', border: 'none', borderRadius: 4 }}
+                        className="btn-view"
                     >
                         Xem
                     </button>
                     <button
                         onClick={() => navigate(`/admin/students/edit/${row.msv}`)}
-                        style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}
+                        className="btn-edit"
                     >
                         Sửa
                     </button>
                     <button
                         onClick={() => handleDelete(row.msv)}
-                        style={{ width: 50, padding: '6px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}
+                        className="btn-delete"
                     >
                         Xóa
                     </button>
@@ -160,7 +160,7 @@ export default function StudentManager() {
             <div style={{ marginBottom: 16, textAlign: 'right', }}>
                 <button
                     onClick={() => navigate('/admin/students/add')}
-                    className='add-button-admin'
+                    className="btn-add"
                 >
                     Thêm sinh viên
                 </button>

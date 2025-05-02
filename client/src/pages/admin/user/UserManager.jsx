@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { getUsers, deleteUser } from '../../../api/userApi';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import '../style.css';
 
 export default function UserManager() {
@@ -73,7 +75,7 @@ export default function UserManager() {
             name: 'Hành động',
             cell: r => (
                 <div style={{ display: 'flex', gap: 4 }}>
-                    <button onClick={() => nav(`/admin/users/edit/${r.id}`)} style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}>Sửa</button>
+                    <button onClick={() => nav(`/admin/users/edit/${r.id}`)} className="btn-edit">Sửa</button>
                     {r.vaitro !== 'admin' ? (
                         <button
                             onClick={async () => {
@@ -83,7 +85,7 @@ export default function UserManager() {
                                     setUsers(res.data);
                                 }
                             }}
-                            style={{ width: 50, padding: '6px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}
+                            className="btn-delete"
                         >
                             Xóa
                         </button>
@@ -114,6 +116,7 @@ export default function UserManager() {
         <div style={{ padding: 20 }}>
             <h1>Quản lý tài khoản</h1>
             <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
+                <FontAwesomeIcon icon={faSearch} className="search-icon" />
                 <input
                     placeholder="Tìm username hoặc vai trò…"
                     value={search}
@@ -124,7 +127,7 @@ export default function UserManager() {
 
             </div>
             <div style={{ marginBottom: 16, textAlign: 'right' }}>
-                <button onClick={() => nav('/admin/users/add')} className='add-button-admin'>
+                <button onClick={() => nav('/admin/users/add')} className="btn-add">
                     Thêm User
                 </button>
 

@@ -3,13 +3,22 @@ import React, { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { getSchedules, deleteSchedule } from '../../../api/scheduleApi';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash, faSearch } from '@fortawesome/free-solid-svg-icons';
 import '../style.css';
 
 export default function ScheduleManager() {
     const navigate = useNavigate();
     const { schedules, setSchedules } = useOutletContext();
     const [loading, setLoading] = useState(false);
+    const [search, setSearch] = useState('');
 
+    const filteredSchedules = schedules.filter(item =>
+        item.mamh.toLowerCase().includes(search.toLowerCase()) ||
+        item.tenmh.toLowerCase().includes(search.toLowerCase()) ||
+        item.tennhom.toLowerCase().includes(search.toLowerCase()) ||
+        item.tengv.toLowerCase().includes(search.toLowerCase())
+    );
     const fetch = async () => {
         setLoading(true);
         const res = await getSchedules();
@@ -45,7 +54,7 @@ export default function ScheduleManager() {
             selector: r => r.id,
             sortable: true,
             width: '68px',           // narrow
-            center: true,
+
         },
         {
             name: 'Mã MH',
@@ -55,18 +64,25 @@ export default function ScheduleManager() {
         {
             name: 'Tên MH',
             selector: r => r.tenmh
+
         },
         {
             name: 'Tên nhóm',
             selector: r => r.tennhom,
-            width: '135px',
+            width: '110px',
         },
         {
             name: 'Số TC',
             selector: r => r.sotinchi,
             width: '80px',          // narrow
-            center: true,
+
         },
+        {
+            name: 'Giảng viên',
+            selector: r => r.tengv,
+            width: '225px',
+        },
+
         {
             name: 'Phòng',
             selector: r => `${r.tenphong} – Khu ${r.khu}`,
@@ -87,29 +103,50 @@ export default function ScheduleManager() {
         {
             name: 'Hành động',
             cell: r => (
-                <div style={{ display: 'flex', gap: 4 }}>
-                    <button onClick={() => navigate(`/admin/lichhoc/edit/${r.id}`)}>Sửa</button>
-                    <button onClick={async () => {
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <button className="btn-icon btn-icon-edit" onClick={() => navigate(`/admin/lichhoc/edit/${r.id}`)}><FontAwesomeIcon icon={faEdit} /></button>
+                    <button className="btn-icon btn-icon-delete" onClick={async () => {
                         if (window.confirm('Xóa?')) {
                             await deleteSchedule(r.id);
                             fetch();
                         }
-                    }}>Xóa</button>
+                    }}> <FontAwesomeIcon icon={faTrash} /></button>
                 </div>
             ),
-            ignoreRowClick: true
+            ignoreRowClick: true,
+            width: '109px',
         }
     ];
 
     return (
         <div style={{ padding: 20 }}>
             <h1>Quản lý Lịch học</h1>
-            <button onClick={() => navigate('/admin/lichhoc/add')} style={{ marginBottom: 16 }}>
-                Thêm Lịch học
-            </button>
+            <FontAwesomeIcon icon={faSearch} className="search-icon" />
+            <input
+                type="text"
+                placeholder="Tìm theo mã MH, tên MH, tên nhóm, giảng viên..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{
+                    marginLeft: '8px',
+                    marginBottom: '12px',
+                    padding: '10px',
+                    width: '100%',
+                    maxWidth: '400px',
+                    borderRadius: '4px',
+                    border: '1px solid #ccc',
+                    fontSize: '14px'
+                }}
+            />
+            <div style={{ marginBottom: 16, textAlign: 'right' }}>
+                <button onClick={() => navigate('/admin/lichhoc/add')} className='btn-add'>
+                    Thêm Lịch học
+                </button>
+            </div>
+
             <DataTable
                 columns={columns}
-                data={schedules}
+                data={filteredSchedules}
                 pagination
                 persistTableHead
                 progressPending={loading}

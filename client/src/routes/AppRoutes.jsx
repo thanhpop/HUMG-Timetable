@@ -47,6 +47,11 @@ import AddSchedule from '../pages/admin/schedule/AddSchedule.jsx';
 import EditSchedule from '../pages/admin/schedule/EditSchedule.jsx';
 import ViewSchedule from '../pages/admin/schedule/ViewSchedule.jsx';
 
+import DotDKManager from '../pages/admin/dotdangky/DotDKManager.jsx';
+import AddDotDK from '../pages/admin/dotdangky/AddDotDK.jsx';
+import EditDotDK from '../pages/admin/dotdangky/EditDotDK.jsx';
+
+
 import Login from '../pages/login/Login.jsx';
 
 
@@ -86,6 +91,9 @@ export default function AppRoutes() {
                 <Route path="/admin/lichhoc/add" element={<AddSchedule />} />
                 <Route path="/admin/lichhoc/edit/:id" element={<EditSchedule />} />
                 <Route path="/admin/lichhoc/view/:id" element={<ViewSchedule />} />
+                <Route path="/admin/dotdangky" element={<DotDKManager />} />
+                <Route path="/admin/dotdangky/add" element={<AddDotDK />} />
+                <Route path="/admin/dotdangky/edit/:id" element={<EditDotDK />} />
             </Route>
             <Route path="/student" element={<ProtectedRoute allowedRoles={['sv']}>
                 <DashboardStudent />

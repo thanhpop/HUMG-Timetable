@@ -72,7 +72,7 @@ export default function Sidebar() {
                                 </NavLink>
                             </li>
                             <li>
-                                <NavLink to="/admin/registration-periods" className={({ isActive }) => isActive ? 'active' : ''}>
+                                <NavLink to="/admin/dotdangky" className={({ isActive }) => isActive ? 'active' : ''}>
                                     Quản lý đợt đăng ký
                                 </NavLink>
                             </li>

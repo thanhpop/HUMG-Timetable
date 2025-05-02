@@ -81,13 +81,13 @@ export default function SemesterManager() {
                 <div style={{ display: 'flex', gap: 4 }}>
                     <button
                         onClick={() => nav(`/admin/semesters/edit/${r.mahk}`)}
-                        style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}
+                        className="btn-edit"
                     >
                         Sửa
                     </button>
                     <button
                         onClick={async () => { if (window.confirm('Xóa học kỳ này?')) { await deleteSemester(r.mahk); fetch(); } }}
-                        style={{ width: 50, padding: '6px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}
+                        className="btn-delete"
                     >
                         Xóa
                     </button>
@@ -115,14 +115,7 @@ export default function SemesterManager() {
             <div style={{ marginBottom: 16, textAlign: 'right' }}>
                 <button
                     onClick={() => nav('/admin/semesters/add')}
-                    style={{
-                        padding: '15px 20px',
-                        backgroundColor: '#0c4ca3',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: 4,
-                        fontWeight: 'bold',
-                    }}
+                    className="btn-add"
                 >
                     Thêm Học kỳ
                 </button>

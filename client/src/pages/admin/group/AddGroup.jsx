@@ -68,10 +68,10 @@ export default function AddGroup() {
                     getAllRooms(),
                     getAllSemesters()
                 ]);
-                setCourses(cRes.data.map(c => ({ value: c.mamh, label: `${c.mamh} – ${c.tenmh}` })));
-                setTeachers(tRes.data.map(t => ({ value: t.mgv, label: `${t.mgv} – ${t.ten}` })));
-                setRooms(rRes.data.map(r => ({ value: r.maphong, label: `${r.maphong} – ${r.tenphong}` })));
-                setSemesters(sRes.data.map(s => ({ value: s.mahk, label: `${s.mahk} – ${s.tenhk}` })));
+                setCourses(cRes.data.map(c => ({ value: c.mamh, label: `Mã môn học: ${c.mamh} – ${c.tenmh}` })));
+                setTeachers(tRes.data.map(t => ({ value: t.mgv, label: `Mã GV: ${t.mgv} – ${t.ten}` })));
+                setRooms(rRes.data.map(r => ({ value: r.maphong, label: `Mã phòng: ${r.maphong} – ${r.tenphong}` })));
+                setSemesters(sRes.data.map(s => ({ value: s.mahk, label: `Mã HK: ${s.mahk} – ${s.tenhk}` })));
             } catch (err) {
                 console.error('Lỗi tải dữ liệu tham chiếu:', err);
                 setError('Không thể tải dữ liệu');
@@ -120,7 +120,7 @@ export default function AddGroup() {
                 <label>Tên nhóm*</label>
                 <input name="tennhom" value={form.tennhom} onChange={onInput} required />
 
-                <label>Môn học*</label>
+                <label>Mã môn học*</label>
                 <Select
                     options={courses}
                     value={courses.find(c => c.value === form.mamh) || null}
@@ -130,7 +130,7 @@ export default function AddGroup() {
                     styles={customSelectStyles}
                 />
 
-                <label>Giảng viên*</label>
+                <label>Mã giảng viên*</label>
                 <Select
                     options={teachers}
                     value={teachers.find(t => t.value === form.mgv) || null}
@@ -140,7 +140,7 @@ export default function AddGroup() {
                     styles={customSelectStyles}
                 />
 
-                <label>Phòng học*</label>
+                <label>Mã phòng học*</label>
                 <Select
                     options={rooms}
                     value={rooms.find(r => r.value === form.maphong) || null}
@@ -150,7 +150,7 @@ export default function AddGroup() {
                     styles={customSelectStyles}
                 />
 
-                <label>Học kỳ*</label>
+                <label>Mã học kỳ*</label>
                 <Select
                     options={semesters}
                     value={semesters.find(s => s.value === form.mahk) || null}

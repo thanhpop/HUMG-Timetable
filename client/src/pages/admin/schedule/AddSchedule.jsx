@@ -2,40 +2,49 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import Select from 'react-select';
 import { createSchedule } from '../../../api/scheduleApi';
+import { getGroups } from '../../../api/groupApi';
+import { getCourses } from '../../../api/courseApi';
+import { getTeachers } from '../../../api/teacherApi';
 import '../style.css';
 
 export default function AddSchedule() {
     const navigate = useNavigate();
     const { schedules, setSchedules } = useOutletContext();
+
     const [form, setForm] = useState({
-        manhom: '', thu: 2, tietbd: 1, tietkt: 2, ngaybd: '', ngaykt: ''
+        manhom: '',
+        thu: 2,
+        tietbd: 1,
+        tietkt: 2,
+        ngaybd: '',
+        ngaykt: ''
     });
+
     const [options, setOptions] = useState([]);
     const [loadingOpts, setLoadingOpts] = useState(true);
     const [error, setError] = useState('');
+
     useEffect(() => {
         (async () => {
             try {
-                // fetch groups, courses, teachers
                 const [gRes, cRes, tRes] = await Promise.all([
-                    getAllGroups(),       // should return [{ manhom, tennhom, mamh, mgv, … }, …]
-                    getAllCourses(),      // [{ mamh, tenmh, … }, …]
-                    getAllTeachers()      // [{ mgv, ten, … }, …]
+                    getGroups(),   // [{ manhom, mamh, mgv, tennhom }]
+                    getCourses(),  // [{ mamh, tenmh }]
+                    getTeachers()  // [{ mgv, ten }]
                 ]);
 
                 const groups = gRes.data;
-                const courses = cRes.data.reduce((m, c) => { m[c.mamh] = c; return m; }, {});
-                const teachers = tRes.data.reduce((m, t) => { m[t.mgv] = t; return m; }, {});
+                const courseMap = Object.fromEntries(cRes.data.map(c => [c.mamh, c.tenmh]));
+                const teacherMap = Object.fromEntries(tRes.data.map(t => [t.mgv, t.ten]));
 
-                // build react-select options
                 const opts = groups.map(g => ({
                     value: g.manhom,
-                    label: `${g.manhom} – ${g.tennhom} – ${courses[g.mamh]?.tenmh || g.mamh} – ${teachers[g.mgv]?.ten || g.mgv}`
+                    label: `Mã nhóm: ${g.manhom} – ${g.tennhom} – ${courseMap[g.mamh] || g.mamh} – ${teacherMap[g.mgv] || g.mgv}`
                 }));
 
                 setOptions(opts);
             } catch (e) {
-                console.error('Cannot load group options', e);
+                console.error('Không thể tải dữ liệu nhóm.', e);
             } finally {
                 setLoadingOpts(false);
             }
@@ -53,9 +62,20 @@ export default function AddSchedule() {
             setError('Vui lòng chọn nhóm');
             return;
         }
-        const res = await createSchedule(form);
-        setSchedules([res.data, ...schedules]);
-        navigate('/admin/lichhoc');
+
+        if (parseInt(form.tietbd) >= parseInt(form.tietkt)) {
+            setError('Tiết bắt đầu phải nhỏ hơn tiết kết thúc');
+            return;
+        }
+
+        try {
+            const res = await createSchedule(form);
+            setSchedules([res.data, ...schedules]);
+            navigate('/admin/lichhoc');
+        } catch (err) {
+            console.error('Lỗi khi tạo lịch học', err);
+            setError('Lỗi khi tạo lịch học');
+        }
     };
 
     return (
@@ -68,8 +88,41 @@ export default function AddSchedule() {
                     options={options}
                     onChange={opt => setForm(f => ({ ...f, manhom: opt.value }))}
                     placeholder="Chọn nhóm..."
+                    isClearable
+                    styles={{
+                        control: (base) => ({
+                            ...base,
+                            backgroundColor: 'black',
+                            color: 'white',
+                            borderColor: '#555',
+                        }),
+                        singleValue: (base) => ({
+                            ...base,
+                            color: 'white',
+                        }),
+                        menu: (base) => ({
+                            ...base,
+                            backgroundColor: 'black',
+                            color: 'white',
+                        }),
+                        option: (base, state) => ({
+                            ...base,
+                            backgroundColor: state.isFocused ? '#333' : 'black',
+                            color: 'white',
+                            cursor: 'pointer',
+                        }),
+                        placeholder: (base) => ({
+                            ...base,
+                            color: '#ccc',
+                        }),
+                        input: (base) => ({
+                            ...base,
+                            color: 'white',
+                        }),
+                    }}
                 />
                 {error && <div className="error-message">{error}</div>}
+
                 <label>Thứ*</label>
                 <select name="thu" value={form.thu} onChange={onInput}>
                     {[2, 3, 4, 5, 6, 7, 8].map(n => (
@@ -78,12 +131,28 @@ export default function AddSchedule() {
                 </select>
 
                 <label>Tiết bắt đầu*</label>
-                <input name="tietbd" type="number" min="1" value={form.tietbd} onChange={onInput} required />
+                <input
+                    name="tietbd"
+                    type="number"
+                    min="1"
+                    value={form.tietbd}
+                    onChange={onInput}
+                    required
+                />
+
                 <label>Tiết kết thúc*</label>
-                <input name="tietkt" type="number" min={form.tietbd} value={form.tietkt} onChange={onInput} required />
+                <input
+                    name="tietkt"
+                    type="number"
+                    min={parseInt(form.tietbd) + 1}
+                    value={form.tietkt}
+                    onChange={onInput}
+                    required
+                />
 
                 <label>Ngày bắt đầu*</label>
                 <input name="ngaybd" type="date" value={form.ngaybd} onChange={onInput} required />
+
                 <label>Ngày kết thúc*</label>
                 <input name="ngaykt" type="date" min={form.ngaybd} value={form.ngaykt} onChange={onInput} required />
 

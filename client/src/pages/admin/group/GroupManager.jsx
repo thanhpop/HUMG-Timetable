@@ -89,15 +89,15 @@ export default function GroupManager() {
             name: 'Hành động',
             cell: r => (
                 <div style={{ display: 'flex', gap: 4 }}>
-                    <button onClick={() => nav(`/admin/groups/view/${r.manhom}`)} style={{ width: 50, padding: '6px', backgroundColor: '#17a2b8', color: 'white', border: 'none', borderRadius: 4 }}>Xem</button>
-                    <button onClick={() => nav(`/admin/groups/edit/${r.manhom}`)} style={{ width: 50, padding: '6px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}>Sửa</button>
+                    <button onClick={() => nav(`/admin/groups/view/${r.manhom}`)} className="btn-view">Xem</button>
+                    <button onClick={() => nav(`/admin/groups/edit/${r.manhom}`)} className="btn-edit">Sửa</button>
                     <button onClick={async () => {
                         if (window.confirm('Xóa?')) {
                             await deleteGroup(r.manhom);
                             const res = await getGroups();
                             setGroups(res.data);
                         }
-                    }} style={{ width: 50, padding: '6px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}>Xóa</button>
+                    }} className="btn-delete">Xóa</button>
                 </div>
             ),
             ignoreRowClick: true
@@ -117,7 +117,7 @@ export default function GroupManager() {
                 />
             </div>
             <div style={{ textAlign: 'right', margin: '16px 0' }}>
-                <button onClick={() => nav('/admin/groups/add')}>Thêm Nhóm môn học</button>
+                <button onClick={() => nav('/admin/groups/add')} className="btn-add">Thêm Nhóm môn học</button>
             </div>
             <DataTable
                 columns={columns}
