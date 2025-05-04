@@ -2,13 +2,14 @@
 const db = require('../config/db');
 
 exports.findAll = () => {
-    const sql = `
+  const sql = `
     SELECT 
       lh.id,
       lh.manhom,
       nh.tennhom,
       nh.mamh,
       mh.tenmh,
+      mh.khoa, 
       mh.sotinchi,
       nh.maphong,
       p.tenphong,
@@ -28,17 +29,18 @@ exports.findAll = () => {
     JOIN giangvien gv ON nh.mgv      = gv.mgv
     ORDER BY lh.id DESC
   `;
-    return db.query(sql);
+  return db.query(sql);
 };
 
 exports.findById = id => {
-    const sql = `
+  const sql = `
       SELECT 
         lh.id,
         lh.manhom,
         nh.tennhom,
         nh.mamh,
         mh.tenmh,
+        mh.khoa, 
         mh.sotinchi,
         nh.maphong,
         p.tenphong,
@@ -58,21 +60,21 @@ exports.findById = id => {
       JOIN giangvien gv ON nh.mgv      = gv.mgv
       WHERE lh.id = ?
     `;
-    return db.query(sql, [id]);
+  return db.query(sql, [id]);
 };
 
 
 exports.create = ({ manhom, thu, tietbd, tietkt, ngaybd, ngaykt }) =>
-    db.query(
-        'INSERT INTO lichhoc (manhom,thu,tietbd,tietkt,ngaybd,ngaykt) VALUES (?,?,?,?,?,?)',
-        [manhom, thu, tietbd, tietkt, ngaybd, ngaykt]
-    );
+  db.query(
+    'INSERT INTO lichhoc (manhom,thu,tietbd,tietkt,ngaybd,ngaykt) VALUES (?,?,?,?,?,?)',
+    [manhom, thu, tietbd, tietkt, ngaybd, ngaykt]
+  );
 
 exports.update = (id, data) =>
-    db.query(
-        'UPDATE lichhoc SET manhom=?,thu=?,tietbd=?,tietkt=?,ngaybd=?,ngaykt=? WHERE id=?',
-        [data.manhom, data.thu, data.tietbd, data.tietkt, data.ngaybd, data.ngaykt, id]
-    );
+  db.query(
+    'UPDATE lichhoc SET manhom=?,thu=?,tietbd=?,tietkt=?,ngaybd=?,ngaykt=? WHERE id=?',
+    [data.manhom, data.thu, data.tietbd, data.tietkt, data.ngaybd, data.ngaykt, id]
+  );
 
 exports.remove = id =>
-    db.query('DELETE FROM lichhoc WHERE id = ?', [id]);
+  db.query('DELETE FROM lichhoc WHERE id = ?', [id]);

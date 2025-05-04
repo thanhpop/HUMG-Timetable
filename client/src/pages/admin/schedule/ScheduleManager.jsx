@@ -12,13 +12,8 @@ export default function ScheduleManager() {
     const { schedules, setSchedules } = useOutletContext();
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
+    const [filterKhoa, setFilterKhoa] = useState('');
 
-    const filteredSchedules = schedules.filter(item =>
-        item.mamh.toLowerCase().includes(search.toLowerCase()) ||
-        item.tenmh.toLowerCase().includes(search.toLowerCase()) ||
-        item.tennhom.toLowerCase().includes(search.toLowerCase()) ||
-        item.tengv.toLowerCase().includes(search.toLowerCase())
-    );
     const fetch = async () => {
         setLoading(true);
         const res = await getSchedules();
@@ -28,17 +23,30 @@ export default function ScheduleManager() {
 
     useEffect(() => { fetch(); }, []);
 
+    // build list of unique khoa for the dropdown
+    const khoaOptions = Array.from(new Set(schedules.map(r => r.khoa))).sort();
+
+    // apply both text‐search and khoa filter
+    const filteredSchedules = schedules.filter(r => {
+        const textMatch =
+            r.mamh.toLowerCase().includes(search.toLowerCase()) ||
+            r.tenmh.toLowerCase().includes(search.toLowerCase()) ||
+            r.tennhom.toLowerCase().includes(search.toLowerCase()) ||
+            r.tengv.toLowerCase().includes(search.toLowerCase());
+        const khoaMatch = !filterKhoa || r.khoa === filterKhoa;
+        return textMatch && khoaMatch;
+    });
+
     const customStyles = {
         headCells: {
             style: {
                 fontSize: '15px',
                 paddingLeft: '16px',
                 paddingRight: '16px',
-                border: '1px solid #e0e0e0', // Thêm border đầy đủ
+                border: '1px solid #e0e0e0',
                 backgroundColor: '#f1f1f1',
             },
         },
-
         cells: {
             style: {
                 paddingLeft: '16px',
@@ -49,46 +57,14 @@ export default function ScheduleManager() {
     };
 
     const columns = [
-        {
-            name: 'ID',
-            selector: r => r.id,
-            sortable: true,
-            width: '68px',           // narrow
-
-        },
-        {
-            name: 'Mã MH',
-            selector: r => r.mamh,
-            width: '135px',
-        },
-        {
-            name: 'Tên MH',
-            selector: r => r.tenmh
-
-        },
-        {
-            name: 'Tên nhóm',
-            selector: r => r.tennhom,
-            width: '110px',
-        },
-        {
-            name: 'Số TC',
-            selector: r => r.sotinchi,
-            width: '80px',          // narrow
-
-        },
-        {
-            name: 'Giảng viên',
-            selector: r => r.tengv,
-            width: '225px',
-        },
-
-        {
-            name: 'Phòng',
-            selector: r => `${r.tenphong} – Khu ${r.khu}`,
-            wrap: true,
-            width: '150px',
-        },
+        { name: 'ID', selector: r => r.id, sortable: true, width: '68px' },
+        { name: 'Mã MH', selector: r => r.mamh, width: '135px' },
+        { name: 'Tên MH', selector: r => r.tenmh, width: '300px' },
+        { name: 'Tên nhóm', selector: r => r.tennhom, width: '110px' },
+        { name: 'Khoa', selector: r => r.khoa, width: '212px' },
+        { name: 'Số TC', selector: r => r.sotinchi, width: '80px' },
+        { name: 'Giảng viên', selector: r => r.tengv, width: '225px' },
+        { name: 'Phòng', selector: r => `${r.tenphong} – Khu ${r.khu}`, wrap: true, width: '120px' },
         {
             name: 'Thời gian',
             selector: r => {
@@ -96,7 +72,7 @@ export default function ScheduleManager() {
                 const tiet = `${r.tietbd}–${r.tietkt}`;
                 const from = new Date(r.ngaybd).toLocaleDateString('vi-VN');
                 const to = new Date(r.ngaykt).toLocaleDateString('vi-VN');
-                return `${thu}, tiết ${tiet}\n,${from} → ${to}`;
+                return `${thu}, tiết ${tiet}\n${from} → ${to}`;
             },
             wrap: true
         },
@@ -104,13 +80,17 @@ export default function ScheduleManager() {
             name: 'Hành động',
             cell: r => (
                 <div style={{ display: 'flex', gap: '8px' }}>
-                    <button className="btn-icon btn-icon-edit" onClick={() => navigate(`/admin/lichhoc/edit/${r.id}`)}><FontAwesomeIcon icon={faEdit} /></button>
+                    <button className="btn-icon btn-icon-edit" onClick={() => navigate(`/admin/lichhoc/edit/${r.id}`)}>
+                        <FontAwesomeIcon icon={faEdit} />
+                    </button>
                     <button className="btn-icon btn-icon-delete" onClick={async () => {
                         if (window.confirm('Xóa?')) {
                             await deleteSchedule(r.id);
                             fetch();
                         }
-                    }}> <FontAwesomeIcon icon={faTrash} /></button>
+                    }}>
+                        <FontAwesomeIcon icon={faTrash} />
+                    </button>
                 </div>
             ),
             ignoreRowClick: true,
@@ -121,10 +101,12 @@ export default function ScheduleManager() {
     return (
         <div style={{ padding: 20 }}>
             <h1>Quản lý Lịch học</h1>
-            <FontAwesomeIcon icon={faSearch} className="search-icon" />
+
+
+            <FontAwesomeIcon icon={faSearch} />
             <input
                 type="text"
-                placeholder="Tìm theo mã MH, tên MH, tên nhóm, giảng viên..."
+                placeholder="Tìm theo mã MH, tên MH, nhóm, giảng viên…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 style={{
@@ -138,11 +120,20 @@ export default function ScheduleManager() {
                     fontSize: '14px'
                 }}
             />
+            <select
+                value={filterKhoa}
+                onChange={e => setFilterKhoa(e.target.value)}
+                style={{ padding: '8px', fontSize: '14px', borderRadius: '4px' }}
+            >
+                <option value="">-- Tất cả khoa --</option>
+                {khoaOptions.map(k => <option key={k} value={k}>{k}</option>)}
+            </select>
             <div style={{ marginBottom: 16, textAlign: 'right' }}>
-                <button onClick={() => navigate('/admin/lichhoc/add')} className='btn-add'>
+                <button onClick={() => navigate('/admin/lichhoc/add')} className="btn-add" style={{ marginLeft: 'auto' }}>
                     Thêm Lịch học
                 </button>
             </div>
+
 
             <DataTable
                 columns={columns}

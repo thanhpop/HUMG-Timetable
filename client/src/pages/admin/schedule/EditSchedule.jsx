@@ -16,8 +16,10 @@ export default function EditSchedule() {
     const [options, setOptions] = useState([]);
     const [loadingOpts, setLoadingOpts] = useState(true);
 
-    function fmtDate(d) {
-        return d?.split('T')[0] ?? '';
+    function toLocalDateInputValue(iso) {
+        const d = new Date(iso);
+        const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+        return local.toISOString().split('T')[0];
     }
 
     useEffect(() => {
@@ -26,8 +28,8 @@ export default function EditSchedule() {
             const res = await getSchedule(id);
             setForm({
                 ...res.data,
-                ngaybd: fmtDate(res.data.ngaybd),
-                ngaykt: fmtDate(res.data.ngaykt),
+                ngaybd: toLocalDateInputValue(res.data.ngaybd),
+                ngaykt: toLocalDateInputValue(res.data.ngaykt),
             });
         })();
         // load select-options

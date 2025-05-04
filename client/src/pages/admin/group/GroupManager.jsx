@@ -18,6 +18,7 @@ export default function GroupManager() {
 
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
+    const [filterKhoa, setFilterKhoa] = useState('');
     const [courses, setCourses] = useState([]);
     const [teachers, setTeachers] = useState([]);
     const [rooms, setRooms] = useState([]);
@@ -45,10 +46,22 @@ export default function GroupManager() {
         })();
     }, []);
 
-    const filtered = groups.filter(g =>
-        g.manhom.includes(search) ||
-        g.tennhom.toLowerCase().includes(search.toLowerCase())
-    );
+    const khoaOptions = Array.from(new Set(courses.map(c => c.khoa))).sort();
+
+    // filter groups by text and khoa
+    const filtered = groups.filter(g => {
+        const term = search.toLowerCase();
+        const textMatch =
+            g.manhom.toLowerCase().includes(term) ||
+            g.tennhom.toLowerCase().includes(term);
+
+        // lookup this group’s course to get its khoa
+        const course = courses.find(c => c.mamh === g.mamh);
+        const khoa = course?.khoa ?? '';
+        const khoaMatch = !filterKhoa || khoa === filterKhoa;
+
+        return textMatch && khoaMatch;
+    });
 
     const customStyles = {
         table: { style: { backgroundColor: '#f9f9f9' } },
@@ -67,6 +80,14 @@ export default function GroupManager() {
                 const c = courses.find(c => c.mamh === r.mamh);
                 return c ? c.tenmh : '';
             }
+        },
+        {
+            name: 'Khoa',
+            selector: r => {
+                const c = courses.find(c => c.mamh === r.mamh);
+                return c ? c.khoa : '';
+            },
+            sortable: true
         },
 
         {
@@ -115,6 +136,16 @@ export default function GroupManager() {
                     onChange={e => setSearch(e.target.value)}
                     style={{ padding: 8, width: 300, fontSize: 14 }}
                 />
+                <select
+                    value={filterKhoa}
+                    onChange={e => setFilterKhoa(e.target.value)}
+                    style={{ padding: 8, fontSize: 14 }}
+                >
+                    <option value="">-- Tất cả khoa --</option>
+                    {khoaOptions.map(k => (
+                        <option key={k} value={k}>{k}</option>
+                    ))}
+                </select>
             </div>
             <div style={{ textAlign: 'right', margin: '16px 0' }}>
                 <button onClick={() => nav('/admin/groups/add')} className="btn-add">Thêm Nhóm môn học</button>

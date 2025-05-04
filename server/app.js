@@ -12,11 +12,15 @@ const groupRoutes = require('./routes/groupRoutes');
 const lichhocRoutes = require('./routes/lichhoc');
 const dotdangkyRoutes = require('./routes/dotdangky');
 
+
 const authRoutes = require('./routes/auth');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173', // chỉ định đúng client
+    credentials: true // cho phép gửi cookie
+}));
 app.use(express.json());
 
 
@@ -32,12 +36,12 @@ app.use('/users', userRoutes);
 app.use('/lichhoc', lichhocRoutes);
 app.use('/dotdangky', dotdangkyRoutes);
 
+app.use('/dangky', require('./routes/dangky'));
+
 app.use('/auth', authRoutes);
 
 
-app.use((req, res) => {
-    res.status(404).json({ error: 'Not Found' });
-});
+
 
 
 app.use(errorHandler);

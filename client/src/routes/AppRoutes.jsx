@@ -52,6 +52,8 @@ import AddDotDK from '../pages/admin/dotdangky/AddDotDK.jsx';
 import EditDotDK from '../pages/admin/dotdangky/EditDotDK.jsx';
 
 
+import Registration from '../pages/student/Registration.jsx';
+
 import Login from '../pages/login/Login.jsx';
 
 
@@ -99,6 +101,7 @@ export default function AppRoutes() {
                 <DashboardStudent />
             </ProtectedRoute>} >
                 <Route path="info" element={<StudentInfo />} />
+                <Route path="registration" element={<Registration />} />
             </Route>
             <Route path="/teacher" element={<ProtectedRoute allowedRoles={['gv']}>
                 <DashboardTeacher />
