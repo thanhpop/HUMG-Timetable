@@ -109,7 +109,7 @@ export default function GroupManager() {
         {
             name: 'Hành động',
             cell: r => (
-                <div style={{ display: 'flex', gap: 4 }}>
+                <div style={{ display: 'flex', gap: 2 }}>
                     <button onClick={() => nav(`/admin/groups/view/${r.manhom}`)} className="btn-view">Xem</button>
                     <button onClick={() => nav(`/admin/groups/edit/${r.manhom}`)} className="btn-edit">Sửa</button>
                     <button onClick={async () => {

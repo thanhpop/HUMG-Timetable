@@ -101,6 +101,15 @@ CREATE TABLE IF NOT EXISTS dangky (
   FOREIGN KEY (lichhoc_id) REFERENCES lichhoc(id)
 );
 
+CREATE TABLE IF NOT EXISTS dotdangky (
+  id           INT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  mahk         VARCHAR(50) NOT NULL,           -- học kỳ
+  ngaybd_dk    DATETIME  NOT NULL,              -- bắt đầu đăng ký
+  ngaykt_dk    DATETIME  NOT NULL,              -- kết thúc đăng ký
+  FOREIGN KEY (mahk) REFERENCES hocky(mahk)
+);
+
+
 --truy vấn để lấy ra lịch học cho sinh viên đăng ký
 SELECT
   l.id                   AS lichhoc_id,
@@ -142,11 +151,4 @@ JOIN phonghoc ph  ON nh.maphong = ph.maphong
 WHERE d.msv = 'SV001';
 
 
-CREATE TABLE IF NOT EXISTS dotdangky (
-  id           INT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  mahk         VARCHAR(50) NOT NULL,           -- học kỳ
-  ngaybd_dk    DATETIME  NOT NULL,              -- bắt đầu đăng ký
-  ngaykt_dk    DATETIME  NOT NULL,              -- kết thúc đăng ký
-  FOREIGN KEY (mahk) REFERENCES hocky(mahk)
-);
 

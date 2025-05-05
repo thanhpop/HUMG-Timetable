@@ -14,9 +14,14 @@ export default function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.body.classList.add('login-bg');
-    return () => document.body.classList.remove('login-bg');
+    // Khi mount Login: reset body class rồi thêm login-bg
+    document.body.className = 'login-bg';
+    return () => {
+      // Khi unmount Login: xoá class để không ảnh hưởng page khác
+      document.body.className = '';
+    };
   }, []);
+
 
   const handleSubmit = async e => {
     e.preventDefault();

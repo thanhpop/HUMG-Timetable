@@ -60,7 +60,33 @@
 }
 
 .registration-header h1 {
+
     margin: 0;
     font-size: 18px;
     font-weight: 500;
+}
+
+
+/* datatable style */
+/* style.css */
+
+.registration-page .rdt_Table {
+    font-size: 16px;
+}
+
+.registration-page .rdt_TableCell,
+.registration-page .rdt_TableCol {
+    border-right: 1px solid #e0e0e0;
+    padding: 8px;
+}
+
+.registration-page .rdt_TableHead {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+
+
+.registration-page .rdt_TableRow:hover {
+    background-color: #e6f7ff;
 }

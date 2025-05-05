@@ -4,7 +4,8 @@ import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import Select from 'react-select';
 import { getSchedule, updateSchedule } from '../../../api/scheduleApi';
 import { getGroups } from '../../../api/groupApi';
-import { getAllCourses, getAllTeachers } from '../../../api/utilsApi';
+import { getCourses } from '../../../api/courseApi';
+import { getTeachers } from '../../../api/teacherApi';
 import '../style.css';
 
 export default function EditSchedule() {
@@ -15,6 +16,7 @@ export default function EditSchedule() {
     const [form, setForm] = useState(null);
     const [options, setOptions] = useState([]);
     const [loadingOpts, setLoadingOpts] = useState(true);
+    const [error, setError] = useState('');
 
     function toLocalDateInputValue(iso) {
         const d = new Date(iso);
@@ -23,7 +25,6 @@ export default function EditSchedule() {
     }
 
     useEffect(() => {
-        // load the schedule to edit
         (async () => {
             const res = await getSchedule(id);
             setForm({
@@ -32,22 +33,26 @@ export default function EditSchedule() {
                 ngaykt: toLocalDateInputValue(res.data.ngaykt),
             });
         })();
-        // load select-options
+
         (async () => {
             try {
                 const [gRes, cRes, tRes] = await Promise.all([
                     getGroups(),
-                    getAllCourses(),
-                    getAllTeachers(),
+                    getCourses(),
+                    getTeachers(),
                 ]);
-                const courses = Object.fromEntries(cRes.data.map(c => [c.mamh, c]));
-                const teachers = Object.fromEntries(tRes.data.map(t => [t.mgv, t]));
-                setOptions(
-                    gRes.data.map(g => ({
-                        value: g.manhom,
-                        label: `Mã nhóm: ${g.manhom} – ${g.tennhom} – ${courses[g.mamh]?.tenmh} – ${teachers[g.mgv]?.ten}`,
-                    }))
-                );
+
+                const courseMap = Object.fromEntries(cRes.data.map(c => [c.mamh, c.tenmh]));
+                const teacherMap = Object.fromEntries(tRes.data.map(t => [t.mgv, t.ten]));
+
+                const opts = gRes.data.map(g => ({
+                    value: g.manhom,
+                    label: `Mã nhóm: ${g.manhom} – ${g.tennhom} – Môn: ${courseMap[g.mamh] || g.mamh} – GV: ${teacherMap[g.mgv] || g.mgv} – ${g.tenphong} – Khu ${g.khu}`
+                }));
+
+                setOptions(opts);
+            } catch (e) {
+                console.error('Không thể tải dữ liệu nhóm.', e);
             } finally {
                 setLoadingOpts(false);
             }
@@ -63,9 +68,25 @@ export default function EditSchedule() {
 
     const onSubmit = async e => {
         e.preventDefault();
-        const res = await updateSchedule(id, form);
-        setSchedules(schedules.map(s => (s.id === res.data.id ? res.data : s)));
-        navigate('/admin/lichhoc');
+
+        if (!form.manhom) {
+            setError('Vui lòng chọn nhóm');
+            return;
+        }
+
+        if (parseInt(form.tietbd) >= parseInt(form.tietkt)) {
+            setError('Tiết bắt đầu phải nhỏ hơn tiết kết thúc');
+            return;
+        }
+
+        try {
+            const res = await updateSchedule(id, form);
+            setSchedules(schedules.map(s => (s.id === res.data.id ? res.data : s)));
+            navigate('/admin/lichhoc');
+        } catch (err) {
+            console.error('Lỗi khi cập nhật lịch học', err);
+            setError('Lỗi khi cập nhật lịch học');
+        }
     };
 
     return (
@@ -76,9 +97,10 @@ export default function EditSchedule() {
                 <Select
                     isLoading={loadingOpts}
                     options={options}
-                    defaultValue={options.find(o => o.value === form.manhom)}
-                    onChange={opt => setForm(f => ({ ...f, manhom: opt.value }))}
+                    value={options.find(o => o.value === form.manhom) || null}
+                    onChange={opt => setForm(f => ({ ...f, manhom: opt?.value || '' }))}
                     isClearable
+                    placeholder="Chọn nhóm..."
                     styles={{
                         control: base => ({ ...base, backgroundColor: 'black', borderColor: '#555' }),
                         singleValue: base => ({ ...base, color: 'white' }),
@@ -92,6 +114,7 @@ export default function EditSchedule() {
                         input: base => ({ ...base, color: 'white' }),
                     }}
                 />
+                {error && <div className="error-message">{error}</div>}
 
                 <label>Thứ*</label>
                 <select name="thu" value={form.thu} onChange={onChange}>
@@ -104,7 +127,7 @@ export default function EditSchedule() {
                 <input name="tietbd" type="number" min="1" value={form.tietbd} onChange={onChange} required />
 
                 <label>Tiết kết thúc*</label>
-                <input name="tietkt" type="number" min={form.tietbd + 1} value={form.tietkt} onChange={onChange} required />
+                <input name="tietkt" type="number" min={parseInt(form.tietbd) + 1} value={form.tietkt} onChange={onChange} required />
 
                 <label>Ngày bắt đầu*</label>
                 <input name="ngaybd" type="date" value={form.ngaybd} onChange={onChange} required />

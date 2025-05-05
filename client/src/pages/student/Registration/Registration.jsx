@@ -1,13 +1,13 @@
-// src/pages/student/Registration.jsx
+// src/pages/student/Registration/Registration.jsx
 import React, { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
-import { getSchedules } from '../../api/scheduleApi';
+import { getSchedules } from '../../../api/scheduleApi';
 import {
     getMyRegistrations,
     createRegistration,
     deleteRegistration
-} from '../../api/dangkyApi';
-import { getCurrentMsv } from '../utils/auth';
+} from '../../../api/dangkyApi';
+import { getCurrentMsv } from '../../utils/auth';
 import './style.css';
 
 export default function Registration() {
@@ -47,17 +47,28 @@ export default function Registration() {
     };
 
     const openCols = [
+
+        { name: 'Mã MH', selector: r => r.mamh },
+        { name: 'Tên MH', selector: r => r.tenmh },
+        { name: 'Số TC', selector: r => r.sotinchi },
+        { name: 'Nhóm', selector: r => r.tennhom },
+
+        {
+            name: 'Thời gian',
+            selector: r => {
+                const day = `Thứ ${r.thu === 8 ? 'CN' : r.thu}`;
+                const range = `${new Date(r.ngaybd).toLocaleDateString()} → ${new Date(r.ngaykt).toLocaleDateString()}`;
+                const gv = `GV: ${r.tengv}`;
+                const room = `Phòng: ${r.tenphong} – Khu ${r.khu}`;
+                return `${day}\n${range}\n${gv},\n${room}`;
+            },
+            wrap: true
+        },
         {
             name: 'Đăng ký',
             cell: r => <button onClick={() => handleRegister(r)}>Đăng ký</button>,
             ignoreRowClick: true
         },
-        { name: 'Mã MH', selector: r => r.mamh },
-        { name: 'Tên MH', selector: r => r.tenmh },
-        { name: 'Nhóm', selector: r => r.tennhom },
-        { name: 'GV', selector: r => r.tengv },
-        { name: 'Phòng', selector: r => `${r.tenphong}–Khu ${r.khu}` },
-
     ];
 
     const myCols = [
@@ -76,7 +87,7 @@ export default function Registration() {
     return (
         <div className="registration-page">
             <div className="registration-header">
-                <h1>Đăng ký môn học học kỳ 2 – Năm học 2024–2025</h1>
+                <h1>Đăng ký môn học học kỳ 2 – Năm học 2024 – 2025</h1>
             </div>
             <h2>Danh sách môn học mở cho đăng ký</h2>
             <DataTable

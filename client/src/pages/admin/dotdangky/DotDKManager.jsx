@@ -4,6 +4,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { getDotDK, deleteDotDK } from '../../../api/dotdangkyApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { getAllSemesters } from '../../../api/utilsApi';
 
 // Hàm định dạng ngày từ chuỗi ISO sang "dd/mm/yyyy"
 function formatDate(isoDate) {
@@ -20,10 +21,25 @@ export default function DotDKManager() {
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
 
+    // semInfo sẽ là object: { [mahk]: { tenhk, namhoc } }
+    const [semInfo, setSemInfo] = useState({});
+
     const fetch = async () => {
         setLoading(true);
-        const res = await getDotDK();
-        setDotDK(res.data);
+        // song song lấy dotdk và semesters
+        const [dkRes, semRes] = await Promise.all([
+            getDotDK(),
+            getAllSemesters()
+        ]);
+        setDotDK(dkRes.data);
+
+        // build semInfo map
+        const info = {};
+        semRes.data.forEach(s => {
+            info[s.mahk] = { tenhk: s.tenhk, namhoc: s.namhoc };
+        });
+        setSemInfo(info);
+
         setLoading(false);
     };
 
@@ -36,6 +52,17 @@ export default function DotDKManager() {
     const columns = [
         { name: 'ID', selector: r => r.id, sortable: true, width: '60px' },
         { name: 'Mã học kì', selector: r => r.mahk },
+        {
+            name: 'Học kỳ / Năm học',
+            selector: r => {
+                const info = semInfo[r.mahk];
+                return info
+                    ? `${info.tenhk} – ${info.namhoc}`
+                    : '';
+            },
+            wrap: true,
+            sortable: true
+        },
         { name: 'Ngày bắt đầu đăng ký', selector: r => formatDate(r.ngaybd_dk) },
         { name: 'Ngày kết thúc đăng ký', selector: r => formatDate(r.ngaykt_dk) },
         {

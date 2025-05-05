@@ -1,3 +1,4 @@
+// src/pages/admin/schedule/AddSchedule.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import Select from 'react-select';
@@ -5,6 +6,7 @@ import { createSchedule } from '../../../api/scheduleApi';
 import { getGroups } from '../../../api/groupApi';
 import { getCourses } from '../../../api/courseApi';
 import { getTeachers } from '../../../api/teacherApi';
+import { getRooms } from '../../../api/roomApi';
 import '../style.css';
 
 export default function AddSchedule() {
@@ -12,14 +14,8 @@ export default function AddSchedule() {
     const { schedules, setSchedules } = useOutletContext();
 
     const [form, setForm] = useState({
-        manhom: '',
-        thu: 2,
-        tietbd: 1,
-        tietkt: 2,
-        ngaybd: '',
-        ngaykt: ''
+        manhom: '', thu: 2, tietbd: 1, tietkt: 2, ngaybd: '', ngaykt: ''
     });
-
     const [options, setOptions] = useState([]);
     const [loadingOpts, setLoadingOpts] = useState(true);
     const [error, setError] = useState('');
@@ -27,24 +23,37 @@ export default function AddSchedule() {
     useEffect(() => {
         (async () => {
             try {
-                const [gRes, cRes, tRes] = await Promise.all([
-                    getGroups(),   // [{ manhom, mamh, mgv, tennhom }]
+                const [gRes, cRes, tRes, rRes] = await Promise.all([
+                    getGroups(),   // [{ manhom, mamh, mgv, maphong, tennhom }]
                     getCourses(),  // [{ mamh, tenmh }]
-                    getTeachers()  // [{ mgv, ten }]
+                    getTeachers(), // [{ mgv, ten }]
+                    getRooms()     // [{ maphong, tenphong, khu }]
                 ]);
 
                 const groups = gRes.data;
                 const courseMap = Object.fromEntries(cRes.data.map(c => [c.mamh, c.tenmh]));
                 const teacherMap = Object.fromEntries(tRes.data.map(t => [t.mgv, t.ten]));
+                // roomMap now stores an object { tenphong, khu }
+                const roomMap = Object.fromEntries(rRes.data.map(r => [r.maphong, { tenphong: r.tenphong, khu: r.khu }]));
 
-                const opts = groups.map(g => ({
-                    value: g.manhom,
-                    label: `Mã nhóm: ${g.manhom} – ${g.tennhom} – ${courseMap[g.mamh] || g.mamh} – ${teacherMap[g.mgv] || g.mgv}`
-                }));
+                const opts = groups.map(g => {
+                    const room = roomMap[g.maphong] || {};
+                    return {
+                        value: g.manhom,
+                        label: [
+                            `Nhóm: ${g.manhom}`,
+                            g.tennhom,
+                            `Môn: ${courseMap[g.mamh] || g.mamh}`,
+                            `GV: ${teacherMap[g.mgv] || g.mgv}`,
+                            `Phòng: ${room.tenphong || g.maphong}`,
+                            `Khu: ${room.khu || ''}`
+                        ].join(' – ')
+                    };
+                });
 
                 setOptions(opts);
             } catch (e) {
-                console.error('Không thể tải dữ liệu nhóm.', e);
+                console.error('Không thể tải dữ liệu tham chiếu', e);
             } finally {
                 setLoadingOpts(false);
             }
@@ -62,18 +71,16 @@ export default function AddSchedule() {
             setError('Vui lòng chọn nhóm');
             return;
         }
-
         if (parseInt(form.tietbd) >= parseInt(form.tietkt)) {
             setError('Tiết bắt đầu phải nhỏ hơn tiết kết thúc');
             return;
         }
-
         try {
             const res = await createSchedule(form);
             setSchedules([res.data, ...schedules]);
             navigate('/admin/lichhoc');
         } catch (err) {
-            console.error('Lỗi khi tạo lịch học', err);
+            console.error(err);
             setError('Lỗi khi tạo lịch học');
         }
     };
@@ -86,73 +93,38 @@ export default function AddSchedule() {
                 <Select
                     isLoading={loadingOpts}
                     options={options}
-                    onChange={opt => setForm(f => ({ ...f, manhom: opt.value }))}
+                    onChange={opt => setForm(f => ({ ...f, manhom: opt ? opt.value : '' }))}
                     placeholder="Chọn nhóm..."
                     isClearable
                     styles={{
-                        control: (base) => ({
-                            ...base,
-                            backgroundColor: 'black',
-                            color: 'white',
-                            borderColor: '#555',
-                        }),
-                        singleValue: (base) => ({
-                            ...base,
-                            color: 'white',
-                        }),
-                        menu: (base) => ({
-                            ...base,
-                            backgroundColor: 'black',
-                            color: 'white',
-                        }),
+                        control: base => ({ ...base, backgroundColor: 'black', borderColor: '#555' }),
+                        singleValue: base => ({ ...base, color: 'white' }),
+                        menu: base => ({ ...base, backgroundColor: 'black' }),
                         option: (base, state) => ({
                             ...base,
                             backgroundColor: state.isFocused ? '#333' : 'black',
-                            color: 'white',
-                            cursor: 'pointer',
+                            color: 'white'
                         }),
-                        placeholder: (base) => ({
-                            ...base,
-                            color: '#ccc',
-                        }),
-                        input: (base) => ({
-                            ...base,
-                            color: 'white',
-                        }),
+                        placeholder: base => ({ ...base, color: '#ccc' }),
+                        input: base => ({ ...base, color: 'white' })
                     }}
                 />
                 {error && <div className="error-message">{error}</div>}
 
                 <label>Thứ*</label>
                 <select name="thu" value={form.thu} onChange={onInput}>
-                    {[2, 3, 4, 5, 6, 7, 8].map(n => (
+                    {[2, 3, 4, 5, 6, 7, 8].map(n =>
                         <option key={n} value={n}>Thứ {n === 8 ? 'CN' : n}</option>
-                    ))}
+                    )}
                 </select>
 
                 <label>Tiết bắt đầu*</label>
-                <input
-                    name="tietbd"
-                    type="number"
-                    min="1"
-                    value={form.tietbd}
-                    onChange={onInput}
-                    required
-                />
-
+                <input name="tietbd" type="number" min="1" value={form.tietbd} onChange={onInput} required />
                 <label>Tiết kết thúc*</label>
-                <input
-                    name="tietkt"
-                    type="number"
-                    min={parseInt(form.tietbd) + 1}
-                    value={form.tietkt}
-                    onChange={onInput}
-                    required
-                />
+                <input name="tietkt" type="number" min={parseInt(form.tietbd) + 1} value={form.tietkt} onChange={onInput} required />
 
                 <label>Ngày bắt đầu*</label>
                 <input name="ngaybd" type="date" value={form.ngaybd} onChange={onInput} required />
-
                 <label>Ngày kết thúc*</label>
                 <input name="ngaykt" type="date" min={form.ngaybd} value={form.ngaykt} onChange={onInput} required />
 

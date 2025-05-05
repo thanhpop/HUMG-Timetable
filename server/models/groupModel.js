@@ -2,11 +2,27 @@ const db = require('../config/db');
 
 // Lấy tất cả nhóm
 exports.findAll = () =>
-    db.query('SELECT * FROM nhommh ORDER BY manhom');
+    db.query(`
+        SELECT 
+            nhommh.*, 
+            phonghoc.tenphong, 
+            phonghoc.khu
+        FROM nhommh
+        LEFT JOIN phonghoc ON nhommh.maphong = phonghoc.maphong
+        ORDER BY nhommh.manhom
+    `);
 
 // Tìm theo mã nhóm
 exports.findById = manhom =>
-    db.query('SELECT * FROM nhommh WHERE manhom = ?', [manhom]);
+    db.query(`
+        SELECT 
+            nhommh.*, 
+            phonghoc.tenphong, 
+            phonghoc.khu
+        FROM nhommh
+        LEFT JOIN phonghoc ON nhommh.maphong = phonghoc.maphong
+        WHERE nhommh.manhom = ?
+    `, [manhom]);
 
 // Thêm nhóm mới
 exports.create = ({ manhom, tennhom, mamh, mgv, maphong, mahk }) =>
