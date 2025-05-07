@@ -34,6 +34,13 @@ exports.findByStudent = msv => {
     `;
     return db.query(sql, [msv]);
 };
+exports.countByLichHoc = () =>
+    db.query(
+        `SELECT lichhoc_id, COUNT(*) AS count
+     FROM dangky
+     GROUP BY lichhoc_id`
+    );
+
 
 exports.findById = id =>
     db.query('SELECT * FROM dangky WHERE id = ?', [id]);
@@ -52,3 +59,7 @@ exports.update = (id, { msv, lichhoc_id }) =>
 
 exports.remove = id =>
     db.query('DELETE FROM dangky WHERE id = ?', [id]);
+
+
+exports.removeByLichHoc = lichhoc_id =>
+    db.query('DELETE FROM dangky WHERE lichhoc_id = ?', [lichhoc_id]);

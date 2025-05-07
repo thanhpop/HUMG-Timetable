@@ -20,3 +20,6 @@ export function createRegistration(data) {
 export function deleteRegistration(id) {
     return axios.delete(`${BASE}/dangky/${id}`);
 }
+
+
+export const getCountByLichHoc = () => axios.get(`${BASE}/dangky/count-by-lichhoc`);

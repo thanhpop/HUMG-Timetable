@@ -1,5 +1,6 @@
 // server/controllers/lichhocController.js
 const Schedule = require('../models/lichhocModel');
+const DangKy = require('../models/dangkyModel');
 
 exports.getAll = async (req, res, next) => {
     try {
@@ -15,6 +16,15 @@ exports.getOne = async (req, res, next) => {
         const [rows] = await Schedule.findById(req.params.id);
         if (!rows.length) return res.status(404).json({ error: 'Not found' });
         res.json(rows[0]);
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.getByGroup = async (req, res, next) => {
+    try {
+        const [rows] = await Schedule.findByGroup(req.params.manhom);
+        res.json(rows);
     } catch (err) {
         next(err);
     }
@@ -48,10 +58,15 @@ exports.update = async (req, res, next) => {
 };
 
 exports.remove = async (req, res, next) => {
+    const id = req.params.id;
     try {
-        const [result] = await Schedule.remove(req.params.id);
+        // 1) xóa tất cả đăng ký tham chiếu tới lichhoc_id = id
+        await DangKy.removeByLichHoc(id);
+
+        // 2) xóa bản ghi lịch học
+        const [result] = await Schedule.remove(id);
         if (result.affectedRows === 0) return res.status(404).json({ error: 'Not found' });
-        res.json({ message: 'Deleted' });
+        res.json({ message: 'Deleted lịch và tất cả đăng ký liên quan' });
     } catch (err) {
         next(err);
     }

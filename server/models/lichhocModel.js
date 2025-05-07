@@ -62,7 +62,23 @@ exports.findById = id => {
     `;
   return db.query(sql, [id]);
 };
-
+exports.findByGroup = manhom =>
+  db.query(
+    `SELECT 
+       lh.id, lh.manhom, lh.thu, lh.tietbd, lh.tietkt, lh.ngaybd, lh.ngaykt,
+       nh.tennhom, nh.mamh,
+       mh.tenmh, mh.sotinchi, mh.khoa,
+       p.tenphong, p.succhua, p.khu, 
+       t.ten AS tengv
+     FROM lichhoc lh
+     JOIN nhommh nh    ON lh.manhom = nh.manhom
+     JOIN monhoc mh    ON nh.mamh    = mh.mamh
+     JOIN phonghoc p   ON nh.maphong = p.maphong
+     JOIN giangvien t  ON nh.mgv     = t.mgv
+     WHERE lh.manhom = ?
+     ORDER BY lh.id`,
+    [manhom]
+  );
 
 exports.create = ({ manhom, thu, tietbd, tietkt, ngaybd, ngaykt }) =>
   db.query(

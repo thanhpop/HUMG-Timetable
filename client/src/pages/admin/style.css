@@ -298,3 +298,25 @@
         margin-top: 8px;
     }
 }
+
+/* mỗi session-block sẽ có viền và khoảng cách */
+.two-column-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* sessions stacked */
+.two-column-form .session-block {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid #ccc;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.ag-cell.no-top-border {
+    border-top: none !important;
+}

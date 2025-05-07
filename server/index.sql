@@ -104,11 +104,17 @@ CREATE TABLE IF NOT EXISTS dangky (
 CREATE TABLE IF NOT EXISTS dotdangky (
   id           INT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
   mahk         VARCHAR(50) NOT NULL,           -- học kỳ
-  ngaybd_dk    DATETIME  NOT NULL,              -- bắt đầu đăng ký
-  ngaykt_dk    DATETIME  NOT NULL,              -- kết thúc đăng ký
+  ngaybd_dk    DATE  NOT NULL,              -- bắt đầu đăng ký
+  ngaykt_dk    DATE  NOT NULL,              -- kết thúc đăng ký
   FOREIGN KEY (mahk) REFERENCES hocky(mahk)
 );
 
+
+
+
+
+
+-- đừng lấy câu lệnh dưới này nhé
 
 --truy vấn để lấy ra lịch học cho sinh viên đăng ký
 SELECT

@@ -7,7 +7,7 @@ body {
     background-color: #f2f0f0;
 }
 
-.main-content {
+.container .main-content {
     margin-left: 250px;
     padding: 20px;
     width: 100%;

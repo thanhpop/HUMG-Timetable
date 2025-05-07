@@ -75,8 +75,8 @@ body.login-bg::before {
 }
 
 .login-container .logo {
-  width: 50px;
-  margin-right: 12px;
+  width: 68px;
+  margin-right: 15px;
   z-index: 1;
 }
 
@@ -85,7 +85,7 @@ body.login-bg::before {
   left: 50%;
   transform: translateX(-50%);
   color: #003f88;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: bold;
   margin: 0;
   z-index: 1;

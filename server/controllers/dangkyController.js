@@ -57,3 +57,12 @@ exports.remove = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.countByLichHoc = async (req, res, next) => {
+    try {
+        const [rows] = await Registration.countByLichHoc();
+        res.json(rows);
+    } catch (err) {
+        next(err);
+    }
+};
