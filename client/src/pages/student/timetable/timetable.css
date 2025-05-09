@@ -1,0 +1,442 @@
+/* CSS thuần cho thời khóa biểu - Đã cải thiện responsive */
+:-moz-any-link:focus {
+  outline: none;
+}
+
+/* Container chính của ứng dụng */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  ;
+}
+
+/* Main content chứa thời khóa biểu */
+.main-content {
+  margin-right: 240px;
+  flex: 1;
+  padding: 16px;
+  overflow-x: hidden;
+  background-color: white;
+}
+
+/* Header chứa tiêu đề và tabs */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+/* Tiêu đề thời khóa biểu */
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-right: 20px;
+}
+
+/* Container cho tabs */
+.tabs-container {
+  display: flex;
+  align-items: center;
+}
+
+/* Tabs list */
+.tabs-list {
+  display: flex;
+  border-radius: 6px;
+  background-color: #f1f5f9;
+  padding: 2px;
+}
+
+/* Tab trigger button */
+.tab-trigger {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  white-space: nowrap;
+  color: black;
+}
+
+/* Active tab */
+.tab-trigger.active {
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Tab content */
+.tab-content {
+  display: none;
+}
+
+/* Active tab content */
+.tab-content.active {
+  display: block;
+}
+
+/* Week info */
+.week-info {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  color: #1e40af;
+}
+
+/* Navigation buttons container */
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 8px;
+}
+
+/* Navigation button */
+.nav-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.nav-button:hover {
+  background-color: #bfdbfe;
+}
+
+/* Day buttons container */
+.day-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+/* Day button */
+.day-button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  background-color: white;
+  color: black;
+}
+
+/* Active day button */
+.day-button.active {
+  background-color: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+/* Day view container */
+.day-view {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+}
+
+/* Day title */
+.day-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* Course list */
+.course-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Course card */
+.course-card {
+  padding: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+  border-left-width: 4px;
+}
+
+.course-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Course name */
+.course-name {
+  font-weight: 550;
+}
+
+/* Course info */
+.course-info {
+  font-size: 14px;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.course-info svg {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+/* Empty message */
+.empty-message {
+  text-align: center;
+  padding: 32px 0;
+  color: #6b7280;
+}
+
+/* Week view */
+.week-view {
+  overflow-x: auto;
+}
+
+/* Timetable */
+.timetable {
+  min-width: 800px;
+}
+
+/* Timetable grid */
+.timetable-grid {
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+  gap: 0;
+  border-collapse: collapse;
+}
+
+/* Header cell */
+.header-cell {
+  text-align: center;
+  font-weight: 550;
+  padding: 8px;
+  background-color: #f3f4f6;
+  border: 1px solid #e2e8f0;
+}
+
+/* Header date */
+.header-date {
+  font-size: 12px;
+  color: #4b5563;
+  margin-top: 4px;
+}
+
+/* Time cell */
+.time-cell {
+  position: sticky;
+  left: 0;
+  background-color: #f9fafb;
+  font-size: 12px;
+  color: #6b7280;
+  padding: 8px 4px;
+  text-align: right;
+  border: 1px solid #e2e8f0;
+}
+
+/* Slot cell */
+.slot-cell {
+  border: 1px solid #e2e8f0;
+  position: relative;
+  min-height: 52px;
+  height: 52px;
+}
+
+/* Course item in timetable */
+.course-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+  border: none;
+  border-left-width: 4px;
+  border-left-style: solid;
+  z-index: 1;
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.course-item:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+
+/* Course item name */
+.course-item-name {
+  font-size: 12px;
+  font-weight: 550;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Course item details */
+.course-item-details {
+  font-size: 10px;
+  color: #4b5563;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Dialog overlay */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+
+/* Dialog content */
+.dialog-content {
+  background-color: white;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 100%;
+  padding: 16px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  margin: 16px;
+}
+
+/* Dialog header */
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Dialog title */
+.dialog-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Dialog actions */
+.dialog-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Icon button */
+
+/* Dialog body */
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+/* Info item */
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+/* Icon container */
+.icon-container {
+  padding: 8px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.icon-container.blue {
+  background-color: #dbeafe;
+}
+
+.icon-container svg {
+  width: 20px;
+  height: 20px;
+}
+
+.icon-container.blue svg {
+  color: #2563eb;
+}
+
+/* Info label */
+.info-label {
+  font-size: 14px;
+  font-weight: 550;
+}
+
+/* Info value */
+.info-value {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* Close button */
+.close-button {
+  margin-top: 16px;
+  padding: 8px 16px;
+  background-color: #f3f4f6;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: black;
+}
+
+.close-button:hover {
+  background-color: #e5e7eb;
+}
+
+/* Form content */
+
+/* Màu sắc cho các môn học - chỉ giữ lại màu xanh dương nhạt */
+.blue {
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .title {
+    margin-bottom: 12px;
+    margin-right: 0;
+  }
+
+  .dialog-content {
+    max-width: 100%;
+    margin: 16px;
+  }
+
+  .navigation-buttons {
+    flex-direction: column;
+  }
+}

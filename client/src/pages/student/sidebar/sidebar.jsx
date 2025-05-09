@@ -36,7 +36,7 @@ const Sidebar = () => {
           <BookOpen size={20} />
           <span>Đăng ký môn học</span>
         </NavLink>
-        <NavLink to="/student/schedule" className={({ isActive }) => `menu-item ${isActive ? "active" : ""}`}>
+        <NavLink to="/student/timetable" className={({ isActive }) => `menu-item ${isActive ? "active" : ""}`}>
           <Calendar size={20} />
           <span>Thời khóa biểu</span>
         </NavLink>

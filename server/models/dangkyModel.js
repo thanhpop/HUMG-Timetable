@@ -40,7 +40,13 @@ exports.countByLichHoc = () =>
      FROM dangky
      GROUP BY lichhoc_id`
     );
-
+exports.countFor = async (lichhoc_id) => {
+    const rows = await db.query(
+        'SELECT COUNT(*) AS count FROM dangky WHERE lichhoc_id = ?',
+        [lichhoc_id]
+    );
+    return rows[0].count;
+};
 
 exports.findById = id =>
     db.query('SELECT * FROM dangky WHERE id = ?', [id]);

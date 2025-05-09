@@ -53,7 +53,7 @@ import EditDotDK from '../pages/admin/dotdangky/EditDotDK.jsx';
 
 
 import Registration from '../pages/student/Registration/Registration.jsx';
-// import App from '../pages/student/timetable/App.jsx';
+import Timetable from '../pages/student/timetable/Timetable.jsx';
 
 import Login from '../pages/login/Login.jsx';
 
@@ -105,7 +105,7 @@ export default function AppRoutes() {
                 <Route index element={<StudentInfo />} />
                 <Route path="info" element={<StudentInfo />} />
                 <Route path="registration" element={<Registration />} />
-                {/* <Route path="schedule" element={<App />} /> */}
+                <Route path="timetable" element={<Timetable />} />
             </Route>
             <Route path="/teacher" element={<ProtectedRoute allowedRoles={['gv']}>
                 <DashboardTeacher />

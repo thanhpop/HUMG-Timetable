@@ -1,6 +1,6 @@
 // server/controllers/dangkyController.js
 const Registration = require('../models/dangkyModel');
-
+const LichHoc = require('../models/lichhocModel');
 exports.getAll = async (req, res, next) => {
     try {
         const [rows] = await Registration.findAll();
@@ -26,9 +26,25 @@ exports.create = async (req, res, next) => {
         if (!msv || !lichhoc_id) {
             return res.status(400).json({ error: 'msv and lichhoc_id are required' });
         }
+
+        // 1) Đếm số đăng ký hiện tại cho buổi này
+        const currentCount = await Registration.countFor(lichhoc_id);
+
+        // 2) Lấy sức chứa phòng của buổi này
+        const [lh] = await LichHoc.findById(lichhoc_id);
+        if (!lh) return res.status(404).json({ error: 'Buổi học không tồn tại' });
+        const capacity = lh.succhua;
+
+        // 3) Nếu đã đầy, trả lỗi
+        if (currentCount >= capacity) {
+            return res.status(400).json({ error: 'Buổi học đã hết chỗ.' });
+        }
+
+        // 4) Ngược lại, tạo đăng ký
         const [result] = await Registration.create({ msv, lichhoc_id });
         const [[newRow]] = await Registration.findById(result.insertId);
         res.status(201).json(newRow);
+
     } catch (err) {
         next(err);
     }
