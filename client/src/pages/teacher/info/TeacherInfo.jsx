@@ -17,11 +17,11 @@ const TeacherInfo = () => {
         <section className="infolec-section">
           <h1>Thông tin giảng viên</h1>
           <div className="infolec-grid">
-            <div><strong>Mã giảng viên:</strong><span>{profile.mgv || 'N/A'}</span> </div>
-            <div><strong>Họ và tên:</strong><span>{profile.ten || 'N/A'}</span> </div>
-            <div><strong>Khoa:</strong><span>{profile.khoa || 'N/A'}</span> </div>
-            <div><strong>Email:</strong><span>{profile.email || 'N/A'}</span></div>
-            <div><strong>Điện thoại:</strong> <span>{profile.sdt || 'N/A'}</span></div>
+            <div><strong>Mã giảng viên:</strong><span>{profile.mgv || ''}</span> </div>
+            <div><strong>Họ và tên:</strong><span>{profile.ten || ''}</span> </div>
+            <div><strong>Khoa:</strong><span>{profile.khoa || ''}</span> </div>
+            <div><strong>Email:</strong><span>{profile.email || ''}</span></div>
+            <div><strong>Điện thoại:</strong> <span>{profile.sdt || ''}</span></div>
 
           </div>
         </section>

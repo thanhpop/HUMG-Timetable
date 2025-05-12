@@ -94,3 +94,48 @@ exports.update = (id, data) =>
 
 exports.remove = id =>
   db.query('DELETE FROM lichhoc WHERE id = ?', [id]);
+
+
+// Lấy tất cả buổi học của một sinh viên theo msv
+exports.findByStudentSchedules = (msv) => {
+  const sql = `
+    SELECT lh.id, lh.thu, lh.tietbd, lh.tietkt
+    FROM dangky d
+    JOIN lichhoc lh ON d.lichhoc_id = lh.id
+    WHERE d.msv = ?
+  `;
+  return db.query(sql, [msv]);
+};
+
+
+exports.findByTeacher = (mgv) => {
+  const sql = `
+    SELECT 
+      lh.id,
+      lh.manhom,
+      nh.tennhom,
+      nh.mamh,
+      mh.tenmh,
+      mh.khoa, 
+      mh.sotinchi,
+      nh.maphong,
+      p.tenphong,
+      p.succhua,
+      p.khu,
+      nh.mgv,
+      gv.ten    AS tengv,
+      lh.thu,
+      lh.tietbd,
+      lh.tietkt,
+      lh.ngaybd,
+      lh.ngaykt
+    FROM lichhoc lh
+    JOIN nhommh    nh ON lh.manhom   = nh.manhom
+    JOIN monhoc    mh ON nh.mamh      = mh.mamh
+    JOIN phonghoc  p  ON nh.maphong   = p.maphong
+    JOIN giangvien gv ON nh.mgv       = gv.mgv
+    WHERE nh.mgv = ?
+    ORDER BY lh.id DESC
+  `;
+  return db.query(sql, [mgv]);
+};

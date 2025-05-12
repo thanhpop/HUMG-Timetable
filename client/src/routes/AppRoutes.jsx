@@ -55,6 +55,8 @@ import EditDotDK from '../pages/admin/dotdangky/EditDotDK.jsx';
 import Registration from '../pages/student/Registration/Registration.jsx';
 import Timetable from '../pages/student/timetable/Timetable.jsx';
 
+import TimetableGV from '../pages/teacher/timetable/TimetableGV.jsx';
+
 import Login from '../pages/login/Login.jsx';
 
 
@@ -112,6 +114,7 @@ export default function AppRoutes() {
             </ProtectedRoute>} >
                 <Route index element={<TeacherInfo />} />
                 <Route path="info" element={<TeacherInfo />} />
+                <Route path="timetable" element={<TimetableGV />} />
             </Route>
 
             <Route path="/login" element={<Login />} />

@@ -39,10 +39,11 @@ CREATE TABLE IF NOT EXISTS monhoc (
 
 
 CREATE TABLE IF NOT EXISTS phonghoc (
-  maphong   VARCHAR(50)   NOT NULL PRIMARY KEY,
+  maphong   VARCHAR(50)   NOT NULL ,
   tenphong  VARCHAR(100) NOT NULL,
   khu       VARCHAR(100) NOT NULL,
   succhua   INT NOT NULL
+  PRIMARY KEY (maphong),
 );
 
 
@@ -65,6 +66,7 @@ CREATE TABLE IF NOT EXISTS taikhoan (
   vaitro    ENUM('admin','gv','sv') NOT NULL
 );
 
+-- nhóm môn học
 CREATE TABLE IF NOT EXISTS nhommh (
   manhom      VARCHAR(50)   NOT NULL PRIMARY KEY,
   tennhom     VARCHAR(150)  NOT NULL,
@@ -101,6 +103,7 @@ CREATE TABLE IF NOT EXISTS dangky (
   FOREIGN KEY (lichhoc_id) REFERENCES lichhoc(id)
 );
 
+-- 3. Bảng dotdangky: lưu thông tin các đợt đăng ký học phần
 CREATE TABLE IF NOT EXISTS dotdangky (
   id           INT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
   mahk         VARCHAR(50) NOT NULL,           -- học kỳ
@@ -113,48 +116,6 @@ CREATE TABLE IF NOT EXISTS dotdangky (
 
 
 
-
--- đừng lấy câu lệnh dưới này nhé
-
---truy vấn để lấy ra lịch học cho sinh viên đăng ký
-SELECT
-  l.id                   AS lichhoc_id,
-  nh.manhom              AS mamon,           -- mã MH
-  m.tenmh                AS tenmon,          -- tên môn
-  nh.tennhom             AS tennhom,         -- tên nhóm MH
-  l.thu,                                     -- thứ
-  l.tietbd, l.tietkt,                       -- tiết bắt đầu/kết thúc
-  m.sotinchi,                               -- số tín chỉ
-  gv.ten                 AS giangvien,       -- tên giảng viên
-  ph.tenphong            AS tenphong,        -- tên phòng
-  ph.succhua             AS succhua,         -- sức chứa phòng
-  COUNT(d.msv)           AS sv_dangky,       -- số SV đã đăng ký
-  l.ngaybd, l.ngaykt                        -- ngày bắt đầu/kết thúc
-FROM lichhoc l
-JOIN nhommh nh   ON l.manhom = nh.manhom
-JOIN monhoc m    ON nh.mamh   = m.mamh
-JOIN giangvien gv ON nh.mgv   = gv.mgv
-JOIN phonghoc ph ON nh.maphong= ph.maphong
-LEFT JOIN dangky d ON l.id      = d.lichhoc_id
-GROUP BY l.id
-ORDER BY l.thu, l.tietbd;
-
--- danh sách các môn sv đã đăng ký
-SELECT
-  d.msv,
-  l.id         AS lichhoc_id,
-  nh.mamh      AS mamh,
-  m.tenmh      AS tenmh,
-  nh.tennhom   AS tennhom,
-  l.thu, l.tietbd, l.tietkt,
-  ph.tenphong,
-  d.ngaydk
-FROM dangky d
-JOIN lichhoc l    ON d.lichhoc_id = l.id
-JOIN nhommh nh    ON l.manhom = nh.manhom
-JOIN monhoc m     ON nh.mamh  = m.mamh
-JOIN phonghoc ph  ON nh.maphong = ph.maphong
-WHERE d.msv = 'SV001';
 
 
 

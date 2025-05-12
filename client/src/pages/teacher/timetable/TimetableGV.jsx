@@ -2,10 +2,11 @@
 import React from "react"
 import { useState, useEffect, useMemo } from "react"
 import { Calendar, Clock, MapPin, User, ChevronLeft, ChevronRight } from "lucide-react"
-import { getSchedules } from "../../../api/scheduleApi"
-import { getMyRegistrations } from "../../../api/dangkyApi"
-import { getCurrentMsv } from "../../utils/auth"
-import "./timetable.css"
+
+
+import { getSchedulesByTeacher } from "../../../api/scheduleApi"
+import { getCurrentMgv } from "../../utils/auth";
+import "./timetableGV.css"
 
 // Các tiết học 
 const tietThoiGian = {
@@ -31,58 +32,56 @@ function getTimeFromTiet(tietbd, tietkt) {
 // Tên các ngày trong tuần - đã thay đổi thứ tự để Chủ nhật ở cuối
 const weekdays = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật"]
 
-export default function Timetable() {
+export default function TimetableGV() {
 
-  const msv = getCurrentMsv()
-  if (!msv) return <div>Vui lòng đăng nhập để xem thời khóa biểu.</div>
+  const mgv = getCurrentMgv();
+  if (!mgv) return <div>Vui lòng đăng nhập để xem thời khóa biểu.</div>;
 
-  const [sessions, setSessions] = useState([])    // all sessions from API
-  const [regs, setRegs] = useState([])    // all registrations of this student
-  const [coursesData, setCoursesData] = useState([])  // the filtered+mapped array for timetable
+
+
+  const [sessions, setSessions] = useState([]);     // all registrations of this student
+  const [coursesData, setCoursesData] = useState([]);  // the filtered+mapped array for timetable
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   // load sessions + registrations once
   useEffect(() => {
-    ; (async () => {
-      const resS = await getSchedules()
-      setSessions(resS.data)
-      const resR = await getMyRegistrations()
-      setRegs(resR.data)
+    (async () => {
+      // gọi endpoint mới hoặc filter trực tiếp:
+      const { data } = await getSchedulesByTeacher(mgv)
+      setSessions(data)
     })()
-  }, [])
+  }, [mgv])
 
   // whenever sessions or regs change, build coursesData
   useEffect(() => {
-    const regIds = new Set(regs.map(r => r.lichhoc_id))
-    const mySessions = sessions
-      .filter(s => regIds.has(s.id))
-      .map(s => {
-        // parse và normalize ngày bắt đầu về 00:00
-        const start = new Date(s.ngaybd)
-        start.setHours(0, 0, 0, 0)
+    const mapped = sessions.map(s => {
+      // parse và normalize ngày bắt đầu về 00:00
+      const start = new Date(s.ngaybd)
+      start.setHours(0, 0, 0, 0)
 
-        // parse và normalize ngày kết thúc về 23:59:59.999
-        const end = new Date(s.ngaykt)
-        end.setHours(23, 59, 59, 999)
+      // parse và normalize ngày kết thúc về 23:59:59.999
+      const end = new Date(s.ngaykt)
+      end.setHours(23, 59, 59, 999)
 
-        return {
-          id: s.id,
-          name: s.tenmh,
-          code: s.mamh,
-          room: s.tenphong,
-          khu: s.khu,
-          instructor: s.tengv,
-          tennhom: s.tennhom,
-          day: s.thu - 2 < 0 ? 6 : s.thu - 2,
-          startPeriod: s.tietbd,
-          endPeriod: s.tietkt,
-          startTime: getTimeFromTiet(s.tietbd, s.tietkt).split(" – ")[0],
-          endTime: getTimeFromTiet(s.tietbd, s.tietkt).split(" – ")[1],
-          ngaybd: start,
-          ngaykt: end,
-        }
-      })
-    setCoursesData(mySessions)
-  }, [sessions, regs])
+      return {
+        id: s.id,
+        name: s.tenmh,
+        code: s.mamh,
+        room: s.tenphong,
+        khu: s.khu,
+        instructor: s.tengv,
+        tennhom: s.tennhom,
+        day: s.thu - 2 < 0 ? 6 : s.thu - 2,
+        startPeriod: s.tietbd,
+        endPeriod: s.tietkt,
+        startTime: getTimeFromTiet(s.tietbd, s.tietkt).split(" – ")[0],
+        endTime: getTimeFromTiet(s.tietbd, s.tietkt).split(" – ")[1],
+        ngaybd: start,
+        ngaykt: end,
+      }
+    })
+
+    setCoursesData(mapped)
+  }, [sessions])
   // State lưu trữ dữ liệu môn học
   const getCoursesByDay = (dayIndex) => {
     const date = getDateForDay(dayIndex);
@@ -131,6 +130,13 @@ export default function Timetable() {
 
   // Tính toán ngày bắt đầu của tuần dựa vào offset tuần
   const calculateWeekStartDate = (weekOffset) => {
+
+    // 0 = Chủ nhật, 1 = Thứ 2, ..., 6 = Thứ 7
+
+    // Tính số ngày cần trừ để về thứ 2 của tuần hiện tại
+    // Nếu hôm nay là Chủ nhật (0), cần trừ 6 ngày để về thứ 2
+    // Nếu hôm nay là thứ 2 (1), cần trừ 0 ngày
+    // Nếu hôm nay là thứ 3 (2), cần trừ 1 ngày, v.v.
     const today = new Date()
     today.setFullYear(selectedYear)
     const dayOfWeek = today.getDay()
@@ -329,10 +335,7 @@ export default function Timetable() {
                   getCoursesByDay(currentDay).map((course) => (
                     <div key={course.id} className="course-card blue" onClick={() => handleCourseClick(course)}>
                       <div className="course-name">{course.name}</div>
-                      <div className="course-info">
-                        <User className="course-icon" />
-                        {course.instructor}
-                      </div>
+
                       <div className="course-info">
                         <MapPin className="course-icon" />
                         {course.room} - Khu {course.khu}
@@ -427,7 +430,7 @@ export default function Timetable() {
                                     <div className="course-item-details">
                                       <span><b>Nhóm: </b>{course.tennhom}</span><br />
                                       <span><b>Phòng:</b> {course.room} - Khu {course.khu}</span><br />
-                                      <span><b>GV: </b>{course.instructor}</span>
+
                                     </div>
                                   </div>
                                 )
@@ -488,17 +491,6 @@ export default function Timetable() {
                   <div>
                     <div className="info-label">Phòng học</div>
                     <div className="info-value">{selectedCourse.room} – Khu {selectedCourse.khu} </div>
-                  </div>
-                </div>
-
-                {/* Thông tin giảng viên */}
-                <div className="info-item">
-                  <div className="icon-container blue">
-                    <User />
-                  </div>
-                  <div>
-                    <div className="info-label">Giảng viên</div>
-                    <div className="info-value">{selectedCourse.instructor}</div>
                   </div>
                 </div>
 

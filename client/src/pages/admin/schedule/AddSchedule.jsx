@@ -39,8 +39,8 @@ export default function AddSchedule() {
                         return {
                             value: g.manhom,
                             label: [
-                                `Nhóm: ${g.manhom}`,
-                                g.tennhom,
+                                `Mã nhóm: ${g.manhom}`,
+                                `Tên nhóm: ${g.tennhom}`,
                                 `Môn: ${courseMap[g.mamh]}`,
                                 `GV: ${teacherMap[g.mgv]}`,
                                 `Phòng: ${room.tenphong}`,

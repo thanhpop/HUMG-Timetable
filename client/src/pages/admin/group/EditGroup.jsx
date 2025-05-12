@@ -30,6 +30,10 @@ const customSelectStyles = {
     }),
     singleValue: (base) => ({ ...base, color: '#fff' }),
     placeholder: (base) => ({ ...base, color: '#ccc' }),
+    input: (base) => ({
+        ...base,
+        color: '#fff',
+    }),
 };
 
 export default function EditGroup() {

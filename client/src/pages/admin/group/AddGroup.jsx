@@ -56,6 +56,10 @@ export default function AddGroup() {
             ...base,
             color: '#ccc',
         }),
+        input: (base) => ({
+            ...base,
+            color: '#fff',
+        }),
     };
 
     // Load reference data

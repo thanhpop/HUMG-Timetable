@@ -60,8 +60,8 @@ export default function EditSchedule() {
                         return {
                             value: g.manhom,
                             label: [
-                                `Nhóm: ${g.manhom}`,
-                                g.tennhom,
+                                `Mã nhóm: ${g.manhom}`,
+                                `Tên nhóm: ${g.tennhom}`,
                                 `Môn: ${courseMap[g.mamh] || g.mamh}`,
                                 `GV: ${teacherMap[g.mgv] || g.mgv}`,
                                 `Phòng: ${room.tenphong || g.maphong}`,

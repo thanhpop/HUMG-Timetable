@@ -80,3 +80,13 @@ exports.getAll = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.getByTeacher = async (req, res, next) => {
+    try {
+        const mgv = req.params.mgv;
+        const [rows] = await Schedule.findByTeacher(mgv);
+        res.json(rows);
+    } catch (err) {
+        next(err);
+    }
+};

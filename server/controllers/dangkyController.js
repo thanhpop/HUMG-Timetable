@@ -27,23 +27,35 @@ exports.create = async (req, res, next) => {
             return res.status(400).json({ error: 'msv and lichhoc_id are required' });
         }
 
-        // 1) Đếm số đăng ký hiện tại cho buổi này
-        const currentCount = await Registration.countFor(lichhoc_id);
-
-        // 2) Lấy sức chứa phòng của buổi này
+        // 1) Lấy thông tin buổi học muốn đăng ký
         const [lh] = await LichHoc.findById(lichhoc_id);
         if (!lh) return res.status(404).json({ error: 'Buổi học không tồn tại' });
+
         const capacity = lh.succhua;
 
-        // 3) Nếu đã đầy, trả lỗi
+        // 2) Kiểm tra xem buổi học đã đầy chưa
+        const currentCount = await Registration.countFor(lichhoc_id);
         if (currentCount >= capacity) {
             return res.status(400).json({ error: 'Buổi học đã hết chỗ.' });
         }
 
-        // 4) Ngược lại, tạo đăng ký
+        // 3) Lấy tất cả buổi học mà sinh viên đã đăng ký
+        const [existingSessions] = await LichHoc.findByStudentSchedules(msv);
+
+        // 4) Kiểm tra xung đột lịch
+        const conflict = existingSessions.some(s => {
+            return s.thu === lh.thu && !(s.tietkt < lh.tietbd || s.tietbd > lh.tietkt);
+        });
+
+        if (conflict) {
+            return res.status(400).json({ error: 'Xung đột lịch: buổi này trùng với một buổi bạn đã đăng ký.' });
+        }
+
+        // 5) Nếu không xung đột, tạo đăng ký
         const [result] = await Registration.create({ msv, lichhoc_id });
         const [[newRow]] = await Registration.findById(result.insertId);
         res.status(201).json(newRow);
+
 
     } catch (err) {
         next(err);

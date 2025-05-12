@@ -17,18 +17,18 @@ const StudentInfo = () => {
         <section className="info-section">
           <h1>Thông tin sinh viên</h1>
           <div className="info-grid">
-            <div><strong>Mã sinh viên:</strong><span>{profile.msv || 'N/A'}</span> </div>
-            <div><strong>Họ và tên:</strong><span>{profile.ten || 'N/A'}</span></div>
-            <div><strong>Khoa:</strong><span>{profile.khoa || 'N/A'}</span></div>
-            <div><strong>Lớp:</strong><span>{profile.lop || 'N/A'}</span></div>
-            <div><strong>Giới tính:</strong><span>{profile.gioitinh || 'N/A'}</span></div>
+            <div><strong>Mã sinh viên:</strong><span>{profile.msv || ''}</span> </div>
+            <div><strong>Họ và tên:</strong><span>{profile.ten || ''}</span></div>
+            <div><strong>Khoa:</strong><span>{profile.khoa || ''}</span></div>
+            <div><strong>Lớp:</strong><span>{profile.lop || ''}</span></div>
+            <div><strong>Giới tính:</strong><span>{profile.gioitinh || ''}</span></div>
             <div><strong>Ngày sinh:</strong><span>{profile.ngaysinh
               ? new Date(profile.ngaysinh).toLocaleDateString('vi-VN')
-              : 'N/A'}</span> </div>
-            <div><strong>Điện thoại:</strong><span>{profile.sdt || 'N/A'}</span></div>
-            <div><strong>Email:</strong><span>{profile.email || 'N/A'}</span></div>
-            <div><strong>Số CCCD:</strong><span>{profile.cccd || 'N/A'}</span></div>
-            <div><strong>Địa chỉ:</strong><span>{profile.diachi || 'N/A'}</span></div>
+              : ''}</span> </div>
+            <div><strong>Điện thoại:</strong><span>{profile.sdt || ''}</span></div>
+            <div><strong>Email:</strong><span>{profile.email || ''}</span></div>
+            <div><strong>Số CCCD:</strong><span>{profile.cccd || ''}</span></div>
+            <div><strong>Địa chỉ:</strong><span>{profile.diachi || ''}</span></div>
           </div>
         </section>
       </div>

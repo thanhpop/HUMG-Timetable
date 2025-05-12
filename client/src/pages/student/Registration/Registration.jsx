@@ -87,6 +87,27 @@ export default function RegistrationTanStack() {
         }, {});
         setDangKyCount(map);
     };
+    function isConflict(session1, session2) {
+        // Cùng thứ
+        if (session1.thu !== session2.thu) return false;
+
+        // Khoảng ngày học giao nhau
+        const bd1 = new Date(session1.ngaybd);
+        const kt1 = new Date(session1.ngaykt);
+        const bd2 = new Date(session2.ngaybd);
+        const kt2 = new Date(session2.ngaykt);
+        const dateOverlap = !(kt1 < bd2 || kt2 < bd1);
+        if (!dateOverlap) return false;
+
+        // Giao tiết học
+        const start1 = session1.tietbd;
+        const end1 = session1.tietkt;
+        const start2 = session2.tietbd;
+        const end2 = session2.tietkt;
+        const tietOverlap = !(end1 < start2 || end2 < start1);
+
+        return tietOverlap;
+    }
 
     const handleToggleGroup = async sessionIds => {
         await refreshDangKyCount();
@@ -95,8 +116,19 @@ export default function RegistrationTanStack() {
         for (const s of sessionObjs) {
             const used = dangKyCount[s.id] || 0;
             const available = (s.succhua || 0) - used;
+
             if (!registeredIds.has(s.id) && available <= 0) {
-                alert(`Môn ${s.mamh} nhóm ${s.tennhom} đã hết chỗ!`);
+                alert(`Môn: ${s.tenmh} (${s.mamh}) nhóm ${s.tennhom} đã hết chỗ!`);
+                return;
+            }
+
+            // Kiểm tra xung đột lịch học
+            const conflict = myRegs.some(r =>
+                isConflict(s, r)
+            );
+
+            if (!registeredIds.has(s.id) && conflict) {
+                alert(`Môn: ${s.tenmh} (${s.mamh}) nhóm ${s.tennhom} bị trùng lịch với môn đã đăng ký!`);
                 return;
             }
         }
