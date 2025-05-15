@@ -16,9 +16,9 @@ export default function Sidebar() {
         navigate('/login');
     };
     return (
-        <div className="sidebar-admin">
+        <div className="sidebar-admin" >
 
-            <h2>Trang admin</h2>
+            <h3>Trang admin</h3>
             <ul>
                 <li>
                     <NavLink to="/admin/students" className={({ isActive }) => isActive ? 'active' : ''}>
@@ -59,7 +59,7 @@ export default function Sidebar() {
                     <div
                         onClick={() => setOpenSchedule(prev => !prev)}
                         className={`submenu-toggle ${openSchedule ? 'open' : ''}`}
-                        style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px' }}
+                        style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                     >
                         <span>Quản lý thời khóa biểu</span>
                         <span>{openSchedule ? <ChevronUp size={18} /> : <ChevronDown size={18} />}</span>
@@ -68,12 +68,17 @@ export default function Sidebar() {
                         <ul className="submenu">
                             <li>
                                 <NavLink to="/admin/lichhoc" className={({ isActive }) => isActive ? 'active' : ''}>
-                                    Quản lý lịch học
+                                    Quản lý lịch học thủ công
                                 </NavLink>
                             </li>
                             <li>
                                 <NavLink to="/admin/dotdangky" className={({ isActive }) => isActive ? 'active' : ''}>
                                     Quản lý đợt đăng ký
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/admin/generatetkb" className={({ isActive }) => isActive ? 'active' : ''}>
+                                    Tạo lịch học tự động
                                 </NavLink>
                             </li>
                         </ul>

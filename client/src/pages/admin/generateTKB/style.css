@@ -1,0 +1,7 @@
+.large-select {
+    font-size: 18px;
+    padding: 8px 12px;
+    width: 300px;
+    max-width: 100%;
+    box-sizing: border-box;
+}

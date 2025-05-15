@@ -13,6 +13,7 @@ export default function AddStudent() {
         ten: '',
         khoa: '',
         lop: '',
+        khoaHoc: '',
         gioitinh: '',
         ngaysinh: '',
         sdt: '',
@@ -73,11 +74,11 @@ export default function AddStudent() {
                         required
                     >
                         <option value="">Chọn khoa</option>
-                        <option value="Công nghệ Thông tin">Công nghệ Thông tin</option>
-                        <option value="Cơ - Điện">Cơ - Điện</option>
-                        <option value="Dầu khí và Năng lượng">Dầu khí và Năng lượng</option>
+                        <option value="Công nghệ thông tin">Công nghệ thông tin</option>
+                        <option value="Cơ điện">Cơ điện</option>
+                        <option value="Dầu khí">Dầu khí</option>
                         <option value="Khoa học và Kỹ thuật Địa chất">Khoa học và Kỹ thuật Địa chất</option>
-                        <option value="Kinh tế - Quản trị kinh doanh">Kinh tế - Quản trị kinh doanh</option>
+                        <option value="Kinh tế">Kinh tế</option>
                         <option value="Mỏ">Mỏ</option>
                         <option value="Môi trường">Môi trường</option>
                         <option value="Trắc địa - Bản đồ và Quản lý đất đai">Trắc địa - Bản đồ và Quản lý đất đai</option>
@@ -86,7 +87,16 @@ export default function AddStudent() {
 
                     <label htmlFor="lop">Lớp*</label>
                     <input id="lop" name="lop" value={form.lop} onChange={handleInput} required />
+                    <label htmlFor="khoaHoc">Khóa học*</label>
+                    <input
+                        id="khoaHoc"
+                        name="khoaHoc"
+                        type="text"
 
+                        value={form.khoaHoc}
+                        onChange={handleInput}
+                        required
+                    />
                     <label htmlFor="gioitinh">Giới tính*</label>
                     <select id="gioitinh" name="gioitinh" value={form.gioitinh} onChange={handleInput} required>
                         <option value="">Chọn giới tính</option>

@@ -3,6 +3,7 @@ const router = express.Router();
 const ctrl = require('../controllers/dotdangkyController');
 
 router.get('/', ctrl.getAll);
+router.get('/current', ctrl.getCurrent);
 router.get('/:id', ctrl.getOne);
 router.post('/', ctrl.create);
 router.put('/:id', ctrl.update);

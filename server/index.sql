@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS sinhvien (
   ten      VARCHAR(100) NOT NULL,
   khoa      VARCHAR(100) NOT NULL,
   lop       VARCHAR(50)  NOT NULL,
+  khoaHoc       VARCHAR(10)  NOT NULL,
   gioitinh    ENUM('Nam','Nữ') NOT NULL,
   ngaysinh       DATE        NOT NULL,
   sdt VARCHAR(20)  NULL,
@@ -72,11 +73,11 @@ CREATE TABLE IF NOT EXISTS nhommh (
   tennhom     VARCHAR(150)  NOT NULL,
   mamh        VARCHAR(50)   NOT NULL,
   mgv         VARCHAR(50)   NOT NULL,
-  maphong     VARCHAR(50)   NOT NULL,
+
   mahk VARCHAR(50) NOT NULL,
   FOREIGN KEY (mamh)    REFERENCES monhoc(mamh),
   FOREIGN KEY (mgv)     REFERENCES giangvien(mgv),
-  FOREIGN KEY (maphong) REFERENCES phonghoc(maphong),
+
   FOREIGN KEY (mahk) REFERENCES hocky(mahk);
 );
 
@@ -90,7 +91,9 @@ CREATE TABLE IF NOT EXISTS lichhoc (
   tietkt       TINYINT        NOT NULL,      -- tiết kết thúc
   ngaybd       DATE           NOT NULL,      -- ngày bắt đầu học
   ngaykt       DATE           NOT NULL,      -- ngày kết thúc học
+  maphong     VARCHAR(50)   NOT NULL,
   FOREIGN KEY (manhom) REFERENCES nhommh(manhom)
+  FOREIGN KEY (maphong) REFERENCES phonghoc(maphong),
 );
 
 -- 2. Bảng dangky: lưu sinh viên đăng ký cho từng buổi học
@@ -109,13 +112,7 @@ CREATE TABLE IF NOT EXISTS dotdangky (
   mahk         VARCHAR(50) NOT NULL,           -- học kỳ
   ngaybd_dk    DATE  NOT NULL,              -- bắt đầu đăng ký
   ngaykt_dk    DATE  NOT NULL,              -- kết thúc đăng ký
+  is_active    TINYINT(1)  NOT NULL DEFAULT 1,
   FOREIGN KEY (mahk) REFERENCES hocky(mahk)
 );
-
-
-
-
-
-
-
 

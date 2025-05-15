@@ -32,12 +32,11 @@ exports.getByGroup = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
     try {
-        const { manhom, thu, tietbd, tietkt, ngaybd, ngaykt } = req.body;
-        // simple validation
-        if (!manhom || thu == null || tietbd == null || tietkt == null || !ngaybd || !ngaykt) {
+        const { manhom, thu, tietbd, tietkt, ngaybd, ngaykt, maphong } = req.body;
+        if (!manhom || thu == null || tietbd == null || tietkt == null || !ngaybd || !ngaykt || !maphong) {
             return res.status(400).json({ error: 'Missing fields' });
         }
-        const [result] = await Schedule.create({ manhom, thu, tietbd, tietkt, ngaybd, ngaykt });
+        const [result] = await Schedule.create({ manhom, thu, tietbd, tietkt, ngaybd, ngaykt, maphong });
         const [[newRow]] = await Schedule.findById(result.insertId);
         res.status(201).json(newRow);
     } catch (err) {
@@ -45,10 +44,11 @@ exports.create = async (req, res, next) => {
     }
 };
 
+
 exports.update = async (req, res, next) => {
     try {
-        const { manhom, thu, tietbd, tietkt, ngaybd, ngaykt } = req.body;
-        const [result] = await Schedule.update(req.params.id, { manhom, thu, tietbd, tietkt, ngaybd, ngaykt });
+        const { manhom, thu, tietbd, tietkt, ngaybd, ngaykt, maphong } = req.body;
+        const [result] = await Schedule.update(req.params.id, { manhom, thu, tietbd, tietkt, ngaybd, ngaykt, maphong });
         if (result.affectedRows === 0) return res.status(404).json({ error: 'Not found' });
         const [[updated]] = await Schedule.findById(req.params.id);
         res.json(updated);
@@ -56,7 +56,6 @@ exports.update = async (req, res, next) => {
         next(err);
     }
 };
-
 exports.remove = async (req, res, next) => {
     const id = req.params.id;
     try {
@@ -86,6 +85,33 @@ exports.getByTeacher = async (req, res, next) => {
         const mgv = req.params.mgv;
         const [rows] = await Schedule.findByTeacher(mgv);
         res.json(rows);
+    } catch (err) {
+        next(err);
+    }
+};
+
+
+exports.getBySemester = async (req, res, next) => {
+    try {
+        const mahk = req.params.mahk;
+        const [rows] = await Schedule.findBySemester(mahk);
+        res.json(rows);
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.deleteBySemester = async (req, res, next) => {
+    const { mahk } = req.params;
+    try {
+        // 1) tìm tất cả manhom của học kỳ này
+        const [[{ count }]] = await Schedule.getCountGroupsBySemester(mahk);
+        if (count === 0) {
+            return res.status(404).json({ message: 'Chưa có lịch cho học kỳ này' });
+        }
+        // 2) xoá tất cả đăng ký liên quan và lịch học
+        await Schedule.deleteBySemester(mahk);
+        res.json({ message: `Đã xóa ${count} lịch học của học kỳ ${mahk}` });
     } catch (err) {
         next(err);
     }

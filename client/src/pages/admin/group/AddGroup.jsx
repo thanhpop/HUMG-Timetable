@@ -20,7 +20,6 @@ export default function AddGroup() {
         tennhom: '',
         mamh: '',
         mgv: '',
-        maphong: '',
         mahk: ''
     });
     const [error, setError] = useState('');
@@ -74,7 +73,6 @@ export default function AddGroup() {
                 ]);
                 setCourses(cRes.data.map(c => ({ value: c.mamh, label: `Mã môn học: ${c.mamh} – ${c.tenmh}` })));
                 setTeachers(tRes.data.map(t => ({ value: t.mgv, label: `Mã GV: ${t.mgv} – ${t.ten}` })));
-                setRooms(rRes.data.map(r => ({ value: r.maphong, label: `Mã phòng: ${r.maphong} – ${r.tenphong}` })));
                 setSemesters(sRes.data.map(s => ({ value: s.mahk, label: `Mã HK: ${s.mahk} – ${s.tenhk}` })));
             } catch (err) {
                 console.error('Lỗi tải dữ liệu tham chiếu:', err);
@@ -144,15 +142,6 @@ export default function AddGroup() {
                     styles={customSelectStyles}
                 />
 
-                <label>Mã phòng học*</label>
-                <Select
-                    options={rooms}
-                    value={rooms.find(r => r.value === form.maphong) || null}
-                    onChange={onSelect('maphong')}
-                    placeholder="Chọn phòng học"
-                    isClearable
-                    styles={customSelectStyles}
-                />
 
                 <label>Mã học kỳ*</label>
                 <Select

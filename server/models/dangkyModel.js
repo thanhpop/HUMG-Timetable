@@ -16,6 +16,7 @@ exports.findByStudent = msv => {
         lh.tietkt,
         lh.ngaybd,
         lh.ngaykt,
+        nh.mahk,
         nh.mamh,
         nh.tennhom,
         mh.tenmh,
@@ -28,7 +29,7 @@ exports.findByStudent = msv => {
       JOIN nhommh nh     ON lh.manhom      = nh.manhom
       JOIN monhoc mh     ON nh.mamh         = mh.mamh
       JOIN giangvien gv  ON nh.mgv          = gv.mgv
-      JOIN phonghoc p    ON nh.maphong      = p.maphong
+      JOIN phonghoc p    ON lh.maphong      = p.maphong
       WHERE d.msv = ?
       ORDER BY d.ngaydk DESC
     `;
@@ -69,3 +70,16 @@ exports.remove = id =>
 
 exports.removeByLichHoc = lichhoc_id =>
     db.query('DELETE FROM dangky WHERE lichhoc_id = ?', [lichhoc_id]);
+
+exports.getCapacityAndCountForUpdate = lichhoc_id =>
+    db.query(
+        `SELECT 
+       ph.succhua              AS capacity,
+       (SELECT COUNT(*) FROM dangky d WHERE d.lichhoc_id = ?) AS current_count
+     FROM lichhoc l
+     JOIN nhommh nh   ON l.manhom  = nh.manhom
+     JOIN phonghoc ph ON l.maphong = ph.maphong
+     WHERE l.id = ?
+     FOR UPDATE`,
+        [lichhoc_id, lichhoc_id]
+    );

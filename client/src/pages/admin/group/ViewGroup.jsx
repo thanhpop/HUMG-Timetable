@@ -5,7 +5,6 @@ import { getGroup } from '../../../api/groupApi';
 import {
     getAllCourses,
     getAllTeachers,
-    getAllRooms,
     getAllSemesters
 } from '../../../api/utilsApi';
 import '../style.css';
@@ -17,7 +16,6 @@ export default function ViewGroup() {
     const [g, setG] = useState(null);
     const [courses, setCourses] = useState([]);
     const [teachers, setTeachers] = useState([]);
-    const [rooms, setRooms] = useState([]);
     const [semesters, setSemesters] = useState([]);
 
     useEffect(() => {
@@ -27,13 +25,11 @@ export default function ViewGroup() {
                     getGroup(manhom),
                     getAllCourses(),
                     getAllTeachers(),
-                    getAllRooms(),
                     getAllSemesters()
                 ]);
                 setG(groupRes.data);
                 setCourses(courseRes.data);
                 setTeachers(teacherRes.data);
-                setRooms(roomRes.data);
                 setSemesters(semRes.data);
             } catch (err) {
                 console.error('Lỗi khi tải dữ liệu:', err);
@@ -45,7 +41,6 @@ export default function ViewGroup() {
 
     const course = courses.find(c => c.mamh === g.mamh);
     const teacher = teachers.find(t => t.mgv === g.mgv);
-    const room = rooms.find(r => r.maphong === g.maphong);
     const semester = semesters.find(s => s.mahk === g.mahk);
 
     return (
@@ -60,9 +55,6 @@ export default function ViewGroup() {
                     </p>
                     <p>
                         <strong>Giảng viên:</strong> {g.mgv} — {teacher?.ten || 'Không tìm thấy'}
-                    </p>
-                    <p>
-                        <strong>Phòng học:</strong> {g.maphong} — {room?.tenphong || 'Không tìm thấy'}
                     </p>
                     <p>
                         <strong>Học kỳ:</strong> {g.mahk} — {semester?.tenhk || 'Không tìm thấy'}

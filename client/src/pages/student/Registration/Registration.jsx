@@ -15,6 +15,8 @@ import {
 } from '../../../api/dangkyApi';
 import { getCountByLichHoc } from '../../../api/dangkyApi';
 import { getCurrentMsv } from '../../utils/auth';
+import { getDotDK } from '../../../api/dotdangkyApi';
+import { getAllSemesters } from '../../../api/utilsApi';
 import './style.css';
 
 export default function RegistrationTanStack() {
@@ -26,11 +28,24 @@ export default function RegistrationTanStack() {
     const [dangKyCount, setDangKyCount] = useState({});
     const [filterKhoa, setFilterKhoa] = useState('');
 
+    // Thông tin đợt đăng ký và học kỳ
+    const [currentPeriod, setCurrentPeriod] = useState(null);
+    const [semInfo, setSemInfo] = useState({});
 
-
+    const [now, setNow] = useState(Date.now());
+    useEffect(() => {
+        const id = setInterval(() => setNow(Date.now()), 60_000);
+        return () => clearInterval(id);
+    }, []);
     const msv = getCurrentMsv();
     if (!msv) return <div>Vui lòng đăng nhập để xem đăng ký.</div>;
 
+    const isPeriodActive = useMemo(() => {
+        if (!currentPeriod) return false;
+        const start = new Date(currentPeriod.ngaybd_dk);
+        const end = new Date(currentPeriod.ngaykt_dk);
+        return now >= start && now <= end;
+    }, [currentPeriod, now]);
 
     const tietThoiGian = {
         1: { start: "06:45", end: "07:35" },
@@ -55,6 +70,24 @@ export default function RegistrationTanStack() {
     }
     useEffect(() => {
         (async () => {
+
+            // Lấy đợt đăng ký và thông tin học kỳ
+            const [dotdkRes, semRes] = await Promise.all([
+                getDotDK(),
+                getAllSemesters()
+            ]);
+
+            // build semInfo map
+            const semMap = {};
+            semRes.data.forEach(s => {
+                semMap[s.mahk] = { tenhk: s.tenhk, namhoc: s.namhoc };
+            });
+            setSemInfo(semMap);
+            // chọn đợt active
+            const active = dotdkRes.data.find(d => d.is_active === 1);
+            setCurrentPeriod(active || null);
+
+
             setLoadingOpen(true);
             const res1 = await getSchedules();
             setOpenClasses(res1.data);
@@ -64,6 +97,7 @@ export default function RegistrationTanStack() {
             const res2 = await getMyRegistrations();
             setMyRegs(res2.data);
             setLoadingMy(false);
+
             const countRes = await getCountByLichHoc();
             const map = countRes.data.reduce((acc, { lichhoc_id, count }) => {
                 acc[lichhoc_id] = count;
@@ -113,49 +147,136 @@ export default function RegistrationTanStack() {
         await refreshDangKyCount();
 
         const sessionObjs = openClasses.filter(s => sessionIds.includes(s.id));
-        for (const s of sessionObjs) {
-            const used = dangKyCount[s.id] || 0;
-            const available = (s.succhua || 0) - used;
+        if (!sessionObjs.length) return;
 
-            if (!registeredIds.has(s.id) && available <= 0) {
-                alert(`Môn: ${s.tenmh} (${s.mamh}) nhóm ${s.tennhom} đã hết chỗ!`);
-                return;
-            }
-
-            // Kiểm tra xung đột lịch học
-            const conflict = myRegs.some(r =>
-                isConflict(s, r)
-            );
-
-            if (!registeredIds.has(s.id) && conflict) {
-                alert(`Môn: ${s.tenmh} (${s.mamh}) nhóm ${s.tennhom} bị trùng lịch với môn đã đăng ký!`);
-                return;
-            }
-        }
+        // Lấy thông tin về môn đang đăng ký 
+        const currentMamh = sessionObjs[0].mamh;
+        const currentMahk = sessionObjs[0].mahk;
+        const currentGroup = sessionObjs[0].tennhom;
 
         const allRegistered = sessionIds.every(id => registeredIds.has(id));
+
+        // Trường hợp người dùng muốn hủy đăng ký
         if (allRegistered) {
             if (window.confirm('Bạn có chắc muốn hủy đăng ký?')) {
                 const regIds = sessionIds.map(id => regMap[id]).filter(Boolean);
                 await Promise.all(regIds.map(rid => deleteRegistration(rid)));
                 setMyRegs(prev => prev.filter(r => !sessionIds.includes(r.lichhoc_id)));
+                await refreshDangKyCount();
             }
-        } else {
-            for (const id of sessionIds) {
-                if (!registeredIds.has(id)) {
-                    await createRegistration({ msv, lichhoc_id: id });
+            return;
+        }
+
+        // Từ đây là trường hợp đăng ký mới
+
+        // Kiểm tra số lượng chỗ trống
+        for (const s of sessionObjs) {
+            const used = dangKyCount[s.id] || 0;
+            const available = (s.succhua || 0) - used;
+
+            if (available <= 0) {
+                alert(`Môn: ${s.tenmh} (${s.mamh}) nhóm ${s.tennhom} đã hết chỗ!`);
+                return;
+            }
+        }
+
+        // Tìm xem đã đăng ký môn này ở nhóm khác trong cùng học kỳ chưa
+        const sameSubjectDifferentGroup = myRegs.filter(reg =>
+            reg.mamh === currentMamh &&
+            reg.mahk === currentMahk &&
+            !sessionIds.includes(reg.lichhoc_id)
+        );
+
+        // Danh sách các đăng ký môn khác (không phải môn này) trong cùng học kỳ
+        const otherSubjectsInSameSemester = myRegs.filter(reg =>
+            reg.mahk === currentMahk && // Cùng học kỳ
+            !(reg.mamh === currentMamh && reg.mahk === currentMahk) // Không phải môn này
+        );
+
+        // Kiểm tra xung đột lịch học với các môn khác trong cùng học kỳ
+        const hasConflict = sessionObjs.some(session =>
+            otherSubjectsInSameSemester.some(reg => isConflict(session, reg))
+        );
+
+        if (hasConflict) {
+            const sem = semInfo[currentMahk] || { tenhk: currentMahk, namhoc: '' };
+            alert(`Môn: ${sessionObjs[0].tenmh} (${currentMamh}) nhóm ${currentGroup} bị trùng lịch với môn học khác đã đăng ký trong học kỳ ` +
+                `học kỳ ${sem.tenhk} – ${sem.namhoc}!`);
+            return;
+        }
+
+        // Xử lý trường hợp đã đăng ký môn này ở nhóm khác
+        if (sameSubjectDifferentGroup.length > 0) {
+            const oldGroup = sameSubjectDifferentGroup[0].tennhom;
+
+            // Kiểm tra xem các buổi học của nhóm cũ có trùng thời gian với nhóm mới không
+            const oldGroupSessions = openClasses.filter(s =>
+                sameSubjectDifferentGroup.some(reg => reg.lichhoc_id === s.id)
+            );
+
+            const sessionOverlap = sessionObjs.some(newSession =>
+                oldGroupSessions.some(oldSession => isConflict(newSession, oldSession))
+            );
+
+            // Nếu không trùng thời gian, cả hai nhóm có thể học được cùng lúc
+            if (!sessionOverlap) {
+                if (window.confirm(`Môn ${currentMamh} nhóm ${currentGroup} có lịch học KHÁC với nhóm ${oldGroup} mà bạn đã đăng ký. Bạn vẫn muốn đổi sang nhóm mới?`)) {
+                    // Hủy đăng ký nhóm cũ
+                    const regIdsToDelete = sameSubjectDifferentGroup.map(r => r.id);
+                    await Promise.all(regIdsToDelete.map(rid => deleteRegistration(rid)));
+
+                    // Đăng ký nhóm mới
+                    for (const id of sessionIds) {
+                        await createRegistration({ msv, lichhoc_id: id });
+                    }
+
+                    const res = await getMyRegistrations();
+                    setMyRegs(res.data);
+                    await refreshDangKyCount();
                 }
+            }
+            // Nếu trùng thời gian, chỉ có thể đăng ký một trong hai
+            else {
+                if (window.confirm(`Bạn đã đăng ký môn ${currentMamh} ở nhóm ${oldGroup} trong cùng học kỳ. Bạn có muốn chuyển sang nhóm ${currentGroup} không?`)) {
+                    // Hủy đăng ký nhóm cũ
+                    const regIdsToDelete = sameSubjectDifferentGroup.map(r => r.id);
+                    await Promise.all(regIdsToDelete.map(rid => deleteRegistration(rid)));
+
+                    // Đăng ký nhóm mới
+                    for (const id of sessionIds) {
+                        await createRegistration({ msv, lichhoc_id: id });
+                    }
+
+                    const res = await getMyRegistrations();
+                    setMyRegs(res.data);
+                    await refreshDangKyCount();
+                }
+            }
+        }
+        // Trường hợp đăng ký mới bình thường
+        else {
+            for (const id of sessionIds) {
+                await createRegistration({ msv, lichhoc_id: id });
             }
             const res = await getMyRegistrations();
             setMyRegs(res.data);
+            await refreshDangKyCount();
         }
-        await refreshDangKyCount();
-    };
 
+    };
     // --- OPEN CLASSES ---
     const dataOpen = useMemo(() => {
+        if (!currentPeriod) return [];
+
+        // 1. Lọc các buổi thật sự thuộc học kỳ này
+        const sessionsOfPeriod = openClasses.filter(s =>
+            s.mahk === currentPeriod.mahk
+            // nếu muốn: && new Date(s.ngaybd) <= now && new Date(s.ngaykt) >= now
+        );
+
+        // 2. Group lại theo manhom
         const grouped = Object.values(
-            openClasses.reduce((acc, s) => {
+            sessionsOfPeriod.reduce((acc, s) => {
                 if (!acc[s.manhom]) acc[s.manhom] = { ...s, sessions: [] };
                 acc[s.manhom].sessions.push(s);
                 return acc;
@@ -210,34 +331,46 @@ export default function RegistrationTanStack() {
                 const ids = sessions.map(s => s.id);
                 const allReg = ids.every(id => registeredIds.has(id));
                 const isFull = conlai <= 0 && !allReg;
-                const baseStyle = {
-                    padding: '8px 16px',
-                    fontSize: '16px',
-                    border: 'none',
-                    borderRadius: 6,
-                    margin: '0 auto',
-                    display: 'block',
-                    width: '100px'
-                };
-                const style = {
-                    ...baseStyle,
-                    backgroundColor: allReg ? '#e74c3c' : '#3498db',
-                    color: '#fff',
-                    cursor: isFull ? 'not-allowed' : 'pointer',
-                    opacity: isFull ? 0.6 : 1
-                };
+                const periodClosed = !isPeriodActive;
+
+                // 1. Logic disable riêng
+                const disableRegister = periodClosed || isFull;
+                const disableCancel = periodClosed;
+
+                // 2. Label và style
+                let label, onClick, btnStyle, isDisabled;
+                if (allReg) {
+                    // Hiện nút Hủy
+                    label = 'Hủy';
+                    isDisabled = disableCancel;
+                    onClick = () => !disableCancel && handleToggleGroup(ids);
+                    btnStyle = {
+                        backgroundColor: '#e74c3c',
+                        opacity: isDisabled ? 0.5 : 1,
+                        cursor: isDisabled ? 'not-allowed' : 'pointer',
+                        width: '100%',
+                    };
+                } else {
+                    // Hiện nút Đăng ký hoặc Hết chỗ
+                    label = isFull ? 'Hết chỗ' : 'Đăng ký';
+                    isDisabled = disableRegister;
+                    onClick = () => !disableRegister && handleToggleGroup(ids);
+                    btnStyle = {
+                        backgroundColor: isFull ? '#aaa' : '#0056b3',
+                        opacity: isDisabled ? 0.5 : 1,
+                        cursor: isDisabled ? 'not-allowed' : 'pointer',
+                        width: '100%',
+                    };
+                }
+
                 return (
-                    <button
-                        disabled={isFull}
-                        style={style}
-                        onClick={() => !isFull && handleToggleGroup(ids)}
-                    >
-                        {allReg ? 'Hủy' : 'Đăng ký'}
+                    <button disabled={isDisabled} style={btnStyle} onClick={onClick}>
+                        {label}
                     </button>
                 );
             }
         }
-    ], [registeredIds, handleToggleGroup, dangKyCount]);
+    ], [registeredIds, handleToggleGroup, dangKyCount, isPeriodActive]);
 
     const tableOpen = useReactTable({
         data: dataOpen,
@@ -249,14 +382,26 @@ export default function RegistrationTanStack() {
 
     // --- MY REGISTRATIONS ---
     const dataMy = useMemo(() => {
+        if (!currentPeriod) return [];
+
+        // 1. Chỉ lấy những đăng ký trong học kỳ đang mở
+        const regsOfPeriod = myRegs.filter(r => r.mahk === currentPeriod.mahk);
+
+        // 2. (Tuỳ chọn) lọc thêm theo ngày trong khoảng đợt đăng ký
+        // const nowDate = new Date();
+        // .filter(r => new Date(r.ngaybd) <= nowDate && new Date(r.ngaykt) >= nowDate)
+
+        // 3. Group lại theo môn/nhóm
         const grouped = Object.values(
-            myRegs.reduce((acc, r) => {
+            regsOfPeriod.reduce((acc, r) => {
                 const key = `${r.mamh}-${r.tennhom}`;
                 if (!acc[key]) acc[key] = { ...r, sessions: [] };
                 acc[key].sessions.push(r);
                 return acc;
             }, {})
         );
+
+        // 4. Map thành dữ liệu cuối
         return grouped.map(g => ({
             mamh: g.mamh,
             tenmh: g.tenmh,
@@ -264,9 +409,8 @@ export default function RegistrationTanStack() {
             tennhom: g.tennhom,
             ngaydk: g.sessions[0].ngaydk,
             sessions: g.sessions,
-            // sessionIds: g.sessions.map(s => s.lichhoc_id)
         }));
-    }, [myRegs]);
+    }, [myRegs, currentPeriod]);
 
     const totalRegistered = dataMy.length;
     const totalCredits = dataMy.reduce((sum, r) => sum + (r.sotinchi || 0), 0);
@@ -296,27 +440,30 @@ export default function RegistrationTanStack() {
         { id: 'ngaydk', header: 'Ngày đăng ký', accessorFn: row => new Date(row.ngaydk).toLocaleString() },
         {
             id: 'unreg', header: 'Hủy', size: 120,
-            cell: ({ row }) => (
-                <button
-                    style={{
-                        padding: '8px 16px',
-                        fontSize: '16px',
-                        border: 'none',
-                        borderRadius: 6,
-                        margin: '0 auto',
-                        display: 'block',
-                        width: '100px',
-                        backgroundColor: '#e74c3c',
-                        color: '#fff',
-                        cursor: 'pointer',
-                    }}
-                    onClick={() => handleToggleGroup(row.original.sessions.map(s => s.lichhoc_id))}
-                >
-                    Xóa
-                </button>
-            )
+            cell: ({ row }) => {
+
+                const ids = row.original.sessions.map(s => s.lichhoc_id);
+                const disabled = !isPeriodActive;
+                const style = {
+                    padding: '8px 16px',
+                    border: 'none',
+                    borderRadius: 6,
+                    width: '100%',
+                    backgroundColor: '#e74c3c',
+                    opacity: disabled ? 0.5 : 1,
+                    pointerEvents: disabled ? 'none' : 'auto',
+                    cursor: disabled ? 'not-allowed' : 'pointer'
+                };
+                return (
+                    <button
+                        disabled={disabled}
+                        style={style}
+                        onClick={() => !disabled && handleToggleGroup(ids)}
+                    >Xóa</button>
+                );
+            }
         }
-    ], [handleToggleGroup]);
+    ], [handleToggleGroup, isPeriodActive]);
 
     const tableMy = useReactTable({
         data: dataMy,
@@ -365,7 +512,10 @@ export default function RegistrationTanStack() {
 
     return (
         <div className="registration-page">
-            <div className="registration-header"><h1>Đăng ký môn học</h1></div>
+            <div className="registration-header"><h1> Đăng ký môn học
+                {currentPeriod && semInfo[currentPeriod.mahk] && (
+                    `: ${semInfo[currentPeriod.mahk].tenhk} – ${semInfo[currentPeriod.mahk].namhoc}`
+                )}</h1></div>
             <section style={{ paddingBottom: 24 }}>
                 <h2>Danh sách môn học mở cho đăng ký</h2>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>

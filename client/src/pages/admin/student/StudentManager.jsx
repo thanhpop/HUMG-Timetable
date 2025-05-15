@@ -11,6 +11,7 @@ export default function StudentManager() {
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterKhoa, setFilterKhoa] = useState('');
+    const [filterKhoaHoc, setFilterKhoaHoc] = useState('');
 
     const fetchStudents = async () => {
         setLoading(true);
@@ -42,11 +43,15 @@ export default function StudentManager() {
     // 3) Lọc theo searchTerm và filterKhoa
     const filtered = (students || []).filter(s => {
         const term = searchTerm.toLowerCase();
+        // phòng vệ: nếu s.msv hoặc s.ten undefined thì dùng chuỗi rỗng
+        const msvLower = (s.msv ?? '').toLowerCase();
+        const tenLower = (s.ten ?? '').toLowerCase();
         const matchText =
-            s.msv.toLowerCase().includes(term) ||
-            s.ten.toLowerCase().includes(term);
+            msvLower.includes(term) ||
+            tenLower.includes(term);
         const matchKhoa = !filterKhoa || s.khoa === filterKhoa;
-        return matchText && matchKhoa;
+        const matchKhoaHoc = !filterKhoaHoc || s.khoaHoc === filterKhoaHoc;
+        return matchText && matchKhoa && matchKhoaHoc;
     });
 
     // Tìm kiếm sinh viên theo tên hoặc MSV
@@ -58,6 +63,8 @@ export default function StudentManager() {
         { name: 'Tên', selector: row => row.ten, sortable: true },
         { name: 'Khoa', selector: row => row.khoa, sortable: true },
         { name: 'Lớp', selector: row => row.lop, sortable: true },
+        { name: 'Khóa', selector: row => row.khoaHoc, sortable: true },
+
         { name: 'Giới tính', selector: row => row.gioitinh },
         { name: 'Ngày sinh', selector: row => new Date(row.ngaysinh).toLocaleDateString('vi-VN'), },
         {
@@ -149,9 +156,23 @@ export default function StudentManager() {
                     onChange={e => setFilterKhoa(e.target.value)}
                     style={{ padding: 8, fontSize: 14 }}
                 >
-                    <option value="">-- Tất cả khoa --</option>
+                    <option key="all" value="">
+                        -- Tất cả khoa --
+                    </option>
                     {khoaOptions.map(k => (
-                        <option key={k} value={k}>{k}</option>
+                        <option key={k} value={k}>
+                            {k}
+                        </option>
+                    ))}
+                </select>
+                <select
+                    value={filterKhoaHoc}
+                    onChange={e => setFilterKhoaHoc(e.target.value)}
+                    style={{ padding: 8, fontSize: 14 }}
+                >
+                    <option value="">-- Tất cả khóa học --</option>
+                    {[...new Set(students.map(s => s.khoaHoc))].map(kh => (
+                        <option key={kh} value={kh}>{kh}</option>
                     ))}
                 </select>
             </div>

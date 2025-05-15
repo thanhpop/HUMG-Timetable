@@ -14,3 +14,11 @@ export function deleteSchedule(id) { return axios.delete(`${BASE}/lichhoc/${id}`
 export function getSchedulesByTeacher(mgv) {
     return axios.get(`${BASE}/lichhoc/gv/${mgv}`);
 }
+
+export function getSchedulesBySemester(mahk) {
+    return axios.get(`${BASE}/lichhoc/semester/${mahk}`);
+}
+
+export function deleteSchedulesBySemester(mahk) {
+    return axios.delete(`${BASE}/lichhoc/semester/${mahk}`);
+}

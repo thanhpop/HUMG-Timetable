@@ -22,9 +22,8 @@ exports.getOne = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
     try {
-        const { msv, ten, khoa, lop, gioitinh, ngaysinh, sdt, email, cccd, diachi } = req.body;
-        // bạn có thể thêm validate ở đây
-        const [result] = await Student.create({ msv, ten, khoa, lop, gioitinh, ngaysinh, sdt, email, cccd, diachi });
+        const { msv, ten, khoa, lop, khoaHoc, gioitinh, ngaysinh, sdt, email, cccd, diachi } = req.body;
+        const [result] = await Student.create({ msv, ten, khoa, lop, khoaHoc, gioitinh, ngaysinh, sdt, email, cccd, diachi });
         const [newRow] = await Student.findById(result.insertId);
         res.status(201).json(newRow[0]);
     } catch (err) {
@@ -34,8 +33,8 @@ exports.create = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
     try {
-        const { msv, ten, khoa, lop, gioitinh, ngaysinh, sdt, email, cccd, diachi } = req.body;
-        const [result] = await Student.update(req.params.msv, { msv, ten, khoa, lop, gioitinh, ngaysinh, sdt, email, cccd, diachi });
+        const { msv, ten, khoa, lop, khoaHoc, gioitinh, ngaysinh, sdt, email, cccd, diachi } = req.body;
+        const [result] = await Student.update(req.params.msv, { msv, ten, khoa, lop, khoaHoc, gioitinh, ngaysinh, sdt, email, cccd, diachi });
         if (result.affectedRows === 0) return res.status(404).json({ error: 'Not found' });
         const [rows] = await Student.findById(req.params.msv);
         res.json(rows[0]);

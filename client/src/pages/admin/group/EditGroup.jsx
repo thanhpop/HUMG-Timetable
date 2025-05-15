@@ -6,7 +6,6 @@ import { getGroup, updateGroup } from '../../../api/groupApi';
 import {
     getAllCourses,
     getAllTeachers,
-    getAllRooms,
     getAllSemesters
 } from '../../../api/utilsApi';
 import '../style.css';
@@ -46,7 +45,6 @@ export default function EditGroup() {
         tennhom: '',
         mamh: '',
         mgv: '',
-        maphong: '',
         mahk: ''
     });
     const [error, setError] = useState('');
@@ -54,18 +52,16 @@ export default function EditGroup() {
 
     const [courses, setCourses] = useState([]);
     const [teachers, setTeachers] = useState([]);
-    const [rooms, setRooms] = useState([]);
     const [semesters, setSemesters] = useState([]);
 
     // load group + reference lists
     useEffect(() => {
         (async () => {
             try {
-                const [{ data: grp }, cRes, tRes, rRes, sRes] = await Promise.all([
+                const [{ data: grp }, cRes, tRes, sRes] = await Promise.all([
                     getGroup(manhom),
                     getAllCourses(),
                     getAllTeachers(),
-                    getAllRooms(),
                     getAllSemesters()
                 ]);
                 setForm({
@@ -73,12 +69,12 @@ export default function EditGroup() {
                     tennhom: grp.tennhom,
                     mamh: grp.mamh,
                     mgv: grp.mgv,
-                    maphong: grp.maphong,
+
                     mahk: grp.mahk
                 });
                 setCourses(cRes.data);
                 setTeachers(tRes.data);
-                setRooms(rRes.data);
+
                 setSemesters(sRes.data);
             } catch (e) {
                 console.error(e);
@@ -145,15 +141,6 @@ export default function EditGroup() {
                     isClearable
                 />
 
-                <label>Mã phòng học*</label>
-                <Select
-                    styles={customSelectStyles}
-                    options={rooms.map(r => ({ value: r.maphong, label: `${r.maphong} – ${r.tenphong}` }))}
-                    value={rooms.find(r => r.maphong === form.maphong) ? { value: form.maphong, label: `${form.maphong} – ${rooms.find(r => r.maphong === form.maphong).tenphong}` } : null}
-                    onChange={onInput('maphong')}
-                    placeholder="Chọn phòng học"
-                    isClearable
-                />
 
                 <label>Mã học kỳ*</label>
                 <Select

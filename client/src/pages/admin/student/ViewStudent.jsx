@@ -25,6 +25,7 @@ export default function ViewStudent() {
                     <p><strong>MSV:</strong> {stu.msv}</p>
                     <p><strong>Họ và tên:</strong> {stu.ten}</p>
                     <p><strong>Khoa:</strong> {stu.khoa}</p>
+                    <p><strong>Khóa:</strong> {stu.khoaHoc}</p>
                     <p><strong>Lớp:</strong> {stu.lop}</p>
                     <p><strong>Giới tính:</strong> {stu.gioitinh}</p>
                     <p><strong>Ngày sinh:</strong> {new Date(stu.ngaysinh).toLocaleDateString('vi-VN')}</p>

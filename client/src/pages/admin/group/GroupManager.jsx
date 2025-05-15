@@ -22,7 +22,6 @@ export default function GroupManagerTanStack() {
     const [filterNamHoc, setFilterNamHoc] = useState('');
     const [courses, setCourses] = useState([]);
     const [teachers, setTeachers] = useState([]);
-    const [rooms, setRooms] = useState([]);
     const [semesters, setSemesters] = useState([]);
 
     useEffect(() => {
@@ -34,12 +33,10 @@ export default function GroupManagerTanStack() {
                     getGroups(),
                     getAllCourses(),
                     getAllTeachers(),
-                    getAllRooms()
                 ]);
                 setGroups(gRes.data);
                 setCourses(cRes.data);
                 setTeachers(tRes.data);
-                setRooms(rRes.data);
                 setSemesters(sRes.data);
             } catch (err) {
                 console.error(err);
@@ -77,7 +74,6 @@ export default function GroupManagerTanStack() {
                 const course = courses.find(c => c.mamh === g.mamh) || {};
                 const sem = semesterMap[g.mahk] || {};
                 const teacher = teachers.find(t => t.mgv === g.mgv) || {};
-                const room = rooms.find(rm => rm.maphong === g.maphong) || {};
                 return {
                     id: g.manhom,
                     manhom: g.manhom,
@@ -86,12 +82,11 @@ export default function GroupManagerTanStack() {
                     khoa: course.khoa,
                     hocky: sem.tenhk ? `${sem.tenhk} – ${sem.namhoc}` : 'Chưa xác định',
                     giangvien: teacher.ten,
-                    tenphong: room.tenphong,
                     tenhk: sem.tenhk,
                     namhoc: sem.namhoc
                 };
             });
-    }, [groups, courses, teachers, rooms, semesters, search, filterKhoa, filterHocKy, filterNamHoc, semesterMap]);
+    }, [groups, courses, teachers, semesters, search, filterKhoa, filterHocKy, filterNamHoc, semesterMap]);
 
     const columns = useMemo(
         () => [
@@ -101,7 +96,6 @@ export default function GroupManagerTanStack() {
             { accessorKey: 'khoa', header: 'Khoa' },
             { accessorKey: 'hocky', header: 'Học kỳ' },
             { accessorKey: 'giangvien', header: 'Giảng viên' },
-            { accessorKey: 'tenphong', header: 'Tên phòng' },
             {
                 id: 'actions',
                 header: 'Hành động',

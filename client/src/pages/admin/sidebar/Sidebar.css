@@ -12,22 +12,18 @@
     padding: 1rem;
     box-sizing: border-box;
 
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-    box-sizing: border-box;
+
 }
 
-.sidebar-admin h2 {
-    margin-bottom: 2rem;
-    font-size: 1.5rem;
+.sidebar-admin h3 {
+    /* font-size: 1.5rem; */
     margin-top: 0rem;
 }
 
 .sidebar-admin ul {
     list-style: none;
     padding: 0;
-    height: 80%;
+    height: 100%;
     margin: 0;
     flex-grow: 1;
     overflow-y: auto;
@@ -40,7 +36,7 @@
 
 .sidebar-admin a {
     display: block;
-    text-align: center;
+    text-align: left;
     padding: 0.5rem 1rem;
     color: #fff;
     text-decoration: none;
@@ -65,12 +61,40 @@
 
 .sidebar-footer-admin {
     margin-top: auto;
-    /* align-items: center; */
 }
 
-/* .sidebar-footer-admin button {
-    background-color: transparent;
-} */
+/* 1. Chuyển overflow-y từ ul sang chính .sidebar-admin */
+.sidebar-admin {
+    /* giữ height: 100vh */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    /* cuộn toàn bộ sidebar */
+}
+
+/* ul giờ sẽ tràn thoải mái */
+.sidebar-admin ul {
+    overflow: visible;
+}
+
+/* 2. Tinh chỉnh scrollbar (WebKit browsers) */
+.sidebar-admin::-webkit-scrollbar {
+    width: 6px;
+    /* độ rộng scrollbar */
+}
+
+.sidebar-admin::-webkit-scrollbar-track {
+    background: transparent;
+    /* nền trong suốt hoặc tùy chỉnh */
+}
+
+.sidebar-admin::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    /* màu thumb */
+    border-radius: 3px;
+    /* bo góc */
+}
+
 
 .logout-button-admin {
     width: 100%;
@@ -84,4 +108,27 @@
 
 .logout-button-admin:hover {
     background-color: #c0392b;
+}
+
+.sidebar-admin ul li a {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    /* khoảng 14px */
+}
+
+/* Giảm kích thước chữ của toggle “Quản lý thời khóa biểu” */
+.submenu-toggle span:first-child {
+    font-size: 1rem;
+}
+
+/* Trong Sidebar.css, thêm vào cuối */
+.submenu-toggle {
+    /* Giống padding của .sidebar-admin a */
+    padding: 0.5rem 1rem;
+    text-align: left;
+}
+
+/* Hover/active nếu cần */
+.submenu-toggle:hover {
+    background-color: #4a5568;
 }

@@ -57,6 +57,8 @@ import Timetable from '../pages/student/timetable/Timetable.jsx';
 
 import TimetableGV from '../pages/teacher/timetable/TimetableGV.jsx';
 
+import GenerateTKB from '../pages/admin/generateTKB/GenerateTKB.jsx';
+
 import Login from '../pages/login/Login.jsx';
 
 
@@ -100,6 +102,7 @@ export default function AppRoutes() {
                 <Route path="/admin/dotdangky" element={<DotDKManager />} />
                 <Route path="/admin/dotdangky/add" element={<AddDotDK />} />
                 <Route path="/admin/dotdangky/edit/:id" element={<EditDotDK />} />
+                <Route path="/admin/generateTKB" element={<GenerateTKB />} />
             </Route>
             <Route path="/student" element={<ProtectedRoute allowedRoles={['sv']}>
                 <DashboardStudent />

@@ -15,14 +15,32 @@ export default function AddSchedule() {
 
     const [form, setForm] = useState({
         manhom: '',
+        maphong: '',
         sessions: [
-            { thu: 2, tietbd: 1, tietkt: 2, ngaybd: '', ngaykt: '' }
+            { thu: 2, tietbd: 1, tietkt: 2, ngaybd: '', ngaykt: '', maphong: '' }
         ]
     });
     const [options, setOptions] = useState([]);
+    const [roomOptions, setRoomOptions] = useState([]);
     const [loadingOpts, setLoadingOpts] = useState(true);
     const [error, setError] = useState('');
-
+    const selectStyles = {
+        control: base => ({
+            ...base,
+            backgroundColor: 'black',
+            borderColor: '#555',
+            width: 450
+        }),
+        singleValue: base => ({ ...base, color: 'white' }),
+        menu: base => ({ ...base, backgroundColor: 'black' }),
+        option: (base, state) => ({
+            ...base,
+            backgroundColor: state.isFocused ? '#333' : 'black',
+            color: 'white'
+        }),
+        placeholder: base => ({ ...base, color: '#ccc' }),
+        input: base => ({ ...base, color: 'white' }),
+    };
     useEffect(() => {
         (async () => {
             try {
@@ -31,7 +49,13 @@ export default function AddSchedule() {
                 ]);
                 const courseMap = Object.fromEntries(cRes.data.map(c => [c.mamh, c.tenmh]));
                 const teacherMap = Object.fromEntries(tRes.data.map(t => [t.mgv, t.ten]));
-                const roomMap = Object.fromEntries(rRes.data.map(r => [r.maphong, { tenphong: r.tenphong, khu: r.khu }]));
+                const roomMap = Object.fromEntries(
+                    rRes.data.map(r => [r.maphong, { tenphong: r.tenphong, khu: r.khu }])
+                );
+                setRoomOptions(rRes.data.map(r => ({
+                    value: r.maphong,
+                    label: `${r.tenphong} – Khu ${r.khu}`
+                })));
 
                 setOptions(
                     gRes.data.map(g => {
@@ -43,8 +67,6 @@ export default function AddSchedule() {
                                 `Tên nhóm: ${g.tennhom}`,
                                 `Môn: ${courseMap[g.mamh]}`,
                                 `GV: ${teacherMap[g.mgv]}`,
-                                `Phòng: ${room.tenphong}`,
-                                `Khu: ${room.khu}`
                             ].join(' – ')
                         };
                     })
@@ -105,6 +127,23 @@ export default function AddSchedule() {
                 return;
             }
         }
+        const sessions = form.sessions;
+        for (let i = 0; i < sessions.length; i++) {
+            for (let j = i + 1; j < sessions.length; j++) {
+                const a = sessions[i], b = sessions[j];
+                // Must be same weekday to check
+                if (a.thu !== b.thu) continue;
+                // Block if they share an exact calendar date
+                if (a.ngaybd === b.ngaybd)
+                    return alert(`Buổi ${j + 1} cùng Thứ ${a.thu} và cùng ngày ${a.ngaybd} với Buổi ${i + 1}`);
+                // If recurring ranges overlap
+                if (a.ngaybd <= b.ngaykt && b.ngaybd <= a.ngaykt) {
+                    // And times overlap
+                    if (a.tietbd <= b.tietkt && b.tietbd <= a.tietkt)
+                        return alert(`Buổi ${j + 1} trùng/chéo lịch với Buổi ${i + 1}`);
+                }
+            }
+        }
         try {
             const created = [];
             for (let s of form.sessions) {
@@ -114,7 +153,8 @@ export default function AddSchedule() {
                     tietbd: s.tietbd,
                     tietkt: s.tietkt,
                     ngaybd: s.ngaybd,
-                    ngaykt: s.ngaykt
+                    ngaykt: s.ngaykt,
+                    maphong: s.maphong,
                 });
                 created.push(res.data);
             }
@@ -136,18 +176,7 @@ export default function AddSchedule() {
                     onChange={onGroupChange}
                     placeholder="Chọn nhóm..."
                     isClearable
-                    styles={{
-                        control: base => ({ ...base, backgroundColor: 'black', borderColor: '#555', width: '450px' }),
-                        singleValue: base => ({ ...base, color: 'white' }),
-                        menu: base => ({ ...base, backgroundColor: 'black' }),
-                        option: (base, state) => ({
-                            ...base,
-                            backgroundColor: state.isFocused ? '#333' : 'black',
-                            color: 'white'
-                        }),
-                        placeholder: base => ({ ...base, color: '#ccc' }),
-                        input: base => ({ ...base, color: 'white' })
-                    }}
+                    styles={selectStyles}
                 />
                 {error && <div className="error-message">{error}</div>}
 
@@ -162,7 +191,32 @@ export default function AddSchedule() {
                                 <option key={n} value={n}>Thứ {n === 8 ? 'CN' : n}</option>
                             )}
                         </select>
+                        <label>Phòng học*</label>
+                        <Select
+                            options={roomOptions}
+                            value={roomOptions.find(o => o.value === s.maphong) || null}
+                            onChange={opt => onSessionChange(idx, 'maphong', opt ? opt.value : '')}
+                            placeholder="Chọn phòng..."
+                            styles={{
 
+                                menu: base => ({ ...base, maxHeight: 200, backgroundColor: '#3B3B3B' }),
+                                control: base => ({
+                                    ...base,
+                                    backgroundColor: '#3B3B3B',
+                                    borderColor: '#555',
+
+                                }),
+                                singleValue: base => ({ ...base, color: 'white' }),
+
+                                option: (base, state) => ({
+                                    ...base,
+                                    backgroundColor: state.isFocused ? '#333' : 'black',
+                                    color: 'white'
+                                }),
+                                placeholder: base => ({ ...base, color: '#ccc' }),
+                                input: base => ({ ...base, color: 'white' }),
+                            }}
+                        />
                         <label>Tiết bắt đầu*</label>
                         <input
                             type="number" min="1"

@@ -16,6 +16,9 @@ const dotdangkyRoutes = require('./routes/dotdangky');
 const authRoutes = require('./routes/auth');
 const errorHandler = require('./middleware/errorHandler');
 
+
+const tkbRoutes = require('./routes/tkbRoutes');
+
 const app = express();
 app.use(cors({
     origin: 'http://localhost:5173', // chỉ định đúng client
@@ -40,6 +43,8 @@ app.use('/dangky', require('./routes/dangky'));
 
 app.use('/auth', authRoutes);
 
+
+app.use('/api/tkb', tkbRoutes);
 
 
 

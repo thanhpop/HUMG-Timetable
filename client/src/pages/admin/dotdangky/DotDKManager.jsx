@@ -57,7 +57,7 @@ export default function DotDKManager() {
             selector: r => {
                 const info = semInfo[r.mahk];
                 return info
-                    ? `${info.tenhk} – ${info.namhoc}`
+                    ? `${info.tenhk} – ${info.namhoc}`
                     : '';
             },
             wrap: true,
@@ -65,6 +65,12 @@ export default function DotDKManager() {
         },
         { name: 'Ngày bắt đầu đăng ký', selector: r => formatDate(r.ngaybd_dk) },
         { name: 'Ngày kết thúc đăng ký', selector: r => formatDate(r.ngaykt_dk) },
+        // Cột mới: Trạng thái hoạt động
+        {
+            name: 'Hoạt động',
+            selector: r => (r.is_active ? 'Đang hoạt động' : 'Ngừng hoạt động'),
+            width: '180px'
+        },
         {
             name: 'Hành động',
             cell: r => (
