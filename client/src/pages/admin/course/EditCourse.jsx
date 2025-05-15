@@ -71,10 +71,19 @@ export default function EditCourse() {
                     />
 
                     <label htmlFor="sotinchi">Số tín chỉ *</label>
-                    <input
-                        id="sotinchi" name="sotinchi" type="number"
-                        value={form.sotinchi} onChange={onInput} required
-                    />
+                    <select
+                        id="sotinchi"
+                        name="sotinchi"
+                        value={form.sotinchi}
+                        onChange={onInput}
+                        required
+                    >
+                        <option value="">Chọn số tín chỉ</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
 
                     <label htmlFor="khoa">Khoa *</label>
                     <select

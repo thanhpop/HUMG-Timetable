@@ -65,16 +65,19 @@ export default function AddCourse() {
 
                     {/* Số tín chỉ */}
                     <label htmlFor="sotinchi">Số tín chỉ*</label>
-                    <input
+                    <select
                         id="sotinchi"
                         name="sotinchi"
-                        type="number"
-                        min="1"
-
                         value={form.sotinchi}
                         onChange={onInput}
                         required
-                    />
+                    >
+                        <option value="">Chọn số tín chỉ</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
 
                     {/* Khoa */}
                     <label htmlFor="khoa">Khoa*</label>

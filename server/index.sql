@@ -73,11 +73,9 @@ CREATE TABLE IF NOT EXISTS nhommh (
   tennhom     VARCHAR(150)  NOT NULL,
   mamh        VARCHAR(50)   NOT NULL,
   mgv         VARCHAR(50)   NOT NULL,
-
   mahk VARCHAR(50) NOT NULL,
   FOREIGN KEY (mamh)    REFERENCES monhoc(mamh),
   FOREIGN KEY (mgv)     REFERENCES giangvien(mgv),
-
   FOREIGN KEY (mahk) REFERENCES hocky(mahk);
 );
 

@@ -7,13 +7,13 @@ class EnhancedTKBAlgorithm {
         this.maxTietPerDay = 4;
         this.weekCount = 15;
     }
-    getPatterns(sotinchi) {
+    getSchedulePattern(sotinchi) {
         switch (sotinchi) {
-            case 4: return [{ sessions: [{ tietCount: 2 }, { tietCount: 2 }] }];
-            case 3: return [{ sessions: [{ tietCount: 3 }] }];
-            case 2: return [{ sessions: [{ tietCount: 2 }, { tietCount: 2 }] }];
-            case 1: return [{ sessions: [{ tietCount: 2 }] }];
-            default: return [{ sessions: [{ tietCount: 2 }] }];
+            case 4: return [{ sessions: [{ tietCount: 2 }, { tietCount: 2 }], description: "4 tín: 2 buổi/tuần, 2 tiết/buổi" }];
+            case 3: return [{ sessions: [{ tietCount: 3 }], description: "3 tín: 1 buổi/tuần, 3 tiết" }];
+            case 2: return [{ sessions: [{ tietCount: 2 }, { tietCount: 2 }], description: "2 tín: 2 buổi/tuần, 2 tiết/buổi" }];
+            case 1: return [{ sessions: [{ tietCount: 2 }], description: "1 tín: 1 buổi/tuần, 2 tiết" }];
+            default: return [{ sessions: [{ tietCount: 3 }], description: "Mặc định: 1 buổi/tuần, 3 tiết" }];
         }
     }
 
@@ -104,7 +104,7 @@ class EnhancedTKBAlgorithm {
         });
 
         const tkb = [], conflicts = [];
-        const gvBusy = new Map(), rmBusy = new Map(), svBusy = new Map();
+        const gvBusyMap = new Map(), phongBusyMap = new Map(), svBusyMap = new Map();
 
         // 4) Theo từng nhóm tín chỉ
         for (const credit of [4, 3, 2, 1]) {
@@ -112,14 +112,15 @@ class EnhancedTKBAlgorithm {
             const units = classUnits.filter(u => (u.sotinchi || 3) === credit);
             // Sắp xếp ưu tiên như trước (đã sort filtered, nếu muốn bạn có thể resort units)
             for (const unit of units) {
-                const ok = await this.trySchedule(
+                const ok = await this.scheduleMonHoc(
                     unit,      // giờ là 1 nhóm môn
                     phonghocs,
                     giangviens,
                     tkb,
-                    gvBusy,
-                    rmBusy,
-                    svBusy,
+                    gvBusyMap,
+                    phongBusyMap,
+                    svBusyMap,
+                    nhommhs,
                     hocky
                 );
                 if (!ok) {
@@ -134,34 +135,35 @@ class EnhancedTKBAlgorithm {
 
         return { tkb, conflicts };
     }
-
-    // --- logic trySchedule, findSlot vẫn như trước, chỉ dùng hocky.ngaybd/ngaykt ---
-    async trySchedule(unit, rooms, teachers, tkb, gvBusy, rmBusy, svBusy, hocky) {
+    // pattern based scheduling
+    async scheduleMonHoc(unit, phonghocs, giangviens, tkb, gvBusyMap, phongBusyMap, svBusyMap, nhommhs, hocky) {
         const { manhom, sotinchi, totalSvCount, mgv } = unit;
-        const gv = teachers.find(g => g.mgv === mgv);
-        if (!gv) return false;
+        const nhomMonHoc = nhommhs.find(nhom => nhom.manhom === manhom);
+        if (!nhomMonHoc) return false;
 
-        const pattern = this.getPatterns(sotinchi || 3);
-        const suitable = rooms.filter(r => r.succhua >= totalSvCount);
+        const giangVien = giangviens.find(gv => gv.mgv === nhomMonHoc.mgv);
+        if (!giangVien) return false;
 
-        // --- PHẢI CÓ VÒNG LẶP QUA pattern ---
-        for (const pat of pattern) {
-            for (const room of suitable) {
-                const usedThus = [];
+        const schedulePattern = this.getSchedulePattern(sotinchi || 3);
+        const suitableRooms = phonghocs.filter(r => r.succhua >= totalSvCount).sort((a, b) => a.succhua - b.succhua);
+
+        for (const pattern of schedulePattern) {
+            for (const phong of suitableRooms) {
+                const scheduledDays = [];
                 let success = true;
 
                 // Mỗi pattern có nhiều session
-                for (const ses of pat.sessions) {
-                    const slots = this.findSlot(
-                        unit, gv, room, tkb,
-                        gvBusy, rmBusy, svBusy,
-                        ses.tietCount, usedThus,
+                for (const session of pattern.sessions) {
+                    const scheduled = this.findSlot(
+                        unit, giangVien, phong, tkb,
+                        gvBusyMap, phongBusyMap, svBusyMap,
+                        session.tietCount, scheduledDays,
                         hocky
                     );
-                    if (!slots) { success = false; break; }
+                    if (!scheduled) { success = false; break; }
 
-                    for (const entry of Array.isArray(slots) ? slots : [slots]) {
-                        usedThus.push(entry.thu);
+                    for (const entry of Array.isArray(scheduled) ? scheduled : [scheduled]) {
+                        scheduledDays.push(entry.thu);
                         tkb.push(entry);
                     }
                 }
@@ -174,8 +176,7 @@ class EnhancedTKBAlgorithm {
 
         return false;
     }
-
-    findSlot(unit, gv, room, tkb, gvBusy, rmBusy, svBusy, count, usedDays, hocky) {
+    findSlot(unit, giangviens, phonghocs, tkb, gvBusyMap, phongBusyMap, svBusyMap, count, usedDays, hocky) {
         const { manhom } = unit;        // chỉ lấy manhom (và mamh, tenmh nếu bạn cần)
         for (let i = 0; i < this.ngayHoc.length; i++) {
             const thu = i + 2;            // 2 = Thứ 2, 3 = Thứ 3, …
@@ -188,8 +189,8 @@ class EnhancedTKBAlgorithm {
                 let ok = true;
                 for (let j = 0; j < count; j++) {
                     const tiet = this.tietHoc[s + j];
-                    if (gvBusy.has(`${gv.mgv}-${thu}-${tiet}`) ||
-                        rmBusy.has(`${room.maphong}-${thu}-${tiet}`)) {
+                    if (gvBusyMap.has(`${giangviens.mgv}-${thu}-${tiet}`) ||
+                        phongBusyMap.has(`${phonghocs.maphong}-${thu}-${tiet}`)) {
                         ok = false;
                         break;
                     }
@@ -201,7 +202,7 @@ class EnhancedTKBAlgorithm {
                 // build entry, dùng ngaybd/ngaykt từ hocky
                 const entry1 = {
                     manhom,
-                    maphong: room.maphong,
+                    maphong: phonghocs.maphong,
                     thu,
                     tietbd: startTiet,
                     tietkt: endTiet,
@@ -217,7 +218,7 @@ class EnhancedTKBAlgorithm {
                 // build entry đợt 2: tuần 11 → tuần 18
                 const entry2 = {
                     manhom,
-                    maphong: room.maphong,
+                    maphong: phonghocs.maphong,
                     thu,
                     tietbd: startTiet,
                     tietkt: endTiet,
@@ -238,8 +239,8 @@ class EnhancedTKBAlgorithm {
                 // đánh dấu busy
                 for (let j = 0; j < count; j++) {
                     const tiet = this.tietHoc[s + j];
-                    gvBusy.set(`${gv.mgv}-${thu}-${tiet}`, true);
-                    rmBusy.set(`${room.maphong}-${thu}-${tiet}`, true);
+                    gvBusyMap.set(`${giangviens.mgv}-${thu}-${tiet}`, true);
+                    phongBusyMap.set(`${phonghocs.maphong}-${thu}-${tiet}`, true);
                 }
                 entry1.thu = i + 2;
                 entry2.thu = i + 2;

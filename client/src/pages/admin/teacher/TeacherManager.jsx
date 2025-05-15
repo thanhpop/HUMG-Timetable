@@ -122,7 +122,7 @@ export default function TeacherManager() {
                     onClick={() => navigate('/admin/teachers/add')}
                     className="btn-add"
                 >
-                    Thêm giáo viên
+                    Thêm giảng viên
                 </button>
             </div>
 
