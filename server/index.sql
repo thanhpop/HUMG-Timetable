@@ -100,8 +100,11 @@ CREATE TABLE IF NOT EXISTS dangky (
   msv          VARCHAR(50)    NOT NULL,
   lichhoc_id   INT            NOT NULL,
   ngaydk       DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  manhom      VARCHAR(50) NOT NULL,
+  trangthai ENUM('Cho duyet', 'Da duyet', 'Huy') NOT NULL DEFAULT 'Cho duyet'
   FOREIGN KEY (msv)        REFERENCES sinhvien(msv),
   FOREIGN KEY (lichhoc_id) REFERENCES lichhoc(id)
+  FOREIGN KEY (manhom) REFERENCES nhommh(manhom)
 );
 
 -- 3. Bảng dotdangky: lưu thông tin các đợt đăng ký học phần

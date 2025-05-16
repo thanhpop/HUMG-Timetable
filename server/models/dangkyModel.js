@@ -52,15 +52,15 @@ exports.countFor = async (lichhoc_id) => {
 exports.findById = id =>
     db.query('SELECT * FROM dangky WHERE id = ?', [id]);
 
-exports.create = ({ msv, lichhoc_id }) =>
+exports.create = ({ msv, lichhoc_id, manhom }) =>
     db.query(
-        'INSERT INTO dangky (msv, lichhoc_id) VALUES (?, ?)',
-        [msv, lichhoc_id]
+        'INSERT INTO dangky (msv, lichhoc_id, manhom) VALUES (?, ?, ?)',
+        [msv, lichhoc_id, manhom]
     );
 
-exports.update = (id, { msv, lichhoc_id }) =>
+exports.update = (id, { msv, lichhoc_id, manhom, trangthai }) =>
     db.query(
-        'UPDATE dangky SET msv = ?, lichhoc_id = ? WHERE id = ?',
+        'UPDATE dangky SET msv = ?, lichhoc_id = ?, manhom = ?, trangthai = ? WHERE id = ?',
         [msv, lichhoc_id, id]
     );
 

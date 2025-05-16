@@ -84,7 +84,7 @@ export default function GenerateTKB() {
         // setResult(null);
         try {
             const { data } = await generateTKB({ mahk: selected });
-            setResult(data);
+            setResult({ ...data, scheduled: 0 });
             // sau khi tạo xong, gọi API lấy danh sách lichhoc
             const { data: schedules } = await getSchedulesBySemester(selected);
             setTableData(groupByMnh(schedules));
@@ -152,11 +152,9 @@ export default function GenerateTKB() {
                 </label>
             </div>
 
-            <button onClick={handleClick} disabled={loading || !selected}>
+            <button onClick={handleClick} disabled={loading || !selected || tableData.length > 0}>
                 {loading ? 'Đang tạo...' : 'Tạo Thời Khóa Biểu'}
             </button>
-
-            {error && <p style={{ color: 'red' }}>Lỗi: {error}</p>}
             <button
                 onClick={handleDelete}
                 style={{ marginLeft: 16, backgroundColor: '#e74c3c', color: '#fff' }}
@@ -165,57 +163,64 @@ export default function GenerateTKB() {
                 Xóa Thời Khóa Biểu
             </button>
 
-            {result && (
-                <div style={{ marginTop: 20 }}>
-                    <h2>Kết quả:</h2>
-                    <p>Đã xếp: {result.scheduled} nhóm</p>
-                    <h3>Thống kê:</h3>
-                    <pre>{JSON.stringify(result.stats, null, 2)}</pre>
-                    {result.conflicts.length > 0 && (
-                        <>
-                            <h3>Conflicts:</h3>
-                            <ul>
-                                {result.conflicts.map((c, i) => (
-                                    <li key={i}>
-                                        {c.mamh}: {c.lyDo}
-                                    </li>
-                                ))}
-                            </ul>
-                        </>
-                    )}
-                </div>
-            )}
+            {error && <p style={{ color: 'red' }}>Lỗi: {error}</p>}
+
+
+            {
+                result && (
+                    <div style={{ marginTop: 20 }}>
+                        <h2>Kết quả:</h2>
+                        <p>Đã xếp: {tableData.length} nhóm</p>
+                        <h3>Thống kê:</h3>
+                        <pre>{JSON.stringify(result.stats, null, 2)}</pre>
+                        {result.conflicts.length > 0 && (
+                            <>
+                                <h3>Conflicts:</h3>
+                                <ul>
+                                    {result.conflicts.map((c, i) => (
+                                        <li key={i}>
+                                            {c.mamh}: {c.lyDo}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
+                    </div>
+                )
+            }
 
             {/* Bảng TanStack Table hiển thị lichhoc */}
-            {tableData.length > 0 && (
-                <section style={{ marginTop: 40 }}>
-                    <h2>Kết quả tạo lịch học cho học kỳ: </h2>
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead>
-                            {table.getHeaderGroups().map(headerGroup => (
-                                <tr key={headerGroup.id}>
-                                    {headerGroup.headers.map(header => (
-                                        <th key={header.id} style={{ border: '1px solid #ccc', padding: 8, background: '#f1f1f1' }}>
-                                            {flexRender(header.column.columnDef.header, header.getContext())}
-                                        </th>
-                                    ))}
-                                </tr>
-                            ))}
-                        </thead>
-                        <tbody>
-                            {table.getRowModel().rows.map(row => (
-                                <tr key={row.id}>
-                                    {row.getVisibleCells().map(cell => (
-                                        <td key={cell.id} style={{ border: '1px solid #ccc', padding: 8 }}>
-                                            {flexRender(cell.column.columnDef.cell ?? cell.column.columnDef.accessorKey, cell.getContext())}
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </section>
-            )}
-        </div>
+            {
+                tableData.length > 0 && (
+                    <section style={{ marginTop: 40 }}>
+                        <h2>Kết quả tạo lịch học cho học kỳ: </h2>
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                {table.getHeaderGroups().map(headerGroup => (
+                                    <tr key={headerGroup.id}>
+                                        {headerGroup.headers.map(header => (
+                                            <th key={header.id} style={{ border: '1px solid #ccc', padding: 8, background: '#f1f1f1' }}>
+                                                {flexRender(header.column.columnDef.header, header.getContext())}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </thead>
+                            <tbody>
+                                {table.getRowModel().rows.map(row => (
+                                    <tr key={row.id}>
+                                        {row.getVisibleCells().map(cell => (
+                                            <td key={cell.id} style={{ border: '1px solid #ccc', padding: 8 }}>
+                                                {flexRender(cell.column.columnDef.cell ?? cell.column.columnDef.accessorKey, cell.getContext())}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </section>
+                )
+            }
+        </div >
     );
 }

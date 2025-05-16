@@ -328,7 +328,8 @@ export default function RegistrationTanStack() {
             id: 'register', header: 'Đăng ký', size: 120,
             cell: ({ row }) => {
                 const { conlai, sessions } = row.original;
-                const ids = sessions.map(s => s.id);
+                const ids = row.original.sessions.map(s => s.id);
+
                 const allReg = ids.every(id => registeredIds.has(id));
                 const isFull = conlai <= 0 && !allReg;
                 const periodClosed = !isPeriodActive;

@@ -22,7 +22,7 @@ exports.getByStudent = async (req, res, next) => {
 };
 
 exports.create = async (req, res, next) => {
-    const { msv, lichhoc_id } = req.body;
+    const { msv, lichhoc_id, manhom } = req.body;
     if (!msv || !lichhoc_id) return res.status(400).json({ error: 'Thiếu msv hoặc lichhoc_id' });
 
     let conn;
@@ -53,7 +53,13 @@ exports.create = async (req, res, next) => {
         }
 
         const [[session]] = await conn.query(
-            `SELECT l.thu, l.tietbd, l.tietkt, l.ngaybd, l.ngaykt, nh.mamh
+            `SELECT l.manhom,
+          l.thu,
+          l.tietbd,
+          l.tietkt,
+          l.ngaybd,
+          l.ngaykt,
+          nh.mamh
    FROM lichhoc l
    JOIN nhommh nh ON l.manhom = nh.manhom
    WHERE l.id = ?`,
@@ -92,8 +98,8 @@ exports.create = async (req, res, next) => {
         }
         // C. INSERT
         const [result] = await conn.query(
-            `INSERT INTO dangky (msv, lichhoc_id) VALUES (?, ?)`,
-            [msv, lichhoc_id]
+            `INSERT INTO dangky (msv, lichhoc_id, manhom) VALUES (?, ?, ?)`,
+            [msv, lichhoc_id, session.manhom]
         );
 
         // D. COMMIT
