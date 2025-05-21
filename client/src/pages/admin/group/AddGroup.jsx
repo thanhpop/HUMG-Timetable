@@ -73,7 +73,7 @@ export default function AddGroup() {
                 ]);
                 setCourses(cRes.data.map(c => ({ value: c.mamh, label: `Mã môn học: ${c.mamh} – ${c.tenmh}` })));
                 setTeachers(tRes.data.map(t => ({ value: t.mgv, label: `Mã GV: ${t.mgv} – ${t.ten}` })));
-                setSemesters(sRes.data.map(s => ({ value: s.mahk, label: `Mã HK: ${s.mahk} – ${s.tenhk}` })));
+                setSemesters(sRes.data.map(s => ({ value: s.mahk, label: `Mã HK: ${s.mahk} – ${s.tenhk} – ${s.namhoc}` })));
             } catch (err) {
                 console.error('Lỗi tải dữ liệu tham chiếu:', err);
                 setError('Không thể tải dữ liệu');

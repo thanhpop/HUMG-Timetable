@@ -71,14 +71,6 @@ exports.remove = async (req, res, next) => {
     }
 };
 
-exports.getAll = async (req, res, next) => {
-    try {
-        const [rows] = await Schedule.findAll();
-        res.json(rows);
-    } catch (err) {
-        next(err);
-    }
-};
 
 exports.getByTeacher = async (req, res, next) => {
     try {

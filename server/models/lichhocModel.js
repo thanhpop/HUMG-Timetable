@@ -153,7 +153,7 @@ exports.findByTeacher = (mgv) => {
     FROM lichhoc lh
     JOIN nhommh    nh ON lh.manhom   = nh.manhom
     JOIN monhoc    mh ON nh.mamh      = mh.mamh
-    JOIN phonghoc  p  ON nh.maphong   = p.maphong
+    JOIN phonghoc  p  ON lh.maphong   = p.maphong
     JOIN giangvien gv ON nh.mgv       = gv.mgv
     WHERE nh.mgv = ?
     ORDER BY lh.id DESC

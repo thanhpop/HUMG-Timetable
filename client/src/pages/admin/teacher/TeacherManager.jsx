@@ -4,7 +4,7 @@ import DataTable from 'react-data-table-component';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { getTeachers, deleteTeacher as apiDelete } from '../../../api/teacherApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faEdit, faTrash, faEye } from '@fortawesome/free-solid-svg-icons';
 import '../style.css';
 
 export default function TeacherManager() {
@@ -63,19 +63,19 @@ export default function TeacherManager() {
                         onClick={() => navigate(`/admin/teachers/view/${row.mgv}`)}
                         className="btn-view"
                     >
-                        Xem
+                        <FontAwesomeIcon icon={faEye} />
                     </button>
                     <button
                         onClick={() => navigate(`/admin/teachers/edit/${row.mgv}`)}
                         className="btn-edit"
                     >
-                        Sửa
+                        <FontAwesomeIcon icon={faEdit} />
                     </button>
                     <button
                         onClick={() => handleDelete(row.mgv)}
                         className="btn-delete"
                     >
-                        Xóa
+                        <FontAwesomeIcon icon={faTrash} />
                     </button>
                 </div>
             ),

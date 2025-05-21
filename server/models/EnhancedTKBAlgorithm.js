@@ -20,9 +20,6 @@ class EnhancedTKBAlgorithm {
             default: return [{ sessions: [{ tietCount: 3 }], description: "Mặc định: 1 buổi/tuần, 3 tiết" }];
         }
     }
-
-
-
     /**
      * public API: chạy thuật toán cho học kỳ được truyền vào
      */
@@ -46,7 +43,6 @@ class EnhancedTKBAlgorithm {
         SELECT d.*, l.manhom 
         FROM dangky d 
         JOIN lichhoc l ON d.lichhoc_id = l.id
-        WHERE d.trangthai = 'Da duyet'
       `);
 
             // 3) build nhóm môn và filter
@@ -117,7 +113,7 @@ class EnhancedTKBAlgorithm {
                     }
                 }
             }
-            await this.saveTKBToDatabaseAndEnrollStudents(tkb, hocky.mahk);
+            await this.saveTKBToDatabase(tkb, hocky.mahk);
 
             return { tkb, conflicts };
         } catch (err) {
@@ -264,7 +260,7 @@ class EnhancedTKBAlgorithm {
         // Không tìm được slot
         return null;
     }
-    async saveTKBToDatabaseAndEnrollStudents(tkb, mahk) {
+    async saveTKBToDatabase(tkb, mahk) {
         // Helper để format date
         const fmt = date => new Date(date).toISOString().split('T')[0];
 

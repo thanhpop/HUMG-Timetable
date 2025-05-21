@@ -1,3 +1,26 @@
+/* Sidebar.css */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+/* Logo bên trái, điều chỉnh kích thước */
+.sidebar-logo {
+    width: 60px;
+    /* bạn có thể chỉnh lớn/nhỏ tùy ý */
+    height: auto;
+    margin-right: 0.75rem;
+}
+
+/* Tiêu đề ngay bên phải logo */
+.sidebar-title {
+    font-size: 1.25rem;
+    margin: 0;
+    color: #fff;
+}
+
+
 .sidebar-admin {
     width: 250px;
     height: 100vh;
@@ -95,8 +118,15 @@
     /* bo góc */
 }
 
+.sidebar-divider {
+    border: 0;
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+    margin: 0.5rem 0 1rem;
+}
 
 .logout-button-admin {
+    display: flex;
+    align-items: center;
     width: 100%;
     padding: 10px 15px;
     border: none;
@@ -106,8 +136,14 @@
     font-size: 16px;
 }
 
+
+
 .logout-button-admin:hover {
     background-color: #c0392b;
+}
+
+.logout-button-admin svg {
+    margin-right: 10px;
 }
 
 .sidebar-admin ul li a {

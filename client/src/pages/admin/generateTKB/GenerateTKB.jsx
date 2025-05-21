@@ -132,7 +132,7 @@ export default function GenerateTKB() {
     });
 
     return (
-        <div>
+        <div style={{ padding: 10 }}>
             <h1>Tạo Thời Khóa Biểu tự động</h1>
 
             <div style={{ marginBottom: 16 }}>

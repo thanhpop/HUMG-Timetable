@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { getCourses, deleteCourse } from '../../../api/courseApi';
 import '../style.css';
 
@@ -78,8 +78,8 @@ export default function CourseManager() {
             name: 'Hành động',
             cell: r => (
                 <div style={{ display: 'flex', gap: 4 }}>
-                    <button onClick={() => nav(`/admin/courses/edit/${r.mamh}`)} className="btn-edit">Sửa</button>
-                    <button onClick={async () => { await deleteCourse(r.mamh); fetch() }} className="btn-delete">Xóa</button>
+                    <button onClick={() => nav(`/admin/courses/edit/${r.mamh}`)} className="btn-edit"><FontAwesomeIcon icon={faEdit} /></button>
+                    <button onClick={async () => { await deleteCourse(r.mamh); fetch() }} className="btn-delete"><FontAwesomeIcon icon={faTrash} /></button>
                 </div>
             ), ignoreRowClick: true
         }

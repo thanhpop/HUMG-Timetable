@@ -145,8 +145,13 @@ export default function EditGroup() {
                 <label>Mã học kỳ*</label>
                 <Select
                     styles={customSelectStyles}
-                    options={semesters.map(s => ({ value: s.mahk, label: `${s.mahk} – ${s.tenhk}` }))}
-                    value={semesters.find(s => s.mahk === form.mahk) ? { value: form.mahk, label: `${form.mahk} – ${semesters.find(s => s.mahk === form.mahk).tenhk}` } : null}
+                    options={semesters.map(s => ({ value: s.mahk, label: `${s.mahk} – ${s.tenhk} – ${s.namhoc}` }))}
+                    value={(() => {
+                        const sel = semesters.find(s => s.mahk === form.mahk);
+                        return sel
+                            ? { value: sel.mahk, label: `Mã HK: ${sel.mahk} – ${sel.tenhk} – ${sel.namhoc}` }
+                            : null;
+                    })()}
                     onChange={onInput('mahk')}
                     placeholder="Chọn học kỳ"
                     isClearable

@@ -147,12 +147,12 @@ export default function Timetable() {
   }, [currentWeek, selectedYear])
 
   // Lưu dữ liệu vào localStorage khi coursesData thay đổi
-  useEffect(() => {
-    if (coursesData.length > 0) {
-      // Lưu dữ liệu vào localStorage
-      localStorage.setItem("timetableCourses", JSON.stringify(coursesData))
-    }
-  }, [coursesData])
+  // useEffect(() => {
+  //   if (coursesData.length > 0) {
+  //     // Lưu dữ liệu vào localStorage
+  //     localStorage.setItem("timetableCourses", JSON.stringify(coursesData))
+  //   }
+  // }, [coursesData])
 
   // Hiển thị thông tin chi tiết khi nhấp vào môn học
   const handleCourseClick = (course) => {

@@ -4,7 +4,7 @@ import DataTable from 'react-data-table-component';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { getUsers, deleteUser } from '../../../api/userApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import '../style.css';
 
 export default function UserManager() {
@@ -75,7 +75,7 @@ export default function UserManager() {
             name: 'Hành động',
             cell: r => (
                 <div style={{ display: 'flex', gap: 4 }}>
-                    <button onClick={() => nav(`/admin/users/edit/${r.id}`)} className="btn-edit">Sửa</button>
+                    <button onClick={() => nav(`/admin/users/edit/${r.id}`)} className="btn-edit"><FontAwesomeIcon icon={faEdit} /></button>
                     {r.vaitro !== 'admin' ? (
                         <button
                             onClick={async () => {
@@ -87,7 +87,7 @@ export default function UserManager() {
                             }}
                             className="btn-delete"
                         >
-                            Xóa
+                            <FontAwesomeIcon icon={faTrash} />
                         </button>
                     ) : (
                         <button

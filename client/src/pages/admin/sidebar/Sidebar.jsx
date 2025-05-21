@@ -1,7 +1,9 @@
 // src/components/Sidebar.jsx
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, LogOut } from 'lucide-react';
+import logoHumg from '../../login/pic/logoHumg.png';
+
 import './Sidebar.css';
 
 export default function Sidebar() {
@@ -18,7 +20,11 @@ export default function Sidebar() {
     return (
         <div className="sidebar-admin" >
 
-            <h3>Trang admin</h3>
+            <div className="sidebar-header">
+                <img src={logoHumg} alt="HUMG Logo" className="sidebar-logo" />
+                <h3 className="sidebar-title">Trang admin</h3>
+            </div>
+            <hr className="sidebar-divider" />
             <ul>
                 <li>
                     <NavLink to="/admin/students" className={({ isActive }) => isActive ? 'active' : ''}>
@@ -56,33 +62,9 @@ export default function Sidebar() {
                     </NavLink>
                 </li>
                 <li>
-                    <div
-                        onClick={() => setOpenSchedule(prev => !prev)}
-                        className={`submenu-toggle ${openSchedule ? 'open' : ''}`}
-                        style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                    >
-                        <span>Quản lý thời khóa biểu</span>
-                        <span>{openSchedule ? <ChevronUp size={18} /> : <ChevronDown size={18} />}</span>
-                    </div>
-                    {openSchedule && (
-                        <ul className="submenu">
-                            <li>
-                                <NavLink to="/admin/lichhoc" className={({ isActive }) => isActive ? 'active' : ''}>
-                                    Quản lý lịch học thủ công
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/admin/dotdangky" className={({ isActive }) => isActive ? 'active' : ''}>
-                                    Quản lý đợt đăng ký
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/admin/generatetkb" className={({ isActive }) => isActive ? 'active' : ''}>
-                                    Tạo lịch học tự động
-                                </NavLink>
-                            </li>
-                        </ul>
-                    )}
+                    <NavLink to="/admin/generatetkb" className={({ isActive }) => isActive ? 'active' : ''}>
+                        Tạo lịch học tự động
+                    </NavLink>
                 </li>
 
 
@@ -91,7 +73,8 @@ export default function Sidebar() {
 
             <div className="sidebar-footer-admin">
                 <button onClick={handleLogout} className="logout-button-admin">
-                    Đăng xuất
+                    <LogOut size={20} />
+                    <span>Đăng xuất</span>
                 </button>
             </div>
         </div>

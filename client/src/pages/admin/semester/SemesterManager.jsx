@@ -4,7 +4,8 @@ import DataTable from 'react-data-table-component';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { getSemesters, deleteSemester } from '../../../api/semesterApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+
 import '../style.css';
 
 export default function SemesterManager() {
@@ -83,13 +84,13 @@ export default function SemesterManager() {
                         onClick={() => nav(`/admin/semesters/edit/${r.mahk}`)}
                         className="btn-edit"
                     >
-                        Sửa
+                        <FontAwesomeIcon icon={faEdit} />
                     </button>
                     <button
                         onClick={async () => { if (window.confirm('Xóa học kỳ này?')) { await deleteSemester(r.mahk); fetch(); } }}
                         className="btn-delete"
                     >
-                        Xóa
+                        <FontAwesomeIcon icon={faTrash} />
                     </button>
                 </div>
             ),

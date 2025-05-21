@@ -38,7 +38,6 @@ CREATE TABLE IF NOT EXISTS monhoc (
 );
 
 
-
 CREATE TABLE IF NOT EXISTS phonghoc (
   maphong   VARCHAR(50)   NOT NULL ,
   tenphong  VARCHAR(100) NOT NULL,
@@ -57,7 +56,6 @@ CREATE TABLE IF NOT EXISTS hocky (
   PRIMARY KEY (mahk),
 
 );
-
 
 
 CREATE TABLE IF NOT EXISTS taikhoan ( 
@@ -99,21 +97,10 @@ CREATE TABLE IF NOT EXISTS dangky (
   id           INT            NOT NULL AUTO_INCREMENT PRIMARY KEY,
   msv          VARCHAR(50)    NOT NULL,
   lichhoc_id   INT            NOT NULL,
-  ngaydk       DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
   manhom      VARCHAR(50) NOT NULL,
-  trangthai ENUM('Cho duyet', 'Da duyet', 'Huy') NOT NULL DEFAULT 'Cho duyet'
   FOREIGN KEY (msv)        REFERENCES sinhvien(msv),
   FOREIGN KEY (lichhoc_id) REFERENCES lichhoc(id)
   FOREIGN KEY (manhom) REFERENCES nhommh(manhom)
 );
 
--- 3. Bảng dotdangky: lưu thông tin các đợt đăng ký học phần
-CREATE TABLE IF NOT EXISTS dotdangky (
-  id           INT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  mahk         VARCHAR(50) NOT NULL,           -- học kỳ
-  ngaybd_dk    DATE  NOT NULL,              -- bắt đầu đăng ký
-  ngaykt_dk    DATE  NOT NULL,              -- kết thúc đăng ký
-  is_active    TINYINT(1)  NOT NULL DEFAULT 1,
-  FOREIGN KEY (mahk) REFERENCES hocky(mahk)
-);
 

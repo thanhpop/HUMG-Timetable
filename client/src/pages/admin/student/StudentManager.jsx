@@ -3,7 +3,8 @@ import DataTable from 'react-data-table-component';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { getStudents, deleteStudent as apiDelete } from '../../../api/studentApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faEye, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+
 import '../style.css';
 export default function StudentManager() {
     const navigate = useNavigate();
@@ -73,21 +74,45 @@ export default function StudentManager() {
                 <div style={{ display: 'flex', gap: 4 }}>
                     <button
                         onClick={() => navigate(`/admin/students/view/${row.msv}`)}
-                        className="btn-view"
+                        style={{
+                            width: '40px',
+                            padding: '4px',
+                            backgroundColor: '#17a2b8',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                        }}
                     >
-                        Xem
+                        <FontAwesomeIcon icon={faEye} />
                     </button>
                     <button
                         onClick={() => navigate(`/admin/students/edit/${row.msv}`)}
-                        className="btn-edit"
+                        style={{
+                            width: '40px',
+                            padding: '4px',
+                            backgroundColor: '#007bff',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                        }}
                     >
-                        Sửa
+                        <FontAwesomeIcon icon={faEdit} />
                     </button>
                     <button
                         onClick={() => handleDelete(row.msv)}
-                        className="btn-delete"
+                        style={{
+                            width: '40px',
+                            padding: '4px',
+                            backgroundColor: '#dc3545',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                        }}
                     >
-                        Xóa
+                        <FontAwesomeIcon icon={faTrash} />
                     </button>
                 </div >
             ),
@@ -101,7 +126,7 @@ export default function StudentManager() {
         table: {
             style: {
                 backgroundColor: '#f9f9f9',
-                fontSize: '18px',
+                fontSize: '17px',
                 width: '100%',
                 maxWidth: '100%',
             },
@@ -115,7 +140,7 @@ export default function StudentManager() {
         },
         headCells: {
             style: {
-                fontSize: '18px',
+                fontSize: '16px',
                 paddingLeft: '16px',
                 paddingRight: '16px',
             },
@@ -194,6 +219,7 @@ export default function StudentManager() {
                     data={filtered}
                     pagination
                     highlightOnHover
+
                     defaultSortField="msv"
                     customStyles={customStyles}
                     persistTableHead={true}

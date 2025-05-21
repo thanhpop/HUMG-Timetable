@@ -35,24 +35,17 @@ import GroupManager from '../pages/admin/group/GroupManager.jsx';
 import AddGroup from '../pages/admin/group/AddGroup.jsx';
 import ViewGroup from '../pages/admin/group/ViewGroup.jsx';
 import EditGroup from '../pages/admin/group/EditGroup.jsx';
-// import Home from '../pages/home/Home.jsx';
 import DashboardStudent from '../pages/student/dashboard/DashboardStudent.jsx';
 import StudentInfo from '../pages/student/info/studentInfo.jsx';
 
 import DashboardTeacher from '../pages/teacher/dashboard/DashboardTeacher.jsx';
 import TeacherInfo from '../pages/teacher/info/TeacherInfo.jsx';
 
-import ScheduleManager from '../pages/admin/schedule/ScheduleManager.jsx';
-import AddSchedule from '../pages/admin/schedule/AddSchedule.jsx';
-import EditSchedule from '../pages/admin/schedule/EditSchedule.jsx';
-import ViewSchedule from '../pages/admin/schedule/ViewSchedule.jsx';
-
-import DotDKManager from '../pages/admin/dotdangky/DotDKManager.jsx';
-import AddDotDK from '../pages/admin/dotdangky/AddDotDK.jsx';
-import EditDotDK from '../pages/admin/dotdangky/EditDotDK.jsx';
+// import ScheduleManager from '../pages/admin/schedule/ScheduleManager.jsx';
+// import AddSchedule from '../pages/admin/schedule/AddSchedule.jsx';
+// import EditSchedule from '../pages/admin/schedule/EditSchedule.jsx';
 
 
-import Registration from '../pages/student/Registration/Registration.jsx';
 import Timetable from '../pages/student/timetable/Timetable.jsx';
 
 import TimetableGV from '../pages/teacher/timetable/TimetableGV.jsx';
@@ -95,13 +88,9 @@ export default function AppRoutes() {
                 <Route path="groups/add" element={<AddGroup />} />
                 <Route path="groups/edit/:manhom" element={<EditGroup />} />
                 <Route path="groups/view/:manhom" element={<ViewGroup />} />
-                <Route path="/admin/lichhoc" element={<ScheduleManager />} />
+                {/* <Route path="/admin/lichhoc" element={<ScheduleManager />} />
                 <Route path="/admin/lichhoc/add" element={<AddSchedule />} />
-                <Route path="/admin/lichhoc/edit/:id" element={<EditSchedule />} />
-                <Route path="/admin/lichhoc/view/:id" element={<ViewSchedule />} />
-                <Route path="/admin/dotdangky" element={<DotDKManager />} />
-                <Route path="/admin/dotdangky/add" element={<AddDotDK />} />
-                <Route path="/admin/dotdangky/edit/:id" element={<EditDotDK />} />
+                <Route path="/admin/lichhoc/edit/:id" element={<EditSchedule />} /> */}
                 <Route path="/admin/generateTKB" element={<GenerateTKB />} />
             </Route>
             <Route path="/student" element={<ProtectedRoute allowedRoles={['sv']}>
@@ -109,7 +98,6 @@ export default function AppRoutes() {
             </ProtectedRoute>} >
                 <Route index element={<StudentInfo />} />
                 <Route path="info" element={<StudentInfo />} />
-                <Route path="registration" element={<Registration />} />
                 <Route path="timetable" element={<Timetable />} />
             </Route>
             <Route path="/teacher" element={<ProtectedRoute allowedRoles={['gv']}>
