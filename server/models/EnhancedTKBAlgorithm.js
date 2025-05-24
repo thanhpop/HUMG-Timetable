@@ -3,12 +3,11 @@ const db = require('../config/db');
 class EnhancedTKBAlgorithm {
     constructor() {
         this.tietHoc = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13'];
-        this.ngayHoc = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+        // this.ngayHoc = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+        this.ngayHoc = [2, 3, 4, 5, 6, 7];
         this.maxTietPerDay = 4;
         this.minBreakBetweenZones = 2;
         this.weekCount = 15;
-        this.roomUsage = new Map();
-        this._slotCallCount = 0;
     }
     //Pattern based scheduling
     getSchedulePattern(sotinchi) {
@@ -45,38 +44,17 @@ class EnhancedTKBAlgorithm {
         JOIN lichhoc l ON d.lichhoc_id = l.id
       `);
 
-            // 3) build nhóm môn và filter
-            const monHocGroups = monhocs
-                .map(mh => {
-                    const nhom = nhommhs.filter(n => n.mamh === mh.mamh);
-                    return {
-                        ...mh,
-                        nhom: nhom.map(g => ({
-                            ...g,
-                            svCount: dangkys.filter(d => d.manhom === g.manhom).length
-                        })),
-                        totalSvCount: nhom.reduce((sum, g) => sum + dangkys.filter(d => d.manhom === g.manhom).length, 0)
-                    };
-                })
+            const monHocGroups = this.processMonHocGroups(monhocs, nhommhs, dangkys)
                 .filter(mh => mh.nhom.length > 0);
 
-            const weeksSinceStart = Math.ceil((Date.now() - new Date(hocky.ngaybd)) / (7 * 24 * 3600 * 1000));
-
             // Giải thuật heuristic 
-            const monHocsFiltered = monHocGroups.sort((a, b) => {
-                const priorityA = a.sotinchi * 10 + a.totalSvCount;
-                const priorityB = b.sotinchi * 10 + b.totalSvCount;
+            const monHocsFiltered = monHocGroups;
+            monHocsFiltered.sort((a, b) => {
+                const priorityA = this.calculatePriority(a);
+                const priorityB = this.calculatePriority(b);
                 const diffPriority = priorityB - priorityA;
-                if (diffPriority !== 0) {
-                    return diffPriority;
-                }
-                const roomsA = phonghocs.filter(
-                    ph => ph.loaiphong === a.loaiphong && ph.succhua >= a.totalSvCount
-                ).length;
-                const roomsB = phonghocs.filter(
-                    ph => ph.loaiphong === b.loaiphong && ph.succhua >= b.totalSvCount
-                ).length;
-                return roomsA - roomsB;
+                return diffPriority ||
+                    (this.countPossibleRooms(a, phonghocs) - this.countPossibleRooms(b, phonghocs));
             });
 
             // 4) xếp lịch
@@ -97,14 +75,23 @@ class EnhancedTKBAlgorithm {
                 }))
             );
 
-            for (const credit of [4, 3, 2, 1]) {
-                for (const unit of units.filter(u => (u.sotinchi || 3) === credit)) {
-                    const ok = await this.scheduleMonHoc(
-                        unit, phonghocs, giangviens, tkb,
-                        gvBusyMap, phongBusyMap, svBusyMap,
-                        nhommhs, hocky
+            const creditGroups = this.groupByCreditType(units);
+            for (const creditType of [4, 3, 2, 1]) {
+                const group = creditGroups[creditType];
+                if (!group) continue;
+                for (const unit of group) {
+                    const scheduled = await this.scheduleMonHoc(
+                        unit,
+                        phonghocs,
+                        giangviens,
+                        tkb,
+                        gvBusyMap,
+                        phongBusyMap,
+                        svBusyMap,
+                        nhommhs,
+                        hocky
                     );
-                    if (!ok) {
+                    if (!scheduled) {
                         conflicts.push({
                             mamh: unit.mamh,
                             tenmh: unit.tenmh,
@@ -114,151 +101,232 @@ class EnhancedTKBAlgorithm {
                 }
             }
             await this.saveTKBToDatabase(tkb, hocky.mahk);
-
             return { tkb, conflicts };
         } catch (err) {
             console.error('Lỗi khi tạo TKB:', err);
             throw err;
         }
     }
+    processMonHocGroups(monhocs, nhommhs, dangkys) {
+        return monhocs.map(monHoc => {
+            const nhom = nhommhs.filter(n => n.mamh === monHoc.mamh);
+            const totalSvCount = nhom
+                .reduce((sum, g) => sum + dangkys.filter(d => d.manhom === g.manhom).length, 0);
 
-    async scheduleMonHoc(unit, phonghocs, giangviens, tkb, gvBusyMap, phongBusyMap, svBusyMap, nhommhs, hocky) {
+            return {
+                ...monHoc,
+                nhom: nhom.map(g => ({
+                    ...g,
+                    svCount: dangkys.filter(d => d.manhom === g.manhom).length
+                })),
+                totalSvCount
+            };
+        });
+    }
+    groupByCreditType(monhocs) {
+        return monhocs.reduce((groups, monHoc) => {
+            const credit = monHoc.sotinchi || 3;
+            if (!groups[credit]) groups[credit] = [];
+            groups[credit].push(monHoc);
+            return groups;
+        }, {});
+    }
+
+    async scheduleMonHoc(unit, phonghocs, giangviens, tkb,
+        gvBusyMap, phongBusyMap, svBusyMap,
+        nhommhs, hocky) {
         const { manhom, sotinchi, totalSvCount, mgv } = unit;
-        const nhomMonHoc = nhommhs.find(nhom => nhom.manhom === unit.manhom);
+        const nhomMonHoc = nhommhs.find(n => n.manhom === manhom);
         if (!nhomMonHoc) return false;
 
-        const giangVien = giangviens.find(gv => gv.mgv === nhomMonHoc.mgv);
+        const giangVien = giangviens.find(gv => gv.mgv === mgv);
         if (!giangVien) return false;
-        //Pattern based scheduling
-        const schedulePattern = this.getSchedulePattern(sotinchi);
+
+        const schedulePattern = this.getSchedulePattern(sotinchi || 3);
         const suitableRooms = phonghocs
-            .filter(r => r.succhua >= totalSvCount)
-            .sort((a, b) => {
-                const ua = this.roomUsage.get(a.maphong) || 0;
-                const ub = this.roomUsage.get(b.maphong) || 0;
-                return ua - ub;
-            });
+            .filter(ph => ph.succhua >= totalSvCount)
+            .sort((a, b) => a.succhua - b.succhua);
 
         for (const pattern of schedulePattern) {
             for (const phong of suitableRooms) {
-                const scheduledDays = [];
-                let success = true;
+                const usedDays = new Set();
+                const tempEntries = [];
+                let ok = true;
 
-                // Mỗi pattern có nhiều session
                 for (const session of pattern.sessions) {
-                    const scheduled = this.findSlot(
-                        unit, giangVien, phong, tkb,
-                        gvBusyMap, phongBusyMap, svBusyMap,
-                        session.tietCount, scheduledDays,
+                    const entry = this.tryScheduleSession(
+                        unit, giangVien, phong,
+                        gvBusyMap, phongBusyMap,
+                        session.tietCount, usedDays,
                         hocky
                     );
-                    if (!scheduled) { success = false; break; }
-
-                    for (const entry of Array.isArray(scheduled) ? scheduled : [scheduled]) {
-                        scheduledDays.push(entry.thu);
-                        tkb.push(entry);
-                        this.roomUsage.set(
-                            phong.maphong,
-                            (this.roomUsage.get(phong.maphong) || 0) + 1
-                        );
+                    if (!entry) {
+                        ok = false;
+                        break;
                     }
+                    tempEntries.push(entry);
+                    usedDays.add(entry.thu);
                 }
 
-                if (success) {
+                if (ok) {
+                    // Chỉ thêm vào tkb khi đã xếp đủ các session
+                    for (const e of tempEntries) {
+                        tkb.push(e);
+                    }
                     return true;
                 }
             }
         }
 
         return false;
-
     }
-    //backtracking
-    findSlot(unit, giangVien, phongHoc, tkb,
-        gvBusyMap, phongBusyMap, svBusyMap,
-        count, usedDays, hocky) {
-        const { manhom } = unit;
+    isGvOverloaded(mgv, ngay, gvBusyMap) {
+        const gvKey = `${mgv}-${ngay}`;
+        const gvSchedule = gvBusyMap.get(gvKey) || { tiet: [] };
+        return gvSchedule.tiet.length >= this.maxTietPerDay;
+    }
+    tryScheduleSession(unit, giangVien, phongHoc,
+        gvBusyMap, phongBusyMap,
+        tietCount, usedDays, hocky) {
 
-        // 1) Tạo mảng các "thu" là 2→7
-        const days = this.ngayHoc.map((_, i) => i + 2);
+        const fmt = d => new Date(d).toISOString().slice(0, 10);
 
-        // 2) Xác định vị trí xoay vòng từ biến _slotCallCount
-        const offset = this._slotCallCount++ % days.length;
-        const rotated = days
-            .slice(offset)
-            .concat(days.slice(0, offset));
+        const availableDays = this.ngayHoc.filter(thu =>
+            !usedDays.has(thu) &&
+            !this.isGvOverloaded(giangVien.mgv, thu, gvBusyMap)
+        );
 
-        // 3) helper format date
-        const fmt = d => new Date(d).toISOString().split('T')[0];
+        for (const thu of availableDays) {
+            const consecutiveSlots = this.findConsecutiveSlotsWithZones(
+                thu,
+                tietCount,
+                phongHoc.maphong,
+                giangVien.mgv,
+                gvBusyMap,
+                phongBusyMap
+            );
 
-        // 4) Duyệt từng ngày theo thứ tự đã xoay
-        for (const thu of rotated) {
-            if (usedDays.includes(thu)) continue;
+            if (consecutiveSlots.length >= tietCount) {
+                const slotStart = consecutiveSlots[0];
+                const slotEnd = consecutiveSlots[tietCount - 1];
+                const tietBatDau = this.tietHoc.indexOf(slotStart) + 1;
+                const tietKetThuc = this.tietHoc.indexOf(slotEnd) + 1;
+                if (!(
+                    (tietBatDau >= 1 && tietKetThuc <= 5) ||
+                    (tietBatDau >= 6 && tietKetThuc <= 13)
+                )) {
 
-            // Tìm tiết liền chân đủ count, không cắt giữa sáng/trưa
-            for (let s = 0; s + count <= this.tietHoc.length; s++) {
-                const startTiet = s + 1;
-                const endTiet = s + count;
-                if (startTiet < 6 && endTiet > 5) continue;
-
-                // Kiểm tra giảng viên + phòng rảnh
-                let ok = true;
-                for (let j = 0; j < count; j++) {
-                    const tiet = this.tietHoc[s + j];
-                    if (gvBusyMap.has(`${giangVien.mgv}-${thu}-${tiet}`)
-                        || phongBusyMap.has(`${phongHoc.maphong}-${thu}-${tiet}`)) {
-                        ok = false;
-                        break;
-                    }
-                }
-                if (!ok) continue;
-
-                // 5) Nếu được, xây dựng 2 entry (pha 1 & pha 2)
-                const firstWeeks = 9;
-                const secondStart = 11;
-                const secondEnd = 19;
-
-                // entry pha 1
-                const entry1 = {
-                    manhom,
-                    maphong: phongHoc.maphong,
-                    thu,
-                    tietbd: startTiet,
-                    tietkt: endTiet,
-                    ngaybd: fmt(hocky.ngaybd),
-                    ngaykt: fmt(new Date(new Date(hocky.ngaybd)
-                        .setDate(new Date(hocky.ngaybd).getDate()
-                            + 7 * (firstWeeks - 1))))
-                };
-                // entry pha 2
-                const entry2 = {
-                    manhom,
-                    maphong: phongHoc.maphong,
-                    thu,
-                    tietbd: startTiet,
-                    tietkt: endTiet,
-                    ngaybd: fmt(new Date(new Date(hocky.ngaybd)
-                        .setDate(new Date(hocky.ngaybd).getDate()
-                            + 7 * (secondStart - 1)))),
-                    ngaykt: fmt(new Date(new Date(hocky.ngaybd)
-                        .setDate(new Date(hocky.ngaybd).getDate()
-                            + 7 * (secondEnd - 1))))
-                };
-
-                // 6) Đánh dấu busy cho giảng viên và phòng
-                for (let j = 0; j < count; j++) {
-                    const tiet = this.tietHoc[s + j];
-                    gvBusyMap.set(`${giangVien.mgv}-${thu}-${tiet}`, true);
-                    phongBusyMap.set(`${phongHoc.maphong}-${thu}-${tiet}`, true);
+                    continue;
                 }
 
-                // Trả về 2 buổi
-                return [entry1, entry2];
+                // Tính ngày bắt đầu và kết thúc kéo dài suốt học kỳ
+                const ngaybd = new Date(hocky.ngaybd);
+                const durationWeeks = unit.sotinchi <= 2 ? 8 : this.weekCount;
+                const ngaykt = new Date(ngaybd);
+                ngaykt.setDate(ngaybd.getDate() + (durationWeeks - 1) * 7);
+
+                // Đánh dấu busy cho từng tiết trong khối
+                this.updateBusyMaps(
+                    thu,
+                    slotStart,               // tietBatDau (ví dụ 'T3')
+                    slotEnd,// tietKetThuc
+                    giangVien.mgv,
+                    phongHoc.maphong,
+                    phongHoc.khu,
+                    gvBusyMap,
+                    phongBusyMap
+                );
+
+                // Trả về entry
+                return {
+                    manhom: unit.manhom,
+                    maphong: phongHoc.maphong,
+                    thu,
+                    tietbd: tietBatDau,
+                    tietkt: tietKetThuc,
+                    ngaybd: fmt(ngaybd),
+                    ngaykt: fmt(ngaykt)
+                };
             }
         }
 
-        // Không tìm được slot
+        // không tìm được
         return null;
+    }
+    findConsecutiveSlotsWithZones(ngay, soTiet, maphong, mgv, gvBusyMap, phongBusyMap) {
+        const gvKey = `${mgv}-${ngay}`;
+        const gvSchedule = gvBusyMap.get(gvKey) || { tiet: [], khu: [] };
+
+        const availableSlots = this.tietHoc.filter(tiet => {
+            const phongKey = `${maphong}-${ngay}-${tiet}`;
+            return !phongBusyMap.has(phongKey) &&
+                !gvSchedule.tiet.includes(tiet);
+        });
+
+        let bestSlots = [], currentSlots = [];
+        for (const tiet of availableSlots) {
+            if (this.hasGvZoneConflict(ngay, tiet, mgv, gvSchedule)) {
+                currentSlots = [];
+                continue;
+            }
+            currentSlots.push(tiet);
+            if (currentSlots.length >= soTiet) {
+                bestSlots = currentSlots.slice(0, soTiet);
+                break;
+            }
+        }
+        return bestSlots;
+    }
+    /**
+     * Kiểm tra giữa 2 tiết liền nhau của GV phải có tối thiểu minBreakBetweenZones tiết nghỉ
+     */
+    hasGvZoneConflict(ngay, tiet, mgv, gvSchedule) {
+        const tietIndex = this.tietHoc.indexOf(tiet);
+        for (let i = 1; i <= this.minBreakBetweenZones; i++) {
+            if (tietIndex - i >= 0) {
+                const prevTiet = this.tietHoc[tietIndex - i];
+                if (gvSchedule.tiet.includes(prevTiet)) return true;
+            }
+            if (tietIndex + i < this.tietHoc.length) {
+                const nextTiet = this.tietHoc[tietIndex + i];
+                if (gvSchedule.tiet.includes(nextTiet)) return true;
+            }
+        }
+        return false;
+    }
+
+    updateBusyMaps(
+        ngay, tietBatDau, tietKetThuc,
+        mgv, maphong, khu,
+        gvBusyMap, phongBusyMap /*, svBusyMap, nhomMonHoc */
+    ) {
+        const gvKey = `${mgv}-${ngay}`;
+        if (!gvBusyMap.has(gvKey)) {
+            gvBusyMap.set(gvKey, { tiet: [], khu: [] });
+        }
+        const gvSchedule = gvBusyMap.get(gvKey);
+
+        const startIdx = this.tietHoc.indexOf(tietBatDau);
+        const endIdx = this.tietHoc.indexOf(tietKetThuc);
+
+        // Đánh dấu busy cho giảng viên và phòng
+        for (let i = startIdx; i <= endIdx; i++) {
+            const tiet = this.tietHoc[i];
+            gvSchedule.tiet.push(tiet);
+            gvSchedule.khu.push(khu);
+
+            const phongKey = `${maphong}-${ngay}-${tiet}`;
+            phongBusyMap.set(phongKey, true);
+        }
+    }
+    calculatePriority(monHoc) {
+        return monHoc.sotinchi * 10 + monHoc.totalSvCount;
+    }
+
+    countPossibleRooms(monHoc, phonghocs) {
+        return phonghocs.filter(ph =>
+            ph.succhua >= monHoc.totalSvCount
+        ).length;
     }
     async saveTKBToDatabase(tkb, mahk) {
         // Helper để format date

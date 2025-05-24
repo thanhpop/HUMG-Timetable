@@ -69,19 +69,12 @@ export default function GenerateTKB() {
             alert(err.response?.data?.message || 'Xóa thất bại');
         }
     };
-    useEffect(() => {
-        if (!selected) return;
-        (async () => {
-            const { data: schedules } = await getSchedulesBySemester(selected);
-            setTableData(groupByMnh(schedules));
-        })();
-    }, [selected]);
 
     const handleClick = async () => {
         if (!selected) return;
         setLoading(true);
         setError('');
-        // setResult(null);
+
         try {
             const { data } = await generateTKB({ mahk: selected });
             setResult({ ...data, scheduled: 0 });
