@@ -6,7 +6,7 @@ import '../style.css';
 
 export default function EditSemester() {
     const nav = useNavigate();
-    const { mahk } = useParams();                  // id ở đây chính là mahk
+    const { mahk } = useParams();
     const { semesters, setSemesters } = useOutletContext();
 
     const [form, setForm] = useState({
@@ -16,7 +16,8 @@ export default function EditSemester() {
         ngaybd: '',
         ngaykt: ''
     });
-    const [error, setError] = useState('');
+    const [errorNamhoc, setErrorNamhoc] = useState('');
+    const [errorNgay, setErrorNgay] = useState('');
 
     // load lên form
     useEffect(() => {
@@ -41,13 +42,15 @@ export default function EditSemester() {
     const onInput = e => {
         const { name, value } = e.target;
         setForm(f => ({ ...f, [name]: value }));
-
+        // reset lỗi khi user chỉnh sửa
+        if (name === 'namhoc') setErrorNamhoc('');
+        if (name === 'ngaybd' || name === 'ngaykt') setErrorNgay('');
     };
 
     const onSubmit = async e => {
         e.preventDefault();
 
-        // validate năm học: YYYY-YYYY and difference = 1
+        // 1) validate năm học: YYYY-YYYY and difference = 1
         const pattern = /^\d{4}-\d{4}$/;
         if (!pattern.test(form.namhoc)) {
             setErrorNamhoc('Năm học phải đúng định dạng YYYY-YYYY');
@@ -58,10 +61,30 @@ export default function EditSemester() {
             setErrorNamhoc('Năm kết thúc phải lớn hơn năm bắt đầu 1 năm');
             return;
         }
+
+        // 2) validate ngày kết thúc > ngày bắt đầu
         if (form.ngaykt <= form.ngaybd) {
-            setError('Ngày kết thúc phải sau ngày bắt đầu');
+            setErrorNgay('Ngày kết thúc phải sau ngày bắt đầu');
             return;
         }
+
+        // 3) validate cách nhau ít nhất 16 tuần = 112 ngày
+        const start = new Date(form.ngaybd);
+        const end = new Date(form.ngaykt);
+        const diffDays = (end - start) / (1000 * 60 * 60 * 24);
+        if (diffDays < 112) {
+            setErrorNgay('Ngày kết thúc phải cách ngày bắt đầu ít nhất 16 tuần (112 ngày)');
+            return;
+        }
+        if (start.getDay() !== 1) {
+            setErrorNgay('Ngày bắt đầu phải là Thứ Hai');
+            return;
+        }
+        if (end.getDay() !== 0) {
+            setErrorNgay('Ngày kết thúc phải là Chủ nhật');
+            return;
+        }
+        // nếu hợp lệ, gọi API
         const res = await updateSemester(mahk, form);
         setSemesters(semesters.map(s => s.mahk === mahk ? res.data : s));
         nav('/admin/semesters');
@@ -77,12 +100,8 @@ export default function EditSemester() {
                     id="mahk"
                     name="mahk"
                     value={form.mahk}
-                    onChange={onInput}
-                    required
                     disabled
                 />
-
-
 
                 <label htmlFor="tenhk">Tên HK*</label>
                 <select
@@ -98,19 +117,16 @@ export default function EditSemester() {
                     <option value="Học kỳ 3">Học kỳ 3</option>
                 </select>
 
-
-
                 <label htmlFor="namhoc">Năm học*</label>
                 <input
                     id="namhoc"
                     name="namhoc"
                     value={form.namhoc}
                     onChange={onInput}
-                    required
                     placeholder="YYYY-YYYY"
+                    required
                 />
-
-
+                {errorNamhoc && <div className="error-message">{errorNamhoc}</div>}
 
                 <label htmlFor="ngaybd">Ngày bắt đầu*</label>
                 <input
@@ -122,8 +138,6 @@ export default function EditSemester() {
                     required
                 />
 
-
-
                 <label htmlFor="ngaykt">Ngày kết thúc*</label>
                 <input
                     id="ngaykt"
@@ -134,14 +148,11 @@ export default function EditSemester() {
                     required
                     min={form.ngaybd}
                 />
-                {error && <div className="error-message">{error}</div>}
-
+                {errorNgay && <div className="error-message">{errorNgay}</div>}
 
                 <div className="form-actions">
                     <button type="submit" className="btn btn-primary">Lưu</button>
-                    <button type="button" onClick={() => nav(-1)}>
-                        Hủy
-                    </button>
+                    <button type="button" onClick={() => nav(-1)}>Hủy</button>
                 </div>
             </form>
         </div>

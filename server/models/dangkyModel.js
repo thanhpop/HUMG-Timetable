@@ -9,7 +9,7 @@ exports.findByStudent = msv => {
       SELECT 
         d.id,
         d.msv,
-        d.ngaydk,
+        d.manhom,
         lh.id           AS lichhoc_id,
         lh.thu,
         lh.tietbd,
@@ -26,12 +26,11 @@ exports.findByStudent = msv => {
         p.khu
       FROM dangky d
       JOIN lichhoc lh    ON d.lichhoc_id = lh.id
-      JOIN nhommh nh     ON lh.manhom      = nh.manhom
+      JOIN nhommh nh     ON d.manhom      = nh.manhom
       JOIN monhoc mh     ON nh.mamh         = mh.mamh
       JOIN giangvien gv  ON nh.mgv          = gv.mgv
       JOIN phonghoc p    ON lh.maphong      = p.maphong
       WHERE d.msv = ?
-      ORDER BY d.ngaydk DESC
     `;
     return db.query(sql, [msv]);
 };

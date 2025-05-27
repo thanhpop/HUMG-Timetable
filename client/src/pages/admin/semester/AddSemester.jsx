@@ -16,18 +16,22 @@ export default function AddSemester() {
         ngaykt: ''
     });
     const [errorMahk, setErrorMahk] = useState('');
+    const [errorNamhoc, setErrorNamhoc] = useState('');
     const [errorNgay, setErrorNgay] = useState('');
 
     const onInput = e => {
         const { name, value } = e.target;
         setForm(f => ({ ...f, [name]: value }));
-        if (name === 'mahk') setError('');
+        // reset lỗi tương ứng
+        if (name === 'mahk') setErrorMahk('');
+        if (name === 'namhoc') setErrorNamhoc('');
+        if (name === 'ngaybd' || name === 'ngaykt') setErrorNgay('');
     };
 
     const onSubmit = async e => {
         e.preventDefault();
 
-        // validate năm học: YYYY-YYYY and difference = 1
+        // 1) validate năm học
         const pattern = /^\d{4}-\d{4}$/;
         if (!pattern.test(form.namhoc)) {
             setErrorNamhoc('Năm học phải đúng định dạng YYYY-YYYY');
@@ -39,16 +43,39 @@ export default function AddSemester() {
             return;
         }
 
+        // 2) validate ngày kết thúc > ngày bắt đầu
         if (form.ngaykt <= form.ngaybd) {
             setErrorNgay('Ngày kết thúc phải sau ngày bắt đầu');
             return;
         }
-        // kiểm tra duplicate mã HK
+
+        // 3) validate tối thiểu cách 16 tuần (112 ngày)
+        const start = new Date(form.ngaybd);
+        const end = new Date(form.ngaykt);
+        const diffDays = (end - start) / (1000 * 60 * 60 * 24);
+        if (diffDays < 112) {
+            setErrorNgay('Kỳ phải dài ít nhất 16 tuần (112 ngày)');
+            return;
+        }
+
+        // 4) validate ngày bắt đầu là Thứ Hai
+        // JS: getDay() trả về 1 == Monday
+        if (start.getDay() !== 1) {
+            setErrorNgay('Ngày bắt đầu phải là Thứ Hai');
+            return;
+        }
+        if (end.getDay() !== 0) {
+            setErrorNgay('Ngày kết thúc phải là Chủ nhật');
+            return;
+        }
+
+        // 5) kiểm tra duplicate mã HK
         if (semesters.some(s => s.mahk === form.mahk)) {
             setErrorMahk('Mã học kỳ đã tồn tại');
             return;
         }
-        // gọi API tạo mới
+
+        // 6) gọi API tạo mới
         const res = await createSemester(form);
         setSemesters([res.data, ...semesters]);
         nav('/admin/semesters');
@@ -66,11 +93,8 @@ export default function AddSemester() {
                     value={form.mahk}
                     onChange={onInput}
                     required
-
                 />
                 {errorMahk && <div className="error-message">{errorMahk}</div>}
-
-
 
                 <label htmlFor="tenhk">Tên HK*</label>
                 <select
@@ -86,8 +110,6 @@ export default function AddSemester() {
                     <option value="Học kỳ 3">Học kỳ 3</option>
                 </select>
 
-
-
                 <label htmlFor="namhoc">Năm học*</label>
                 <input
                     id="namhoc"
@@ -97,8 +119,7 @@ export default function AddSemester() {
                     onChange={onInput}
                     required
                 />
-
-
+                {errorNamhoc && <div className="error-message">{errorNamhoc}</div>}
 
                 <label htmlFor="ngaybd">Ngày bắt đầu*</label>
                 <input
@@ -109,8 +130,6 @@ export default function AddSemester() {
                     onChange={onInput}
                     required
                 />
-
-
 
                 <label htmlFor="ngaykt">Ngày kết thúc*</label>
                 <input
@@ -126,13 +145,7 @@ export default function AddSemester() {
 
                 <div className="form-actions">
                     <button type="submit" className="btn btn-primary">Thêm</button>
-                    <button
-                        type="button"
-
-                        onClick={() => nav(-1)}
-                    >
-                        Hủy
-                    </button>
+                    <button type="button" onClick={() => nav(-1)}>Hủy</button>
                 </div>
             </form>
         </div>
