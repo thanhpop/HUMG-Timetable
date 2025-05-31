@@ -42,7 +42,7 @@ export default function EditUser() {
                 <label>Username</label>
                 <input value={form.username} disabled />
 
-                <label>New Password</label>
+                <label>Password</label>
                 <input
                     type="text"
                     value={form.password}

@@ -93,21 +93,18 @@ export default function EditCourse() {
                         onChange={onInput}
                         required
                     >
-
-
                         <option value="">Chọn khoa</option>
                         <option value="Công nghệ thông tin">Công nghệ thông tin</option>
                         <option value="Cơ điện">Cơ điện</option>
                         <option value="Dầu khí">Dầu khí</option>
                         <option value="Khoa học và Kỹ thuật Địa chất">Khoa học và Kỹ thuật Địa chất</option>
-                        <option value="Kinh tế">Kinh tế</option>
+                        <option value="Kinh tế & QTKD">Kinh tế & QTKD</option>
                         <option value="Mỏ">Mỏ</option>
                         <option value="Môi trường">Môi trường</option>
                         <option value="Trắc địa - Bản đồ và Quản lý đất đai">Trắc địa - Bản đồ và Quản lý đất đai</option>
                         <option value="Xây dựng">Xây dựng</option>
                         <option value="Lý luận Chính trị">Lý luận Chính trị</option>
                         <option value="Khoa học cơ bản">Khoa học cơ bản</option>
-                        <option value="Giáo dục Quốc phòng">Giáo dục Quốc phòng</option>
 
                     </select>
 

@@ -46,8 +46,8 @@ export default function Login() {
       }
     } catch (err) {
       setError(
-        err.response?.data?.error === 'Sai username hoặc mật khẩu'
-          ? 'Sai username hoặc mật khẩu'
+        err.response?.data?.error === 'Sai tên truy cập hoặc mật khẩu'
+          ? 'Sai tên truy cập hoặc mật khẩu'
           : 'Đăng nhập thất bại'
       );
     }

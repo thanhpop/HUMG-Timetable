@@ -78,7 +78,7 @@ export default function AddStudent() {
                         <option value="Cơ điện">Cơ điện</option>
                         <option value="Dầu khí">Dầu khí</option>
                         <option value="Khoa học và Kỹ thuật Địa chất">Khoa học và Kỹ thuật Địa chất</option>
-                        <option value="Kinh tế">Kinh tế</option>
+                        <option value="Kinh tế & QTKD">Kinh tế & QTKD</option>
                         <option value="Mỏ">Mỏ</option>
                         <option value="Môi trường">Môi trường</option>
                         <option value="Trắc địa - Bản đồ và Quản lý đất đai">Trắc địa - Bản đồ và Quản lý đất đai</option>
