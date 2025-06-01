@@ -493,3 +493,16 @@
   font-size: 1rem;
   align-items: flex-start;
 }
+
+.filters select {
+  font-size: 16px;
+  /* Tăng cỡ chữ */
+  padding: 6px 12px;
+  /* Tăng khoảng padding bên trong */
+  min-width: 200px;
+  /* Ít nhất rộng 200px */
+
+  /* Bo góc nhẹ */
+  border: 1px solid #cbd5e1;
+  /* Viền nhạt cho dễ nhìn */
+}

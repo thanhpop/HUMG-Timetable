@@ -130,7 +130,7 @@ export default function GenerateTKB() {
 
             <div style={{ marginBottom: 16 }}>
                 <label>
-                    Chọn học kỳ:{' '}
+                    Chọn học kỳ để tạo TKB :{' '}
                     <select className="large-select"
                         value={selected}
                         onChange={e => setSelected(e.target.value)}

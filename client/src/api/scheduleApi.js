@@ -22,3 +22,5 @@ export function getSchedulesBySemester(mahk) {
 export function deleteSchedulesBySemester(mahk) {
     return axios.delete(`${BASE}/lichhoc/semester/${mahk}`);
 }
+
+

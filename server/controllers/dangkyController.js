@@ -155,3 +155,17 @@ exports.countByLichHoc = async (req, res, next) => {
 };
 
 
+
+// exports.getStudentsByGroup = async (req, res) => {
+//     const { manhom } = req.query;
+//     if (!manhom) {
+//         return res.status(400).json({ message: 'Thiếu tham số manhom' });
+//     }
+//     try {
+//         const rows = await dangkyModel.findStudentsByGroup(manhom);
+//         return res.json(rows);
+//     } catch (err) {
+//         console.error('Lỗi khi lấy sinh viên theo nhóm:', err);
+//         return res.status(500).json({ message: 'Lỗi server' });
+//     }
+// };

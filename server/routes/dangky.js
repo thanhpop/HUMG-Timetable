@@ -10,4 +10,6 @@ router.post('/', dkCtrl.create);
 router.put('/:id', dkCtrl.update);
 router.delete('/:id', dkCtrl.remove);
 
+// router.get('/registrations', dkCtrl.getStudentsByGroup);
+
 module.exports = router;

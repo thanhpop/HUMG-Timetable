@@ -202,7 +202,7 @@ export default function GroupManagerTanStack() {
                     {table.getHeaderGroups().map(headerGroup => (
                         <tr key={headerGroup.id}>
                             {headerGroup.headers.map(header => (
-                                <th key={header.id} style={{ border: '1px solid #ccc', padding: 8, backgroundColor: '#f1f1f1' }}>
+                                <th key={header.id} style={{ border: '1px solid #ccc', padding: 8, backgroundColor: '#ccc' }}>
                                     {header.isPlaceholder
                                         ? null
                                         : flexRender(header.column.columnDef.header, header.getContext())}

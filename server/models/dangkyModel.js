@@ -82,3 +82,19 @@ exports.getCapacityAndCountForUpdate = lichhoc_id =>
      FOR UPDATE`,
         [lichhoc_id, lichhoc_id]
     );
+
+
+exports.findStudentsByGroup = (manhom) => {
+    const sql = `
+    SELECT 
+      dk.msv,
+      sv.ten AS ten,
+      sv.lop AS lop
+    FROM dangky dk
+    JOIN sinhvien sv ON dk.msv = sv.msv
+    WHERE dk.manhom = ?
+    ORDER BY sv.ten
+  `;
+    return db.query(sql, [manhom]);
+};
+

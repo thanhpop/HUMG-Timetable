@@ -471,18 +471,18 @@ class EnhancedTKBAlgorithm {
                 let ok = true;
 
                 for (const session of pattern.sessions) {
-                    const entry = this.tryScheduleSession(
+                    const scheduled = this.tryScheduleSession(
                         unit, giangVien, phong,
                         gvBusyMap, phongBusyMap,
                         session.tietCount, usedDays,
                         hocky
                     );
-                    if (!entry) {
+                    if (!scheduled) {
                         ok = false;
                         break;
                     }
-                    tempEntries.push(entry);
-                    usedDays.add(entry.thu);
+                    tempEntries.push(scheduled);
+                    usedDays.add(scheduled.thu);
                 }
 
                 if (ok) {
