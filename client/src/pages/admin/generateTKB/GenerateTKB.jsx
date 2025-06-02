@@ -163,7 +163,7 @@ export default function GenerateTKB() {
                 result && (
                     <div style={{ marginTop: 20 }}>
                         <h2>Kết quả:</h2>
-                        <p>Đã xếp: {tableData.length} nhóm</p>
+                        <p>Đã xếp: {tableData.length} nhóm môn học</p>
                         <h3>Thống kê:</h3>
                         <pre>{JSON.stringify(result.stats, null, 2)}</pre>
                         {result.conflicts.length > 0 && (
@@ -172,7 +172,7 @@ export default function GenerateTKB() {
                                 <ul>
                                     {result.conflicts.map((c, i) => (
                                         <li key={i}>
-                                            {c.mamh}: {c.lyDo}
+                                            Nhóm <strong>{c.tenNhom}</strong> ({c.mamh}): {c.lyDo}
                                         </li>
                                     ))}
                                 </ul>
@@ -203,7 +203,7 @@ export default function GenerateTKB() {
                                 {table.getRowModel().rows.map(row => (
                                     <tr key={row.id}>
                                         {row.getVisibleCells().map(cell => (
-                                            <td key={cell.id} style={{ border: '1px solid #ccc', padding: 8 }}>
+                                            <td key={cell.id} style={{ border: '1px solid #ccc', padding: 8, backgroundColor: '#fff', }}>
                                                 {flexRender(cell.column.columnDef.cell ?? cell.column.columnDef.accessorKey, cell.getContext())}
                                             </td>
                                         ))}

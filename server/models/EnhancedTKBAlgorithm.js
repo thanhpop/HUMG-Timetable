@@ -85,22 +85,23 @@ class EnhancedTKBAlgorithm {
         for (const creditType of [4, 3, 2, 1]) {
             const group = creditGroups[creditType];
             if (!group) continue;
-            for (const unit of group) {
+            for (const monHoc of group) {
                 const scheduled = await this.scheduleMonHoc(
-                    unit,
+                    monHoc,
                     phonghocs,
                     giangviens,
                     tkb,
                     gvBusyMap,
                     phongBusyMap,
-                    svBusyMap,
                     nhommhs,
                     hocky
                 );
                 if (!scheduled) {
+                    const nhomObj = nhommhs.find(n => n.manhom === monHoc.manhom);
                     conflicts.push({
-                        mamh: unit.mamh,
-                        tenmh: unit.tenmh,
+                        mamh: monHoc.mamh,
+                        tenNhom: nhomObj ? nhomObj.tennhom : '',
+                        tenmh: monHoc.tenmh,
                         lyDo: 'Không thể xếp lịch do xung đột'
                     });
                 }
@@ -147,7 +148,14 @@ class EnhancedTKBAlgorithm {
 
             // 3) Lấy tất cả sinh viên
             const [allStudents] = await db.query('SELECT * FROM sinhvien');
-
+            const [existingSchedules] = await db.query(`
+            SELECT d.msv, l.thu, l.tietbd, l.tietkt, p.khu, n.mamh
+            FROM dangky d
+            JOIN lichhoc l ON d.lichhoc_id = l.id  
+            JOIN phonghoc p ON l.maphong = p.maphong
+            JOIN nhommh n ON l.manhom = n.manhom
+            WHERE n.mahk = ?
+        `, [mahk]);
             // 4) Theo dõi trạng thái đăng ký của sinh viên
             const studentRegisteredSubjects = new Map(); // msv -> Set(mamh)
             const studentCredits = new Map(); // msv -> tổng tín chỉ đã đăng ký
@@ -155,6 +163,23 @@ class EnhancedTKBAlgorithm {
             const registrationData = [];
             let totalRegistrations = 0;
 
+            for (const schedule of existingSchedules) {
+                const svKey = `${schedule.msv}-${schedule.thu}`;
+                if (!studentScheduleMap.has(svKey)) {
+                    studentScheduleMap.set(svKey, { tiet: [], khu: [] });
+                }
+                const svSchedule = studentScheduleMap.get(svKey);
+                for (let i = schedule.tietbd; i <= schedule.tietkt; i++) {
+                    svSchedule.tiet.push(this.tietHoc[i - 1]);
+                    svSchedule.khu.push(schedule.khu);
+                }
+
+                // Cập nhật môn đã đăng ký
+                if (!studentRegisteredSubjects.has(schedule.msv)) {
+                    studentRegisteredSubjects.set(schedule.msv, new Set());
+                }
+                studentRegisteredSubjects.get(schedule.msv).add(schedule.mamh);
+            }
             // 5) Duyệt qua từng nhóm môn học 
             for (const [manhom, danhSachBuoiHoc] of nhomLichHoc) {
                 const firstBuoiHoc = danhSachBuoiHoc[0];
@@ -218,8 +243,16 @@ class EnhancedTKBAlgorithm {
                     // Kiểm tra xung đột lịch học 
                     let hasAnyConflict = false;
                     for (const buoiHoc of danhSachBuoiHoc) {
-                        const hasConflict = await this.checkScheduleConflict(sv.msv, buoiHoc);
-                        if (hasConflict) {
+                        // Kiểm tra xung đột database
+                        const hasDbConflict = await this.checkScheduleConflict(sv.msv, buoiHoc);
+                        if (hasDbConflict) {
+                            hasAnyConflict = true;
+                            break;
+                        }
+
+                        // Kiểm tra xung đột trong memory (các đăng ký trong session này)
+                        const hasMemoryConflict = this.checkMemoryScheduleConflict(sv.msv, buoiHoc, studentScheduleMap);
+                        if (hasMemoryConflict) {
                             hasAnyConflict = true;
                             break;
                         }
@@ -227,6 +260,11 @@ class EnhancedTKBAlgorithm {
                         // Kiểm tra xung đột khu
                         const hasZoneConflict = await this.checkStudentZoneConflicts(sv.msv, buoiHoc, studentScheduleMap, this.minBreakBetweenZones);
                         if (hasZoneConflict) {
+                            hasAnyConflict = true;
+                            break;
+                        }
+                        const hasMaxTietConflict = this.checkMaxTietPerDay(sv.msv, buoiHoc, studentScheduleMap);
+                        if (hasMaxTietConflict) {
                             hasAnyConflict = true;
                             break;
                         }
@@ -358,8 +396,8 @@ class EnhancedTKBAlgorithm {
             JOIN lichhoc l ON d.lichhoc_id = l.id
             WHERE d.msv = ?
             AND l.thu = ?
-            AND l.tietbd <= ?
             AND l.tietkt >= ?
+            AND l.tietbd <= ?
             AND l.ngaybd <= ?
             AND l.ngaykt >= ?
         `, [
@@ -421,6 +459,39 @@ class EnhancedTKBAlgorithm {
 
         return false;
     }
+    checkMemoryScheduleConflict(msv, newLichHoc, studentScheduleMap) {
+        const svKey = `${msv}-${newLichHoc.thu}`;
+        const svSchedule = studentScheduleMap.get(svKey);
+
+        if (!svSchedule) return false;
+
+        // Kiểm tra xung đột tiết học
+        for (let i = newLichHoc.tietbd; i <= newLichHoc.tietkt; i++) {
+            const tiet = this.tietHoc[i - 1];
+            if (svSchedule.tiet.includes(tiet)) {
+                return true; // Có xung đột
+            }
+        }
+
+        return false;
+    }
+    checkMaxTietPerDay(msv, newLichHoc, studentScheduleMap) {
+        const svKey = `${msv}-${newLichHoc.thu}`;
+        const svSchedule = studentScheduleMap.get(svKey) || { tiet: [] };
+
+        // Tính số tiết hiện tại trong ngày
+        const currentTietCount = svSchedule.tiet.length;
+
+        // Tính số tiết của buổi học mới
+        const newTietCount = newLichHoc.tietkt - newLichHoc.tietbd + 1;
+
+        // Kiểm tra xem có vượt quá maxTietPerDay không
+        if (currentTietCount + newTietCount > this.maxTietPerDay) {
+            return true; // Vượt quá
+        }
+
+        return false; // Không vượt quá
+    }
 
     processMonHocGroups(monhocs, nhommhs, dangkys) {
         return monhocs.map(monHoc => {
@@ -449,10 +520,10 @@ class EnhancedTKBAlgorithm {
     }
     // thuật toán tham lam
     // Backtracking
-    async scheduleMonHoc(unit, phonghocs, giangviens, tkb,
-        gvBusyMap, phongBusyMap, svBusyMap,
+    async scheduleMonHoc(monHoc, phonghocs, giangviens, tkb,
+        gvBusyMap, phongBusyMap,
         nhommhs, hocky) {
-        const { manhom, sotinchi, totalSvCount, mgv } = unit;
+        const { manhom, sotinchi, totalSvCount, mgv } = monHoc;
         const nhomMonHoc = nhommhs.find(n => n.manhom === manhom);
         if (!nhomMonHoc) return false;
 
@@ -466,26 +537,24 @@ class EnhancedTKBAlgorithm {
 
         for (const pattern of schedulePattern) {
             for (const phong of suitableRooms) {
-                const usedDays = new Set();
+                const scheduledDays = new Set();
                 const tempEntries = [];
-                let ok = true;
 
                 for (const session of pattern.sessions) {
                     const scheduled = this.tryScheduleSession(
-                        unit, giangVien, phong,
+                        monHoc, giangVien, phong,
                         gvBusyMap, phongBusyMap,
-                        session.tietCount, usedDays,
+                        session.tietCount, scheduledDays,
                         hocky
                     );
                     if (!scheduled) {
-                        ok = false;
                         break;
                     }
                     tempEntries.push(scheduled);
-                    usedDays.add(scheduled.thu);
+                    scheduledDays.add(scheduled.thu);
                 }
 
-                if (ok) {
+                if (scheduledDays.size === pattern.sessions.length) {
                     for (const e of tempEntries) {
                         tkb.push(e);
                     }
@@ -503,14 +572,14 @@ class EnhancedTKBAlgorithm {
         return gvSchedule.tiet.length >= this.maxTietPerDay;
     }
 
-    tryScheduleSession(unit, giangVien, phongHoc,
+    tryScheduleSession(monHoc, giangVien, phongHoc,
         gvBusyMap, phongBusyMap,
-        tietCount, usedDays, hocky) {
+        tietCount, scheduledDays, hocky) {
 
         const fmt = d => new Date(d).toISOString().slice(0, 10);
 
         const availableDays = this.ngayHoc.filter(thu =>
-            !usedDays.has(thu) &&
+            !scheduledDays.has(thu) &&
             !this.isGvOverloaded(giangVien.mgv, thu, gvBusyMap)
         );
 
@@ -537,7 +606,7 @@ class EnhancedTKBAlgorithm {
                 }
 
                 const ngaybd = new Date(hocky.ngaybd);
-                const durationWeeks = unit.sotinchi <= 2 ? 8 : this.weekCount;
+                const durationWeeks = monHoc.sotinchi <= 2 ? 8 : this.weekCount;
                 const ngaykt = new Date(ngaybd);
                 ngaykt.setDate(ngaybd.getDate() + (durationWeeks * 7) - 1);
 
@@ -553,7 +622,7 @@ class EnhancedTKBAlgorithm {
                 );
 
                 return {
-                    manhom: unit.manhom,
+                    manhom: monHoc.manhom,
                     maphong: phongHoc.maphong,
                     thu,
                     tietbd: tietBatDau,

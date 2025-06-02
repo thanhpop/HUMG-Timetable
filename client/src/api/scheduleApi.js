@@ -24,3 +24,6 @@ export function deleteSchedulesBySemester(mahk) {
 }
 
 
+export function getRegistrationsByGroup(manhom) {
+    return axios.get(`${BASE}/dangky/group/${manhom}`);
+}

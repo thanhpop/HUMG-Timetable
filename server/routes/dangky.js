@@ -9,7 +9,7 @@ router.get('/:msv', dkCtrl.getByStudent);
 router.post('/', dkCtrl.create);
 router.put('/:id', dkCtrl.update);
 router.delete('/:id', dkCtrl.remove);
+router.get('/group/:manhom', dkCtrl.getByGroup);
 
-// router.get('/registrations', dkCtrl.getStudentsByGroup);
 
 module.exports = router;

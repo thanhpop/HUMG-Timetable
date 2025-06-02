@@ -7,7 +7,10 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
-import { getSchedulesByTeacher } from "../../../api/scheduleApi";
+import {
+  getSchedulesByTeacher
+  , getRegistrationsByGroup
+} from "../../../api/scheduleApi";
 import { getAllSemesters } from "../../../api/utilsApi";
 import { getCurrentMgv } from "../../utils/auth";
 import "./timetableGV.css";
@@ -116,7 +119,8 @@ export default function TimetableGV() {
         startTime: getTimeFromTiet(s.tietbd, s.tietkt).split(" – ")[0],
         endTime: getTimeFromTiet(s.tietbd, s.tietkt).split(" – ")[1],
         ngaybd: start,
-        ngaykt: end
+        ngaykt: end,
+        manhom: s.manhom
       };
     });
     setCoursesData(mapped);
@@ -160,13 +164,35 @@ export default function TimetableGV() {
   // === Đóng dialog khi ESC ===
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const [studentList, setStudentList] = useState([]);
+  const [isStudentDialogOpen, setIsStudentDialogOpen] = useState(false);
+  const [isLoadingStudents, setIsLoadingStudents] = useState(false);
+  const [studentError, setStudentError] = useState("");
   const handleCourseClick = course => {
     setSelectedCourse(course);
     setIsDialogOpen(true);
   };
+  const handleViewStudents = async () => {
+    if (!selectedCourse?.manhom) return;
+    setIsLoadingStudents(true);
+    setStudentError("");
+    try {
+      const res = await getRegistrationsByGroup(selectedCourse.manhom);
+      // Giả sử backend trả về { data: { students: [...] } }
+      const arr = res.data.students;
+      setStudentList(Array.isArray(arr) ? arr : []);
+      setIsStudentDialogOpen(true);
+    } catch (err) {
+      setStudentError("Không tải được danh sách sinh viên.");
+      console.error(err);
+    } finally {
+      setIsLoadingStudents(false);
+    }
+  };
   useEffect(() => {
     const onKey = e => {
-      if (e.key === "Escape") setIsDialogOpen(false);
+      if (e.key === "Escape") { setIsDialogOpen(false); setIsStudentDialogOpen(false); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -499,13 +525,73 @@ export default function TimetableGV() {
                     </div>
                   </div>
                 </div>
+
               </div>
-              <button
-                className="close-button"
-                onClick={() => setIsDialogOpen(false)}
-              >
-                Đóng
-              </button>
+              <div className="dialog-footer" >
+                <button
+                  className="close-button"
+                  onClick={() => setIsDialogOpen(false)}
+                >
+                  Đóng
+                </button>
+                <button className="view-students-button" onClick={handleViewStudents}>Danh sách sinh viên</button>
+              </div>
+            </div>
+          </div>
+        )}
+        {isStudentDialogOpen && (
+          <div className="dialog-overlay " onClick={() => setIsStudentDialogOpen(false)}>
+            <div
+              className="dialog-content"
+              style={{ width: "600px", maxHeight: "80vh", overflowY: "auto", maxWidth: "90%", }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="dialog-header">
+                <div className="dialog-title">
+                  Danh sách sinh viên – {selectedCourse?.tennhom}
+                </div>
+              </div>
+              <div className="dialog-body">
+                {studentError && (
+                  <div className="error-message" style={{ marginBottom: 16 }}>
+                    {studentError}
+                  </div>
+                )}
+                {!studentError && Array.isArray(studentList) && studentList.length === 0 && (
+                  <div>Chưa có sinh viên nào.</div>
+                )}
+                {!studentError && Array.isArray(studentList) && studentList.length > 0 && (
+                  <div className="student-table-wrapper">
+                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                      <thead>
+                        <tr>
+                          <th style={{ border: "1px solid #ccc", padding: 8, width: "10%" }}>STT</th>
+                          <th style={{ border: "1px solid #ccc", padding: 8, width: "25%" }}>Mã SV</th>
+                          <th style={{ border: "1px solid #ccc", padding: 8, width: "50%" }}>Tên sinh viên</th>
+                          <th style={{ border: "1px solid #ccc", padding: 8, width: "20%" }}>Lớp</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {studentList.map((sv, idx) => (
+                          <tr key={idx}>
+                            <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "center" }}>
+                              {idx + 1}
+                            </td>
+                            <td style={{ border: "1px solid #ccc", padding: 8 }}>{sv.msv}</td>
+                            <td style={{ border: "1px solid #ccc", padding: 8 }}>{sv.ten}</td>
+                            <td style={{ border: "1px solid #ccc", padding: 8 }}>{sv.lop}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+              <div className="dialog-footer" style={{ textAlign: "right" }}>
+                <button className="close-button" onClick={() => setIsStudentDialogOpen(false)}>
+                  Đóng
+                </button>
+              </div>
             </div>
           </div>
         )}

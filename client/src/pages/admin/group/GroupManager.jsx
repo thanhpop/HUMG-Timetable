@@ -215,7 +215,7 @@ export default function GroupManagerTanStack() {
                     {table.getRowModel().rows.map(row => (
                         <tr key={row.id}>
                             {row.getVisibleCells().map(cell => (
-                                <td key={cell.id} style={{ border: '1px solid #ccc', padding: 8, verticalAlign: 'middle' }}>
+                                <td key={cell.id} style={{ border: '1px solid #ccc', padding: 8, verticalAlign: 'middle', backgroundColor: '#fff', }}>
                                     {flexRender(cell.column.columnDef.cell ?? cell.column.columnDef.accessorKey, cell.getContext())}
                                 </td>
                             ))}

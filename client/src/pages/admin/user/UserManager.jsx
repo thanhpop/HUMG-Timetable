@@ -103,7 +103,7 @@ export default function UserManager() {
                                 cursor: 'not-allowed'
                             }}
                         >
-                            Xóa
+                            <FontAwesomeIcon icon={faTrash} />
                         </button>
                     )}
                 </div>
