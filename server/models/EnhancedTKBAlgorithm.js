@@ -23,7 +23,7 @@ class EnhancedTKBAlgorithm {
     async generateTKBForSemester(mahk) {
         try {
             // 1) Tạo thời khóa biểu
-            const result = await this.generateTKBOnly(mahk);
+            const result = await this.generateTKB(mahk);
 
             // 2) Tự động đăng ký sinh viên 
             await this.autoRegisterStudents(mahk);
@@ -34,7 +34,7 @@ class EnhancedTKBAlgorithm {
             throw err;
         }
     }
-    async generateTKBOnly(mahk) {
+    async generateTKB(mahk) {
         // 1) load học kỳ
         const [hkRows] = await db.query(`SELECT * FROM hocky WHERE mahk = ?`, [mahk]);
         if (!hkRows.length) throw new Error(`Không tìm thấy học kỳ ${mahk}`);
