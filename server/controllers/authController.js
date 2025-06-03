@@ -31,7 +31,10 @@ exports.login = async (req, res, next) => {
                     lop: stuRows[0].lop,
                     gioitinh: stuRows[0].gioitinh,
                     ngaysinh: stuRows[0].ngaysinh,
-                    // ...các trường khác nếu cần
+                    sdt: stuRows[0].sdt,
+                    email: stuRows[0].email,
+                    cccd: stuRows[0].cccd,
+                    diachi: stuRows[0].diachi
                 };
             }
         } else if (acct.vaitro === 'gv') {
