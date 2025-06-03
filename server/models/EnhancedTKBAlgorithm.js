@@ -110,6 +110,237 @@ class EnhancedTKBAlgorithm {
         await this.saveTKBToDatabase(tkb, hocky.mahk);
         return { tkb, conflicts };
     }
+
+
+    processMonHocGroups(monhocs, nhommhs, dangkys) {
+        return monhocs.map(monHoc => {
+            const nhom = nhommhs.filter(n => n.mamh === monHoc.mamh);
+            const totalSvCount = nhom
+                .reduce((sum, g) => sum + dangkys.filter(d => d.manhom === g.manhom).length, 0);
+
+            return {
+                ...monHoc,
+                nhom: nhom.map(g => ({
+                    ...g,
+                    svCount: dangkys.filter(d => d.manhom === g.manhom).length
+                })),
+                totalSvCount
+            };
+        });
+    }
+
+    groupByCreditType(monhocs) {
+        return monhocs.reduce((groups, monHoc) => {
+            const credit = monHoc.sotinchi || 3;
+            if (!groups[credit]) groups[credit] = [];
+            groups[credit].push(monHoc);
+            return groups;
+        }, {});
+    }
+    // thuật toán tham lam
+    // Backtracking
+    async scheduleMonHoc(monHoc, phonghocs, giangviens, tkb,
+        gvBusyMap, phongBusyMap,
+        nhommhs, hocky) {
+        const { manhom, sotinchi, totalSvCount, mgv } = monHoc;
+        const nhomMonHoc = nhommhs.find(n => n.manhom === manhom);
+        if (!nhomMonHoc) return false;
+
+        const giangVien = giangviens.find(gv => gv.mgv === mgv);
+        if (!giangVien) return false;
+
+        const schedulePattern = this.getSchedulePattern(sotinchi || 3);
+        const suitableRooms = phonghocs
+            .filter(ph => ph.succhua >= totalSvCount)
+            .sort((a, b) => a.succhua - b.succhua);
+
+        for (const pattern of schedulePattern) {
+            for (const phong of suitableRooms) {
+                const scheduledDays = new Set();
+                const tempEntries = [];
+
+                for (const session of pattern.sessions) {
+                    const scheduled = this.tryScheduleSession(
+                        monHoc, giangVien, phong,
+                        gvBusyMap, phongBusyMap,
+                        session.tietCount, scheduledDays,
+                        hocky
+                    );
+                    if (!scheduled) {
+                        break;
+                    }
+                    tempEntries.push(scheduled);
+                    scheduledDays.add(scheduled.thu);
+                }
+
+                if (scheduledDays.size === pattern.sessions.length) {
+                    for (const e of tempEntries) {
+                        tkb.push(e);
+                    }
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    isGvOverloaded(mgv, ngay, gvBusyMap) {
+        const gvKey = `${mgv}-${ngay}`;
+        const gvSchedule = gvBusyMap.get(gvKey) || { tiet: [] };
+        return gvSchedule.tiet.length >= this.maxTietPerDay;
+    }
+
+    tryScheduleSession(monHoc, giangVien, phongHoc,
+        gvBusyMap, phongBusyMap,
+        tietCount, scheduledDays, hocky) {
+
+        const fmt = d => new Date(d).toISOString().slice(0, 10);
+
+        const availableDays = this.ngayHoc.filter(thu =>
+            !scheduledDays.has(thu) &&
+            !this.isGvOverloaded(giangVien.mgv, thu, gvBusyMap)
+        );
+
+        for (const thu of availableDays) {
+            const consecutiveSlots = this.findConsecutiveSlotsWithZones(
+                thu,
+                tietCount,
+                phongHoc.maphong,
+                giangVien.mgv,
+                gvBusyMap,
+                phongBusyMap
+            );
+
+            if (consecutiveSlots.length >= tietCount) {
+                const slotStart = consecutiveSlots[0];
+                const slotEnd = consecutiveSlots[tietCount - 1];
+                const tietBatDau = this.tietHoc.indexOf(slotStart) + 1;
+                const tietKetThuc = this.tietHoc.indexOf(slotEnd) + 1;
+                if (!(
+                    (tietBatDau >= 1 && tietKetThuc <= 5) ||
+                    (tietBatDau >= 6 && tietKetThuc <= 13)
+                )) {
+                    continue;
+                }
+
+                const ngaybd = new Date(hocky.ngaybd);
+                const durationWeeks = monHoc.sotinchi <= 2 ? 8 : this.weekCount;
+                const ngaykt = new Date(ngaybd);
+                ngaykt.setDate(ngaybd.getDate() + (durationWeeks * 7) - 1);
+
+                this.updateBusyMaps(
+                    thu,
+                    slotStart,
+                    slotEnd,
+                    giangVien.mgv,
+                    phongHoc.maphong,
+                    phongHoc.khu,
+                    gvBusyMap,
+                    phongBusyMap
+                );
+
+                return {
+                    manhom: monHoc.manhom,
+                    maphong: phongHoc.maphong,
+                    thu,
+                    tietbd: tietBatDau,
+                    tietkt: tietKetThuc,
+                    ngaybd: fmt(ngaybd),
+                    ngaykt: fmt(ngaykt)
+                };
+            }
+        }
+
+        return null;
+    }
+
+    findConsecutiveSlotsWithZones(ngay, soTiet, maphong, mgv, gvBusyMap, phongBusyMap) {
+        const gvKey = `${mgv}-${ngay}`;
+        const gvSchedule = gvBusyMap.get(gvKey) || { tiet: [], khu: [] };
+
+        const availableSlots = this.tietHoc.filter(tiet => {
+            const phongKey = `${maphong}-${ngay}-${tiet}`;
+            return !phongBusyMap.has(phongKey) &&
+                !gvSchedule.tiet.includes(tiet);
+        });
+
+        let bestSlots = [], currentSlots = [];
+        for (const tiet of availableSlots) {
+            if (currentSlots.length === 0 || this.isNextSlot(currentSlots[currentSlots.length - 1], tiet)) {
+                if (!this.hasGvZoneConflict(ngay, tiet, mgv, gvSchedule)) {
+                    currentSlots.push(tiet);
+                    if (currentSlots.length === soTiet) {
+                        bestSlots = currentSlots.slice();
+                        break;
+                    }
+                } else {
+                    currentSlots = [];
+                }
+            } else {
+                if (!this.hasGvZoneConflict(ngay, tiet, mgv, gvSchedule)) {
+                    currentSlots = [tiet];
+                } else {
+                    currentSlots = [];
+                }
+            }
+        }
+        return bestSlots;
+    }
+    isNextSlot(prevTiet, currentTiet) {
+        const prevIndex = this.tietHoc.indexOf(prevTiet);
+        const currentIndex = this.tietHoc.indexOf(currentTiet);
+        return currentIndex === prevIndex + 1;
+    }
+    hasGvZoneConflict(ngay, tiet, mgv, gvSchedule) {
+        const tietIndex = this.tietHoc.indexOf(tiet);
+        for (let i = 1; i <= this.minBreakBetweenZones; i++) {
+            if (tietIndex - i >= 0) {
+                const prevTiet = this.tietHoc[tietIndex - i];
+                if (gvSchedule.tiet.includes(prevTiet)) return true;
+            }
+            if (tietIndex + i < this.tietHoc.length) {
+                const nextTiet = this.tietHoc[tietIndex + i];
+                if (gvSchedule.tiet.includes(nextTiet)) return true;
+            }
+        }
+        return false;
+    }
+
+    updateBusyMaps(
+        ngay, tietBatDau, tietKetThuc,
+        mgv, maphong, khu,
+        gvBusyMap, phongBusyMap
+    ) {
+        const gvKey = `${mgv}-${ngay}`;
+        if (!gvBusyMap.has(gvKey)) {
+            gvBusyMap.set(gvKey, { tiet: [], khu: [] });
+        }
+        const gvSchedule = gvBusyMap.get(gvKey);
+
+        const startIdx = this.tietHoc.indexOf(tietBatDau);
+        const endIdx = this.tietHoc.indexOf(tietKetThuc);
+
+        for (let i = startIdx; i <= endIdx; i++) {
+            const tiet = this.tietHoc[i];
+            gvSchedule.tiet.push(tiet);
+            gvSchedule.khu.push(khu);
+
+            const phongKey = `${maphong}-${ngay}-${tiet}`;
+            phongBusyMap.set(phongKey, true);
+        }
+    }
+
+    calculatePriority(monHoc) {
+        return monHoc.sotinchi * 10 + monHoc.totalSvCount;
+    }
+
+    countPossibleRooms(monHoc, phonghocs) {
+        return phonghocs.filter(ph =>
+            ph.succhua >= monHoc.totalSvCount
+        ).length;
+    }
+
     isGeneralSubject(khoa) {
         const generalDepartments = [
             'Khoa học cơ bản',
@@ -491,235 +722,6 @@ class EnhancedTKBAlgorithm {
         }
 
         return false; // Không vượt quá
-    }
-
-    processMonHocGroups(monhocs, nhommhs, dangkys) {
-        return monhocs.map(monHoc => {
-            const nhom = nhommhs.filter(n => n.mamh === monHoc.mamh);
-            const totalSvCount = nhom
-                .reduce((sum, g) => sum + dangkys.filter(d => d.manhom === g.manhom).length, 0);
-
-            return {
-                ...monHoc,
-                nhom: nhom.map(g => ({
-                    ...g,
-                    svCount: dangkys.filter(d => d.manhom === g.manhom).length
-                })),
-                totalSvCount
-            };
-        });
-    }
-
-    groupByCreditType(monhocs) {
-        return monhocs.reduce((groups, monHoc) => {
-            const credit = monHoc.sotinchi || 3;
-            if (!groups[credit]) groups[credit] = [];
-            groups[credit].push(monHoc);
-            return groups;
-        }, {});
-    }
-    // thuật toán tham lam
-    // Backtracking
-    async scheduleMonHoc(monHoc, phonghocs, giangviens, tkb,
-        gvBusyMap, phongBusyMap,
-        nhommhs, hocky) {
-        const { manhom, sotinchi, totalSvCount, mgv } = monHoc;
-        const nhomMonHoc = nhommhs.find(n => n.manhom === manhom);
-        if (!nhomMonHoc) return false;
-
-        const giangVien = giangviens.find(gv => gv.mgv === mgv);
-        if (!giangVien) return false;
-
-        const schedulePattern = this.getSchedulePattern(sotinchi || 3);
-        const suitableRooms = phonghocs
-            .filter(ph => ph.succhua >= totalSvCount)
-            .sort((a, b) => a.succhua - b.succhua);
-
-        for (const pattern of schedulePattern) {
-            for (const phong of suitableRooms) {
-                const scheduledDays = new Set();
-                const tempEntries = [];
-
-                for (const session of pattern.sessions) {
-                    const scheduled = this.tryScheduleSession(
-                        monHoc, giangVien, phong,
-                        gvBusyMap, phongBusyMap,
-                        session.tietCount, scheduledDays,
-                        hocky
-                    );
-                    if (!scheduled) {
-                        break;
-                    }
-                    tempEntries.push(scheduled);
-                    scheduledDays.add(scheduled.thu);
-                }
-
-                if (scheduledDays.size === pattern.sessions.length) {
-                    for (const e of tempEntries) {
-                        tkb.push(e);
-                    }
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    isGvOverloaded(mgv, ngay, gvBusyMap) {
-        const gvKey = `${mgv}-${ngay}`;
-        const gvSchedule = gvBusyMap.get(gvKey) || { tiet: [] };
-        return gvSchedule.tiet.length >= this.maxTietPerDay;
-    }
-
-    tryScheduleSession(monHoc, giangVien, phongHoc,
-        gvBusyMap, phongBusyMap,
-        tietCount, scheduledDays, hocky) {
-
-        const fmt = d => new Date(d).toISOString().slice(0, 10);
-
-        const availableDays = this.ngayHoc.filter(thu =>
-            !scheduledDays.has(thu) &&
-            !this.isGvOverloaded(giangVien.mgv, thu, gvBusyMap)
-        );
-
-        for (const thu of availableDays) {
-            const consecutiveSlots = this.findConsecutiveSlotsWithZones(
-                thu,
-                tietCount,
-                phongHoc.maphong,
-                giangVien.mgv,
-                gvBusyMap,
-                phongBusyMap
-            );
-
-            if (consecutiveSlots.length >= tietCount) {
-                const slotStart = consecutiveSlots[0];
-                const slotEnd = consecutiveSlots[tietCount - 1];
-                const tietBatDau = this.tietHoc.indexOf(slotStart) + 1;
-                const tietKetThuc = this.tietHoc.indexOf(slotEnd) + 1;
-                if (!(
-                    (tietBatDau >= 1 && tietKetThuc <= 5) ||
-                    (tietBatDau >= 6 && tietKetThuc <= 13)
-                )) {
-                    continue;
-                }
-
-                const ngaybd = new Date(hocky.ngaybd);
-                const durationWeeks = monHoc.sotinchi <= 2 ? 8 : this.weekCount;
-                const ngaykt = new Date(ngaybd);
-                ngaykt.setDate(ngaybd.getDate() + (durationWeeks * 7) - 1);
-
-                this.updateBusyMaps(
-                    thu,
-                    slotStart,
-                    slotEnd,
-                    giangVien.mgv,
-                    phongHoc.maphong,
-                    phongHoc.khu,
-                    gvBusyMap,
-                    phongBusyMap
-                );
-
-                return {
-                    manhom: monHoc.manhom,
-                    maphong: phongHoc.maphong,
-                    thu,
-                    tietbd: tietBatDau,
-                    tietkt: tietKetThuc,
-                    ngaybd: fmt(ngaybd),
-                    ngaykt: fmt(ngaykt)
-                };
-            }
-        }
-
-        return null;
-    }
-
-    findConsecutiveSlotsWithZones(ngay, soTiet, maphong, mgv, gvBusyMap, phongBusyMap) {
-        const gvKey = `${mgv}-${ngay}`;
-        const gvSchedule = gvBusyMap.get(gvKey) || { tiet: [], khu: [] };
-
-        const availableSlots = this.tietHoc.filter(tiet => {
-            const phongKey = `${maphong}-${ngay}-${tiet}`;
-            return !phongBusyMap.has(phongKey) &&
-                !gvSchedule.tiet.includes(tiet);
-        });
-
-        let bestSlots = [], currentSlots = [];
-        for (const tiet of availableSlots) {
-            if (currentSlots.length === 0 || this.isNextSlot(currentSlots[currentSlots.length - 1], tiet)) {
-                if (!this.hasGvZoneConflict(ngay, tiet, mgv, gvSchedule)) {
-                    currentSlots.push(tiet);
-                    if (currentSlots.length === soTiet) {
-                        bestSlots = currentSlots.slice();
-                        break;
-                    }
-                } else {
-                    currentSlots = [];
-                }
-            } else {
-                if (!this.hasGvZoneConflict(ngay, tiet, mgv, gvSchedule)) {
-                    currentSlots = [tiet];
-                } else {
-                    currentSlots = [];
-                }
-            }
-        }
-        return bestSlots;
-    }
-    isNextSlot(prevTiet, currentTiet) {
-        const prevIndex = this.tietHoc.indexOf(prevTiet);
-        const currentIndex = this.tietHoc.indexOf(currentTiet);
-        return currentIndex === prevIndex + 1;
-    }
-    hasGvZoneConflict(ngay, tiet, mgv, gvSchedule) {
-        const tietIndex = this.tietHoc.indexOf(tiet);
-        for (let i = 1; i <= this.minBreakBetweenZones; i++) {
-            if (tietIndex - i >= 0) {
-                const prevTiet = this.tietHoc[tietIndex - i];
-                if (gvSchedule.tiet.includes(prevTiet)) return true;
-            }
-            if (tietIndex + i < this.tietHoc.length) {
-                const nextTiet = this.tietHoc[tietIndex + i];
-                if (gvSchedule.tiet.includes(nextTiet)) return true;
-            }
-        }
-        return false;
-    }
-
-    updateBusyMaps(
-        ngay, tietBatDau, tietKetThuc,
-        mgv, maphong, khu,
-        gvBusyMap, phongBusyMap
-    ) {
-        const gvKey = `${mgv}-${ngay}`;
-        if (!gvBusyMap.has(gvKey)) {
-            gvBusyMap.set(gvKey, { tiet: [], khu: [] });
-        }
-        const gvSchedule = gvBusyMap.get(gvKey);
-
-        const startIdx = this.tietHoc.indexOf(tietBatDau);
-        const endIdx = this.tietHoc.indexOf(tietKetThuc);
-
-        for (let i = startIdx; i <= endIdx; i++) {
-            const tiet = this.tietHoc[i];
-            gvSchedule.tiet.push(tiet);
-            gvSchedule.khu.push(khu);
-
-            const phongKey = `${maphong}-${ngay}-${tiet}`;
-            phongBusyMap.set(phongKey, true);
-        }
-    }
-
-    calculatePriority(monHoc) {
-        return monHoc.sotinchi * 10 + monHoc.totalSvCount;
-    }
-
-    countPossibleRooms(monHoc, phonghocs) {
-        return phonghocs.filter(ph =>
-            ph.succhua >= monHoc.totalSvCount
-        ).length;
     }
 
     async saveTKBToDatabase(tkb, mahk) {
