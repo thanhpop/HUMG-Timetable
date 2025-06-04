@@ -95,7 +95,7 @@ export default function EditSemester() {
             <h2 className="form-title">Chỉnh sửa Học kỳ</h2>
             <form onSubmit={onSubmit} className="two-column-form">
 
-                <label htmlFor="mahk">Mã HK*</label>
+                <label htmlFor="mahk">Mã HK<span style={{ color: 'red' }}>(*)</span></label>
                 <input
                     id="mahk"
                     name="mahk"
@@ -103,7 +103,7 @@ export default function EditSemester() {
                     disabled
                 />
 
-                <label htmlFor="tenhk">Tên HK*</label>
+                <label htmlFor="tenhk">Tên HK<span style={{ color: 'red' }}>(*)</span></label>
                 <select
                     id="tenhk"
                     name="tenhk"
@@ -117,7 +117,7 @@ export default function EditSemester() {
                     <option value="Học kỳ 3">Học kỳ 3</option>
                 </select>
 
-                <label htmlFor="namhoc">Năm học*</label>
+                <label htmlFor="namhoc">Năm học<span style={{ color: 'red' }}>(*)</span></label>
                 <input
                     id="namhoc"
                     name="namhoc"
@@ -128,7 +128,7 @@ export default function EditSemester() {
                 />
                 {errorNamhoc && <div className="error-message">{errorNamhoc}</div>}
 
-                <label htmlFor="ngaybd">Ngày bắt đầu*</label>
+                <label htmlFor="ngaybd">Ngày bắt đầu<span style={{ color: 'red' }}>(*)</span></label>
                 <input
                     id="ngaybd"
                     name="ngaybd"
@@ -138,7 +138,7 @@ export default function EditSemester() {
                     required
                 />
 
-                <label htmlFor="ngaykt">Ngày kết thúc*</label>
+                <label htmlFor="ngaykt">Ngày kết thúc<span style={{ color: 'red' }}>(*)</span></label>
                 <input
                     id="ngaykt"
                     name="ngaykt"

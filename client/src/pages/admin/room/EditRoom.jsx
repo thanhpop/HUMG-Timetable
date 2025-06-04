@@ -38,14 +38,14 @@ export default function EditRoom() {
         <div className="form-card">
             <h2>Chỉnh sửa Phòng học</h2>
             <form onSubmit={onSubmit} className="two-column-form">
-                <label>Mã phòng*</label>
+                <label>Mã phòng<span style={{ color: 'red' }}>(*)</span></label>
                 <input name="maphong" value={form.maphong} disabled />
                 {err && <div className="error-message">{err}</div>}
 
-                <label>Tên phòng*</label>
+                <label>Tên phòng<span style={{ color: 'red' }}>(*)</span></label>
                 <input name="tenphong" value={form.tenphong} onChange={onInput} required />
 
-                <label>Khu*</label>
+                <label>Khu<span style={{ color: 'red' }}>(*)</span></label>
                 <select name="khu" value={form.khu} onChange={onInput} required>
                     <option value="">Chọn khu</option>
                     <option value="A">Khu A</option>
@@ -53,7 +53,7 @@ export default function EditRoom() {
 
                 </select>
 
-                <label>Số lượng*</label>
+                <label>Số lượng<span style={{ color: 'red' }}>(*)</span></label>
                 <input name="succhua" type="number" min="0" value={form.succhua} onChange={onInput} required />
 
                 <div className="form-actions">

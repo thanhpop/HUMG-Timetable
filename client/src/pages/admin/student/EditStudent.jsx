@@ -63,15 +63,15 @@ export default function EditStudent() {
                 <form onSubmit={handleSubmit}
                     className="two-column-form">
 
-                    <label htmlFor="msv">Mã sinh viên</label>
+                    <label htmlFor="msv">Mã sinh viên<span style={{ color: 'red' }}>(*)</span></label>
                     <input id="msv" name="msv" type="number" pattern="\d*" value={form.msv} onChange={handleInput} disabled />
                     {error && (
                         <div className="error-message">{error}</div>
                     )}
-                    <label htmlFor="ten">Họ và tên</label>
+                    <label htmlFor="ten">Họ và tên<span style={{ color: 'red' }}>(*)</span></label>
                     <input id="ten" name="ten" value={form.ten} onChange={handleInput} />
 
-                    <label htmlFor="khoa">Khoa</label>
+                    <label htmlFor="khoa">Khoa<span style={{ color: 'red' }}>(*)</span></label>
                     <select
                         id="khoa"
                         name="khoa"
@@ -90,7 +90,7 @@ export default function EditStudent() {
                         <option value="Trắc địa - Bản đồ và Quản lý đất đai">Trắc địa - Bản đồ và Quản lý đất đai</option>
                         <option value="Xây dựng">Xây dựng</option>
                     </select>
-                    <label htmlFor="khoaHoc">Khóa học</label>
+                    <label htmlFor="khoaHoc">Khóa học<span style={{ color: 'red' }}>(*)</span></label>
                     <input
                         id="khoaHoc"
                         name="khoaHoc"
@@ -100,17 +100,17 @@ export default function EditStudent() {
                         onChange={handleInput}
                         required
                     />
-                    <label htmlFor="lop">Lớp</label>
+                    <label htmlFor="lop">Lớp<span style={{ color: 'red' }}>(*)</span></label>
                     <input id="lop" name="lop" value={form.lop} onChange={handleInput} />
 
-                    <label htmlFor="gioitinh">Giới tính</label>
+                    <label htmlFor="gioitinh">Giới tính<span style={{ color: 'red' }}>(*)</span></label>
                     <select id="gioitinh" name="gioitinh" value={form.gioitinh} onChange={handleInput}>
                         <option value="">Chọn giới tính</option>
                         <option value="Nam">Nam</option>
                         <option value="Nữ">Nữ</option>
                     </select>
 
-                    <label htmlFor="ngaysinh">Ngày sinh</label>
+                    <label htmlFor="ngaysinh">Ngày sinh<span style={{ color: 'red' }}>(*)</span></label>
                     <input id="ngaysinh" type="date" name="ngaysinh"
                         value={form.ngaysinh} onChange={handleInput} />
 

@@ -57,20 +57,20 @@ export default function EditCourse() {
             <div className="form-card">
                 <h2 className="form-title">Chỉnh sửa Môn học</h2>
                 <form onSubmit={onSubmit} className="two-column-form">
-                    <label htmlFor="mamh">Mã môn học *</label>
+                    <label htmlFor="mamh">Mã môn học <span style={{ color: 'red' }}>(*)</span></label>
                     <input
                         id="mamh" name="mamh" type="text"
-                        value={form.mamh} onChange={onInput} required disabled
+                        value={form.mamh} disabled
                     />
                     {error && <div className="error-message">{error}</div>}
 
-                    <label htmlFor="tenmh">Tên môn học *</label>
+                    <label htmlFor="tenmh">Tên môn học <span style={{ color: 'red' }}>(*)</span></label>
                     <input
                         id="tenmh" name="tenmh" type="text"
                         value={form.tenmh} onChange={onInput} required
                     />
 
-                    <label htmlFor="sotinchi">Số tín chỉ *</label>
+                    <label htmlFor="sotinchi">Số tín chỉ <span style={{ color: 'red' }}>(*)</span></label>
                     <select
                         id="sotinchi"
                         name="sotinchi"
@@ -85,7 +85,7 @@ export default function EditCourse() {
                         <option value="4">4</option>
                     </select>
 
-                    <label htmlFor="khoa">Khoa *</label>
+                    <label htmlFor="khoa">Khoa <span style={{ color: 'red' }}>(*)</span></label>
                     <select
                         id="khoa"
                         name="khoa"

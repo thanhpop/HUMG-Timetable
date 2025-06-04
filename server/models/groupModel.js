@@ -24,12 +24,19 @@ exports.create = ({ manhom, tennhom, mamh, mgv, mahk }) =>
     );
 
 // Cập nhật nhóm
-exports.update = (manhom, { tennhom, mamh, mgv, mahk }) =>
-    db.query(
-        'UPDATE nhommh SET tennhom = ?, mamh = ?, mgv = ?, mahk = ? WHERE manhom = ?',
-        [tennhom, mamh, mgv, mahk, manhom]
+exports.update = (oldManhom, { newManhom, tennhom, mamh, mgv, mahk }) => {
+    const manhomToSet = newManhom || oldManhom;
+    return db.query(
+        `UPDATE nhommh
+     SET manhom  = ?,
+         tennhom = ?,
+         mamh    = ?,
+         mgv     = ?,
+         mahk    = ?
+     WHERE manhom = ?`,
+        [manhomToSet, tennhom, mamh, mgv, mahk, oldManhom]
     );
-
+};
 // Xóa nhóm
 exports.remove = manhom =>
     db.query('DELETE FROM nhommh WHERE manhom = ?', [manhom]);

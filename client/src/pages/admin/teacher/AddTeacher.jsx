@@ -42,7 +42,7 @@ export default function AddTeacher() {
             <div className="form-card">
                 <h2 className="form-title">Thêm Giáo viên</h2>
                 <form onSubmit={onSubmit} className="two-column-form">
-                    <label htmlFor="mgv">Mã giảng viên*</label>
+                    <label htmlFor="mgv">Mã giảng viên<span style={{ color: 'red' }}>(*)</span></label>
                     <input
                         id="mgv"
                         name="mgv"
@@ -53,7 +53,7 @@ export default function AddTeacher() {
                     />
                     {error && <div className="error-message">{error}</div>}
 
-                    <label htmlFor="ten">Họ và tên*</label>
+                    <label htmlFor="ten">Họ và tên<span style={{ color: 'red' }}>(*)</span></label>
                     <input
                         id="ten"
                         name="ten"
@@ -63,7 +63,7 @@ export default function AddTeacher() {
                         required
                     />
 
-                    <label htmlFor="gioitinh">Giới tính</label>
+                    <label htmlFor="gioitinh">Giới tính<span style={{ color: 'red' }}>(*)</span></label>
                     <select
                         id="gioitinh"
                         name="gioitinh"
@@ -75,7 +75,7 @@ export default function AddTeacher() {
                         <option value="Nữ">Nữ</option>
                     </select>
 
-                    <label htmlFor="khoa">Khoa*</label>
+                    <label htmlFor="khoa">Khoa<span style={{ color: 'red' }}>(*)</span></label>
                     <select
                         id="khoa"
                         name="khoa"

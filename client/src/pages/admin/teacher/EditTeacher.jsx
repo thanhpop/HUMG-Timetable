@@ -51,7 +51,7 @@ export default function EditTeacher() {
             <div className="form-card">
                 <h2 className="form-title">Chỉnh sửa Giáo viên</h2>
                 <form onSubmit={handleSubmit} className="two-column-form">
-                    <label htmlFor="mgv">Mã giảng viên*</label>
+                    <label htmlFor="mgv">Mã giảng viên<span style={{ color: 'red' }}>(*)</span></label>
                     <input
                         id="mgv" name="mgv" type="text"
                         value={form.mgv} onChange={handleInput}
@@ -59,14 +59,14 @@ export default function EditTeacher() {
                         disabled
                     />
 
-                    <label htmlFor="ten">Họ và tên*</label>
+                    <label htmlFor="ten">Họ và tên<span style={{ color: 'red' }}>(*)</span></label>
                     <input
                         id="ten" name="ten" type="text"
                         value={form.ten} onChange={handleInput}
                         required
                     />
 
-                    <label htmlFor="gioitinh">Giới tính*</label>
+                    <label htmlFor="gioitinh">Giới tính<span style={{ color: 'red' }}>(*)</span></label>
                     <select
                         id="gioitinh" name="gioitinh"
                         value={form.gioitinh} onChange={handleInput}
@@ -77,7 +77,7 @@ export default function EditTeacher() {
                         <option value="Nữ">Nữ</option>
                     </select>
 
-                    <label htmlFor="khoa">Khoa*</label>
+                    <label htmlFor="khoa">Khoa<span style={{ color: 'red' }}>(*)</span></label>
                     <select
                         id="khoa"
                         name="khoa"

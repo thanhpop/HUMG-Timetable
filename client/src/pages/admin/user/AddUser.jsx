@@ -38,7 +38,7 @@ export default function AddUser() {
         <div className="form-card">
             <h2 className="form-title">Thêm user</h2>
             <form onSubmit={onSubmit} className="two-column-form">
-                <label>Username*</label>
+                <label>Username<span style={{ color: 'red' }}>(*)</span></label>
                 <input
                     name="username"
                     required
@@ -50,7 +50,7 @@ export default function AddUser() {
                 />
                 {error && <div className="error-message">{error}</div>}
 
-                <label>Password*</label>
+                <label>Password<span style={{ color: 'red' }}>(*)</span></label>
                 <input
                     name="password"
 
@@ -59,7 +59,7 @@ export default function AddUser() {
                     onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                 />
 
-                <label>Vai trò</label>
+                <label>Vai trò<span style={{ color: 'red' }}>(*)</span></label>
                 <select
                     name="vaitro"
                     value={form.vaitro}

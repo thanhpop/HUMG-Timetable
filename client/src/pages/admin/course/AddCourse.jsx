@@ -41,7 +41,7 @@ export default function AddCourse() {
                 <h2 className="form-title">Thêm Môn học</h2>
                 <form onSubmit={onSubmit} className="two-column-form">
                     {/* Mã môn học */}
-                    <label htmlFor="mamh">Mã môn học*</label>
+                    <label htmlFor="mamh">Mã môn học<span style={{ color: 'red' }}>(*)</span></label>
                     <input
                         id="mamh"
                         name="mamh"
@@ -53,7 +53,7 @@ export default function AddCourse() {
                     {error && <div className="error-message">{error}</div>}
 
                     {/* Tên môn học */}
-                    <label htmlFor="tenmh">Tên môn học*</label>
+                    <label htmlFor="tenmh">Tên môn học<span style={{ color: 'red' }}>(*)</span></label>
                     <input
                         id="tenmh"
                         name="tenmh"
@@ -64,7 +64,7 @@ export default function AddCourse() {
                     />
 
                     {/* Số tín chỉ */}
-                    <label htmlFor="sotinchi">Số tín chỉ*</label>
+                    <label htmlFor="sotinchi">Số tín chỉ<span style={{ color: 'red' }}>(*)</span></label>
                     <select
                         id="sotinchi"
                         name="sotinchi"
@@ -80,7 +80,7 @@ export default function AddCourse() {
                     </select>
 
                     {/* Khoa */}
-                    <label htmlFor="khoa">Khoa*</label>
+                    <label htmlFor="khoa">Khoa<span style={{ color: 'red' }}>(*)</span></label>
                     <select
                         id="khoa"
                         name="khoa"

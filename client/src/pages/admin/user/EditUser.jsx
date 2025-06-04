@@ -39,17 +39,17 @@ export default function EditUser() {
         <div className="form-card">
             <h2 className="form-title">Chỉnh sửa user</h2>
             <form onSubmit={handleSubmit} className="two-column-form">
-                <label>Username</label>
+                <label>Username<span style={{ color: 'red' }}>(*)</span></label>
                 <input value={form.username} disabled />
 
-                <label>Password</label>
+                <label>Password<span style={{ color: 'red' }}>(*)</span></label>
                 <input
                     type="text"
                     value={form.password}
                     onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                 />
 
-                <label>Vai trò</label>
+                <label>Vai trò<span style={{ color: 'red' }}>(*)</span></label>
                 {form.vaitro === 'admin' ? (
                     /* if it's an admin account, just show it as text */
                     <input type="text" value="Admin" disabled className="readonly-input" />

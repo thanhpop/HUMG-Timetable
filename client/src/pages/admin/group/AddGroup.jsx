@@ -115,14 +115,14 @@ export default function AddGroup() {
         <div className="form-card">
             <h2>Thêm Nhóm môn học</h2>
             <form onSubmit={onSubmit} className="two-column-form">
-                <label>Mã nhóm*</label>
+                <label>Mã nhóm<span style={{ color: 'red' }}>(*)</span></label>
                 <input name="manhom" value={form.manhom} onChange={onInput} required />
                 {error && <div className="error-message">{error}</div>}
 
-                <label>Tên nhóm*</label>
+                <label>Tên nhóm<span style={{ color: 'red' }}>(*)</span></label>
                 <input name="tennhom" value={form.tennhom} onChange={onInput} required />
 
-                <label>Mã môn học*</label>
+                <label>Mã môn học<span style={{ color: 'red' }}>(*)</span></label>
                 <Select
                     options={courses}
                     value={courses.find(c => c.value === form.mamh) || null}
@@ -132,7 +132,7 @@ export default function AddGroup() {
                     styles={customSelectStyles}
                 />
 
-                <label>Mã giảng viên*</label>
+                <label>Mã giảng viên<span style={{ color: 'red' }}>(*)</span></label>
                 <Select
                     options={teachers}
                     value={teachers.find(t => t.value === form.mgv) || null}
@@ -143,7 +143,7 @@ export default function AddGroup() {
                 />
 
 
-                <label>Mã học kỳ*</label>
+                <label>Mã học kỳ<span style={{ color: 'red' }}>(*)</span></label>
                 <Select
                     options={semesters}
                     value={semesters.find(s => s.value === form.mahk) || null}
